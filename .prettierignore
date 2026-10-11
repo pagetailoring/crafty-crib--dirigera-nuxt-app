@@ -1,0 +1,9 @@
+.cache
+.eslintcache
+.data
+.firebase
+.nitro
+.nuxt
+.output
+dist
+node_modules
