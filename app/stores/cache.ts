@@ -30,7 +30,7 @@ const withoutKey = <T>(record: Record<string, T>, key: string) =>
     Object.entries(record).filter(([entryKey]) => entryKey !== key)
   ) as Record<string, T>
 
-export const useDirigeraCacheStore = defineStore('dirigera-cache', () => {
+export const useDirigeraCacheStore = defineStore('cache', () => {
   const dirigera = useDirigera()
   const rooms = ref<CacheEntry<RoomSummary[]>>()
   const scenes = ref<CacheEntry<Scene[]>>()

@@ -3,7 +3,7 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Room } from '../../app/services/dirigera-client'
-import { useDirigeraCacheStore } from '../../app/stores/dirigera-cache'
+import { useDirigeraCacheStore } from '../../app/stores/cache'
 import { DIRIGERA_CACHE_TTL_MS } from '../../config/dirigera-cache'
 
 const { client } = vi.hoisted(() => ({
