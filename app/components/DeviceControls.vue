@@ -60,6 +60,26 @@ async function setSaturation(event: Event) {
   })
   emit('changed')
 }
+
+async function togglePlayback() {
+  const playback =
+    props.device.playback === 'playbackPlaying'
+      ? 'playbackPaused'
+      : 'playbackPlaying'
+  await dirigera.controlDevice(props.device.id, props.device.type, {
+    type: 'setPlayback',
+    playback,
+  })
+  emit('changed')
+}
+
+async function setPlayback(playback: 'playbackNext' | 'playbackPrevious') {
+  await dirigera.controlDevice(props.device.id, props.device.type, {
+    type: 'setPlayback',
+    playback,
+  })
+  emit('changed')
+}
 </script>
 
 <template>
@@ -138,5 +158,36 @@ async function setSaturation(event: Event) {
         @change="setSaturation"
       />
     </label>
+
+    <div v-if="device.playback != null" class="flex gap-2">
+      <UButton
+        color="neutral"
+        variant="outline"
+        :disabled="!device.isReachable || !device.playbackPreviousAvailable"
+        :aria-label="`Previous on ${device.name}`"
+        @click="setPlayback('playbackPrevious')"
+      >
+        Previous
+      </UButton>
+      <UButton
+        color="neutral"
+        variant="outline"
+        :disabled="!device.isReachable"
+        :loading="device.playback === 'playbackBuffering'"
+        :aria-label="`${device.playback === 'playbackPlaying' ? 'Pause' : 'Play'} ${device.name}`"
+        @click="togglePlayback"
+      >
+        {{ device.playback === 'playbackPlaying' ? 'Pause' : 'Play' }}
+      </UButton>
+      <UButton
+        color="neutral"
+        variant="outline"
+        :disabled="!device.isReachable || !device.playbackNextAvailable"
+        :aria-label="`Next on ${device.name}`"
+        @click="setPlayback('playbackNext')"
+      >
+        Next
+      </UButton>
+    </div>
   </div>
 </template>

@@ -119,4 +119,35 @@ describe('Device controls', () => {
       colorSaturation: 0.8,
     })
   })
+
+  it('pauses a playing device', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: { device: device({ playback: 'playbackPlaying' }) },
+    })
+
+    await wrapper.get('[aria-label="Pause Lamp"]').trigger('click')
+
+    expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+      type: 'setPlayback',
+      playback: 'playbackPaused',
+    })
+  })
+
+  it('moves playback to the next item', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: {
+        device: device({
+          playback: 'playbackPaused',
+          playbackNextAvailable: true,
+        }),
+      },
+    })
+
+    await wrapper.get('[aria-label="Next on Lamp"]').trigger('click')
+
+    expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+      type: 'setPlayback',
+      playback: 'playbackNext',
+    })
+  })
 })
