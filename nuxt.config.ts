@@ -1,12 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  app: {
-    head: {
-      htmlAttrs: { lang: 'en' },
-      title: 'Dirigera web',
-    },
-  },
-  css: ['~/assets/css/main.css'],
   modules: [
     '@nuxt/eslint',
     '@nuxt/hints',
@@ -16,15 +9,26 @@ export default defineNuxtConfig({
     '@nuxtjs/html-validator',
   ],
   devtools: { enabled: true },
-  compatibilityDate: '2025-07-15',
+  app: {
+    head: {
+      htmlAttrs: { lang: 'en' },
+      title: 'Dirigera web',
+    },
+  },
+  css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
-    dirigeraBaseUrl: process.env.DIRIGERA_BASE_URL ?? 'http://localhost:4000',
-    dirigeraPassword: process.env.DIRIGERA_PASSWORD ?? process.env.PASSWORD,
+    dirigeraGatewayIp: '',
+    dirigeraAccessToken: '',
     public: {
-      dirigeraWebSocketUrl:
-        process.env.DIRIGERA_WEBSOCKET_URL ?? 'ws://localhost:4000',
+      dirigeraWebSocketUrl: '',
     },
+  },
+  compatibilityDate: '2025-07-15',
+
+  nitro: {
+    preset: 'node-server',
+    experimental: { websocket: true },
   },
 
   typescript: {

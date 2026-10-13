@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "analyze": "nuxt analyze",
-    "build": "nuxt build --prerender",
+    "build": "nuxt build",
     "clean": "nuxt cleanup && rm -rf dist node_modules .firebase .output .nuxt",
     "dev": "run-s host:start",
     "dev:start": "nuxt dev",
@@ -26,11 +26,13 @@
     "test:watch": "vitest --watch",
     "test:unit": "vitest --project unit",
     "test:nuxt": "vitest --project nuxt",
-    "start": "run-s dev",
+    "start": "node .output/server/index.mjs",
     "up": "nuxt upgrade"
   },
   "dependencies": {
     "@nuxt/ui": "4.11.3",
+    "dirigera": "2.0.2",
+    "graphql": "^16.14.2",
     "nuxt": "^4.6.1",
     "vue": "^3.5.43",
     "vue-router": "^5.3.1"
