@@ -80,6 +80,15 @@ async function setPlayback(playback: 'playbackNext' | 'playbackPrevious') {
   })
   emit('changed')
 }
+
+async function setVolume(event: Event) {
+  const volume = Number((event.target as HTMLInputElement).value)
+  await dirigera.controlDevice(props.device.id, props.device.type, {
+    type: 'setVolume',
+    volume,
+  })
+  emit('changed')
+}
 </script>
 
 <template>
@@ -189,5 +198,26 @@ async function setPlayback(playback: 'playbackNext' | 'playbackPrevious') {
         Next
       </UButton>
     </div>
+
+    <label v-if="device.volume != null" class="block space-y-1 text-sm">
+      <span>Volume {{ device.volume }}%</span>
+      <input
+        type="range"
+        min="0"
+        max="50"
+        :value="device.volume"
+        :disabled="!device.isReachable"
+        :aria-label="`${device.name} volume`"
+        class="w-full accent-primary"
+        @change="setVolume"
+      />
+    </label>
+
+    <p v-if="device.playItem" class="text-sm">
+      Now playing: {{ device.playItem }}
+    </p>
+    <p v-if="device.nextPlayItem" class="text-sm">
+      Next: {{ device.nextPlayItem }}
+    </p>
   </div>
 </template>

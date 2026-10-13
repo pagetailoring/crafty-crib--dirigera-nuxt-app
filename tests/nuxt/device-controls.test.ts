@@ -150,4 +150,19 @@ describe('Device controls', () => {
       playback: 'playbackNext',
     })
   })
+
+  it('changes device volume', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: { device: device({ volume: 20 }) },
+    })
+
+    const input = wrapper.get('[aria-label="Lamp volume"]')
+    await input.setValue(30)
+    await input.trigger('change')
+
+    expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+      type: 'setVolume',
+      volume: 30,
+    })
+  })
 })
