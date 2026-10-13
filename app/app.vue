@@ -57,14 +57,16 @@ useDirigeraUpdates(() => {
 
 <template>
   <UApp>
+    <UHeader mode="drawer">
+      <template #title>
+        {{ APP_NAME }}
+      </template>
+    </UHeader>
+
     <NuxtPwaManifest />
     <NuxtRouteAnnouncer />
-    <main class="min-h-screen bg-default p-4 sm:p-6">
-      <header class="mb-6 flex items-center gap-3">
-        <NuxtLink to="/" class="text-3xl font-bold text-highlighted">
-          {{ APP_NAME }}
-        </NuxtLink>
-      </header>
+
+    <UContainer>
       <div
         v-if="unavailableMessage"
         class="mb-6 flex flex-wrap items-center gap-3"
@@ -90,7 +92,10 @@ useDirigeraUpdates(() => {
         title="Connecting to Dirigera"
         class="mb-6"
       />
+    </UContainer>
+
+    <UMain>
       <NuxtPage />
-    </main>
+    </UMain>
   </UApp>
 </template>
