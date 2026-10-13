@@ -1,0 +1,17 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+
+  "files.trimTrailingWhitespace": true,
+  "editor.wordWrap": "on",
+  "files.insertFinalNewline": true,
+
+  // Quiet mode
+  "files.exclude": {
+    // Main directories to exclude/include
+    ".nuxt": true,
+    "dist": true,
+    "**/node_modules": true,
+    ".eslintcache": true
+  }
+}
