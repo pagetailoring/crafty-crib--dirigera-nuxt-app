@@ -11,6 +11,11 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: '2025-07-15',
 
+  runtimeConfig: {
+    dirigeraBaseUrl: process.env.DIRIGERA_BASE_URL ?? 'http://localhost:4000',
+    dirigeraPassword: process.env.DIRIGERA_PASSWORD ?? process.env.PASSWORD,
+  },
+
   typescript: {
     typeCheck: true,
     strict: true,
