@@ -12,12 +12,40 @@ const { data, error, status } = await useAsyncData('home', async () => {
 const formatReading = (value: number) => Math.round(value * 10) / 10
 
 const activeSceneId = ref<string | null>(null)
+const activeQuickControlId = ref<string | null>(null)
 async function activateScene(id: string) {
   activeSceneId.value = id
   try {
     await dirigera.activateScene(id)
   } finally {
     activeSceneId.value = null
+  }
+}
+
+const quickControlNames = {
+  LIGHTS: 'lights',
+  OUTLETS: 'outlets',
+  SPEAKERS: 'speakers',
+} as const
+
+async function toggleQuickControl(
+  roomId: string,
+  control: {
+    id: string
+    type: keyof typeof quickControlNames
+    isOn: boolean | null
+  }
+) {
+  activeQuickControlId.value = control.id
+  try {
+    await dirigera.setQuickControl(
+      roomId,
+      control.type,
+      control.isOn == null ? null : !control.isOn
+    )
+    await refreshNuxtData('home')
+  } finally {
+    activeQuickControlId.value = null
   }
 }
 </script>
@@ -89,6 +117,26 @@ async function activateScene(id: string) {
           <UBadge v-if="room.co2 != null" color="neutral" variant="outline">
             CO2 {{ formatReading(room.co2) }}
           </UBadge>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <UButton
+            v-for="control in room.quickControls"
+            :key="control.id"
+            :color="control.isOn ? 'primary' : 'neutral'"
+            :variant="control.isOn ? 'solid' : 'outline'"
+            :loading="activeQuickControlId === control.id"
+            :aria-label="`Turn ${room.name} ${quickControlNames[control.type]} ${control.isOn ? 'off' : 'on'}`"
+            @click="toggleQuickControl(room.id, control)"
+          >
+            {{ quickControlNames[control.type] }}
+          </UButton>
+          <span
+            v-if="room.quickControls.length === 0"
+            class="text-sm text-muted"
+          >
+            No quick controls available
+          </span>
         </div>
       </UCard>
 

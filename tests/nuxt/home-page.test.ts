@@ -18,10 +18,13 @@ const { client } = vi.hoisted(() => ({
         pm25: 3,
         vocIndex: 98,
         co2: 612,
-        quickControls: [],
+        quickControls: [
+          { id: 'living-room-lights', type: 'LIGHTS', isOn: true },
+        ],
       },
     ]),
     activateScene: vi.fn().mockResolvedValue(undefined),
+    setQuickControl: vi.fn().mockResolvedValue(undefined),
   },
 }))
 
@@ -47,5 +50,19 @@ describe('Home page', () => {
     await wrapper.get('button').trigger('click')
 
     expect(client.activateScene).toHaveBeenCalledWith('all-off')
+  })
+
+  it('toggles a room quick control', async () => {
+    const wrapper = await mountSuspended(HomePage)
+
+    await wrapper
+      .get('[aria-label="Turn Living Room lights off"]')
+      .trigger('click')
+
+    expect(client.setQuickControl).toHaveBeenCalledWith(
+      'living-room',
+      'LIGHTS',
+      false
+    )
   })
 })
