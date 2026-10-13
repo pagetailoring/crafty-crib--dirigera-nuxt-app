@@ -1,3 +1,7 @@
+<script setup lang="ts">
+useDirigeraUpdates(() => refreshNuxtData())
+</script>
+
 <template>
   <UApp>
     <NuxtRouteAnnouncer />

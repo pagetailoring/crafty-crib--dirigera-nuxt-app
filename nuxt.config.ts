@@ -14,6 +14,10 @@ export default defineNuxtConfig({
   runtimeConfig: {
     dirigeraBaseUrl: process.env.DIRIGERA_BASE_URL ?? 'http://localhost:4000',
     dirigeraPassword: process.env.DIRIGERA_PASSWORD ?? process.env.PASSWORD,
+    public: {
+      dirigeraWebSocketUrl:
+        process.env.DIRIGERA_WEBSOCKET_URL ?? 'ws://localhost:4000',
+    },
   },
 
   typescript: {
