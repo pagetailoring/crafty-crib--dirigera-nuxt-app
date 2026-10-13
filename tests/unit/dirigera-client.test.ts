@@ -40,4 +40,123 @@ describe('Dirigera client', () => {
     expect(request).toHaveBeenCalledOnce()
     expect(request).toHaveBeenCalledWith(expect.stringContaining('query Rooms'))
   })
+
+  it('lists scenes', async () => {
+    const request = vi.fn().mockResolvedValue({
+      scenes: [
+        { id: 'all-off', name: 'All off' },
+        { id: 'evening', name: 'Evening' },
+      ],
+    })
+
+    const client = createDirigeraClient(request)
+
+    await expect(client.listScenes()).resolves.toEqual([
+      { id: 'all-off', name: 'All off' },
+      { id: 'evening', name: 'Evening' },
+    ])
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('query Scenes')
+    )
+  })
+
+  it('activates a scene', async () => {
+    const request = vi.fn().mockResolvedValue({ activateScene: null })
+    const client = createDirigeraClient(request)
+
+    await client.activateScene('evening')
+
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('mutation ActivateScene'),
+      { id: 'evening' }
+    )
+  })
+
+  it('loads a room with its devices', async () => {
+    const room = {
+      id: 'living-room',
+      name: 'Living Room',
+      devices: [
+        {
+          id: 'lamp',
+          name: 'Lamp',
+          type: 'DEVICE',
+          isReachable: true,
+          lastSeen: '2026-10-13T01:00:00.000Z',
+          batteryPercentage: null,
+          isOn: true,
+          lightLevel: 70,
+          colorTemperature: 3000,
+          colorSaturation: 0.5,
+          colorHue: 120,
+          playback: null,
+          playbackNextAvailable: null,
+          playbackPreviousAvailable: null,
+          volume: null,
+          playItem: null,
+          nextPlayItem: null,
+          temperature: null,
+          humidity: null,
+          pm25: null,
+          vocIndex: null,
+          co2: null,
+          isOpen: null,
+          isDetected: null,
+          illuminance: null,
+        },
+      ],
+    }
+    const request = vi.fn().mockResolvedValue({ room })
+    const client = createDirigeraClient(request)
+
+    await expect(client.getRoom('living-room')).resolves.toEqual(room)
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('query Room'),
+      {
+        id: 'living-room',
+      }
+    )
+  })
+
+  it('changes a room quick control', async () => {
+    const request = vi.fn().mockResolvedValue({ quickControl: null })
+    const client = createDirigeraClient(request)
+
+    await client.setQuickControl('living-room', 'LIGHTS', false)
+
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('mutation QuickControl'),
+      { roomId: 'living-room', type: 'LIGHTS', isOn: false }
+    )
+  })
+
+  it('switches a device on or off', async () => {
+    const request = vi.fn().mockResolvedValue({ setIsOn: true })
+    const client = createDirigeraClient(request)
+
+    await client.controlDevice('lamp', 'DEVICE', {
+      type: 'setIsOn',
+      isOn: false,
+    })
+
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('mutation SetIsOn'),
+      { id: 'lamp', type: 'DEVICE', isOn: false }
+    )
+  })
+
+  it('changes a device light level', async () => {
+    const request = vi.fn().mockResolvedValue({ setLightLevel: true })
+    const client = createDirigeraClient(request)
+
+    await client.controlDevice('lamp', 'DEVICE_SET', {
+      type: 'setLightLevel',
+      lightLevel: 45,
+    })
+
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('mutation SetLightLevel'),
+      { id: 'lamp', type: 'DEVICE_SET', lightLevel: 45 }
+    )
+  })
 })
