@@ -159,4 +159,42 @@ describe('Dirigera client', () => {
       { id: 'lamp', type: 'DEVICE_SET', lightLevel: 45 }
     )
   })
+
+  it('changes a device color temperature', async () => {
+    const request = vi.fn().mockResolvedValue({ setColorTemperature: true })
+    const client = createDirigeraClient(request)
+
+    await client.controlDevice('lamp', 'DEVICE', {
+      type: 'setColorTemperature',
+      colorTemperature: 3000,
+    })
+
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('mutation SetColorTemperature'),
+      { id: 'lamp', type: 'DEVICE', colorTemperature: 3000 }
+    )
+  })
+
+  it('changes a device hue and saturation together', async () => {
+    const request = vi
+      .fn()
+      .mockResolvedValue({ setColorHueAndSaturation: true })
+    const client = createDirigeraClient(request)
+
+    await client.controlDevice('lamp', 'DEVICE', {
+      type: 'setColor',
+      colorHue: 120,
+      colorSaturation: 0.75,
+    })
+
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('mutation SetColorHueAndSaturation'),
+      {
+        id: 'lamp',
+        type: 'DEVICE',
+        colorHue: 120,
+        colorSaturation: 0.75,
+      }
+    )
+  })
 })

@@ -66,6 +66,8 @@ type GraphqlRequest = <T>(
 export type DeviceCommand =
   | { type: 'setIsOn'; isOn: boolean }
   | { type: 'setLightLevel'; lightLevel: number }
+  | { type: 'setColorTemperature'; colorTemperature: number }
+  | { type: 'setColor'; colorHue: number; colorSaturation: number }
 
 const roomsQuery = `
   query Rooms {
@@ -159,6 +161,36 @@ const setLightLevelMutation = `
   }
 `
 
+const setColorTemperatureMutation = `
+  mutation SetColorTemperature(
+    $id: String!
+    $type: ControlType!
+    $colorTemperature: Int!
+  ) {
+    setColorTemperature(
+      id: $id
+      type: $type
+      colorTemperature: $colorTemperature
+    )
+  }
+`
+
+const setColorMutation = `
+  mutation SetColorHueAndSaturation(
+    $id: String!
+    $type: ControlType!
+    $colorHue: Float!
+    $colorSaturation: Float!
+  ) {
+    setColorHueAndSaturation(
+      id: $id
+      type: $type
+      colorHue: $colorHue
+      colorSaturation: $colorSaturation
+    )
+  }
+`
+
 export function createDirigeraClient(request: GraphqlRequest) {
   return {
     async listRooms() {
@@ -184,6 +216,25 @@ export function createDirigeraClient(request: GraphqlRequest) {
       await request(quickControlMutation, { roomId, type, isOn })
     },
     async controlDevice(id: string, type: ControlType, command: DeviceCommand) {
+      if (command.type === 'setColor') {
+        await request(setColorMutation, {
+          id,
+          type,
+          colorHue: command.colorHue,
+          colorSaturation: command.colorSaturation,
+        })
+        return
+      }
+
+      if (command.type === 'setColorTemperature') {
+        await request(setColorTemperatureMutation, {
+          id,
+          type,
+          colorTemperature: command.colorTemperature,
+        })
+        return
+      }
+
       if (command.type === 'setLightLevel') {
         await request(setLightLevelMutation, {
           id,
