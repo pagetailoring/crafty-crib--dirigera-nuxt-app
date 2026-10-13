@@ -194,8 +194,11 @@ describe('integrated Dirigera backend', () => {
     const { backend, hub } = fixture()
     const connect = vi.fn().mockResolvedValue(backend)
     const connection = createDirigeraConnection(connect)
+    expect(connection.getStatus()).toEqual({ state: 'idle' })
     await Promise.all([connection.getClient(), connection.getClient()])
+    expect(connection.getStatus()).toMatchObject({ state: 'ready' })
     expect(connect).toHaveBeenCalledOnce()
+    expect(hub.home).toHaveBeenCalledOnce()
     expect(hub.startListeningForUpdates).toHaveBeenCalledOnce()
     const notify = vi.fn()
     const unsubscribe = connection.subscribe(notify)
@@ -220,7 +223,31 @@ describe('integrated Dirigera backend', () => {
       .mockResolvedValue(backend)
     const connection = createDirigeraConnection(connect)
     await expect(connection.getClient()).rejects.toThrow('offline')
+    expect(connection.getStatus()).toMatchObject({
+      state: 'unavailable',
+      reason: 'hub-unreachable',
+    })
     await expect(connection.getClient()).resolves.toBe(backend)
+    expect(connection.getStatus()).toMatchObject({ state: 'ready' })
+    await connection.close()
+  })
+
+  it('allows retry after a failed hub probe', async () => {
+    const { backend, hub } = fixture()
+    hub.home.mockRejectedValueOnce(new Error('offline'))
+    const connect = vi.fn().mockResolvedValue(backend)
+    const connection = createDirigeraConnection(connect)
+
+    await expect(connection.getClient()).rejects.toThrow('offline')
+    expect(connection.getStatus()).toMatchObject({
+      state: 'unavailable',
+      reason: 'hub-unreachable',
+    })
+    expect(hub.startListeningForUpdates).not.toHaveBeenCalled()
+
+    await expect(connection.getClient()).resolves.toBe(backend)
+    expect(connect).toHaveBeenCalledTimes(2)
+    expect(connection.getStatus()).toMatchObject({ state: 'ready' })
     await connection.close()
   })
 
