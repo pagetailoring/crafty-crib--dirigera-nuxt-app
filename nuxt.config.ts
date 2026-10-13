@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
 
     '@nuxtjs/html-validator',
+    '@pinia/nuxt',
   ],
   devtools: { enabled: true },
   app: {
