@@ -53,6 +53,9 @@ describe('Room page', () => {
     expect(wrapper.text()).toContain('Living Room')
     expect(wrapper.text()).toContain('Environment sensor')
     expect(wrapper.text()).toContain('Unreachable')
+    expect(wrapper.text()).toContain(
+      new Date('2026-10-13T01:00:00.000Z').toLocaleString()
+    )
     expect(wrapper.text()).toContain('Battery 92%')
     expect(wrapper.text()).toContain('Open')
     expect(wrapper.text()).toContain('Temperature 22.46°C')

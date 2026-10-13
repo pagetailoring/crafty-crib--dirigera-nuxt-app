@@ -26,8 +26,11 @@ describe('Dirigera update subscription', () => {
     const messageListener = socket.addEventListener.mock.calls.find(
       ([name]) => name === 'message'
     )?.[1]
-    messageListener()
-    listeners.get('visibilitychange')?.()
+    messageListener({ data: 'ignored' })
+    expect(refresh).not.toHaveBeenCalled()
+
+    messageListener({ data: 'update' })
+    listeners.get('visibilitychange')?.({})
 
     expect(refresh).toHaveBeenCalledTimes(2)
 

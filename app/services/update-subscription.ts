@@ -1,5 +1,10 @@
 interface EventTargetLike {
-  addEventListener(name: string, listener: () => void): void
+  addEventListener(name: string, listener: (event: EventLike) => void): void
+}
+
+interface EventLike {
+  type?: string
+  data?: unknown
 }
 
 interface DocumentLike extends EventTargetLike {
@@ -23,11 +28,14 @@ export function createUpdateSubscription({
   openWebSocket: (url: string) => WebSocketLike
 }) {
   const socket = openWebSocket(url)
+  const refreshAfterUpdate = (event: EventLike) => {
+    if (event.data === 'update') refresh()
+  }
   const refreshWhenVisible = () => {
     if (!document.hidden) refresh()
   }
 
-  socket.addEventListener('message', refresh)
+  socket.addEventListener('message', refreshAfterUpdate)
   document.addEventListener('visibilitychange', refreshWhenVisible)
 
   return () => {

@@ -1,0 +1,1 @@
+export const DIRIGERA_CACHE_TTL_MS = 30_000

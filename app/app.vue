@@ -1,5 +1,20 @@
 <script setup lang="ts">
-useDirigeraUpdates(() => refreshNuxtData())
+const route = useRoute()
+const cache = useDirigeraCacheStore()
+
+useDirigeraUpdates(() => {
+  cache.invalidateAll()
+  let refresh: Promise<unknown>
+  if (route.name === 'room-id') {
+    refresh = cache.loadRoom(String(route.params.id), { force: true })
+  } else {
+    refresh = cache.loadHome({ force: true })
+  }
+
+  void refresh.catch(error =>
+    console.error('Unable to refresh Dirigera data', error)
+  )
+})
 </script>
 
 <template>

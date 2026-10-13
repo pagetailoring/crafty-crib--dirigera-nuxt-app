@@ -16,8 +16,9 @@ export function useDirigeraUpdates(refresh: () => void) {
       openWebSocket: socketUrl => {
         const socket = new WebSocket(socketUrl)
         return {
-          addEventListener: (name, listener) =>
-            socket.addEventListener(name, listener),
+          addEventListener: (name, listener) => {
+            socket.addEventListener(name, event => listener(event))
+          },
           close: () => socket.close(),
         }
       },

@@ -1,5 +1,6 @@
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
-import { describe, expect, it, vi } from 'vitest'
+import { flushPromises } from '@vue/test-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import DeviceControls from '../../app/components/DeviceControls.vue'
 import type { Device } from '../../app/services/dirigera-client'
@@ -43,6 +44,13 @@ const device = (overrides: Partial<Device> = {}): Device => ({
 })
 
 describe('Device controls', () => {
+  beforeEach(() => {
+    client.controlDevice.mockReset().mockResolvedValue(undefined)
+    client.getPlayItemImage
+      .mockReset()
+      .mockResolvedValue('data:image/png;base64,image')
+  })
+
   it('toggles device power', async () => {
     const wrapper = await mountSuspended(DeviceControls, {
       props: { device: device({ isOn: true }) },
@@ -68,6 +76,24 @@ describe('Device controls', () => {
       type: 'setLightLevel',
       lightLevel: 45,
     })
+  })
+
+  it('disables the light level while its command is pending', async () => {
+    const command = Promise.withResolvers<undefined>()
+    client.controlDevice.mockReturnValueOnce(command.promise)
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: { device: device({ lightLevel: 70 }) },
+    })
+    const input = wrapper.get('[aria-label="Lamp light level"]')
+
+    await input.setValue(45)
+    await input.trigger('change')
+
+    expect(input.attributes('disabled')).toBeDefined()
+
+    command.resolve(undefined)
+    await flushPromises()
+    expect(input.attributes('disabled')).toBeUndefined()
   })
 
   it('changes device color temperature', async () => {
@@ -121,6 +147,27 @@ describe('Device controls', () => {
     })
   })
 
+  it('uses refreshed saturation when changing hue', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: {
+        device: device({ colorHue: 20, colorSaturation: 0.25 }),
+      },
+    })
+
+    await wrapper.setProps({
+      device: device({ colorHue: 30, colorSaturation: 0.9 }),
+    })
+    const input = wrapper.get('[aria-label="Lamp hue"]')
+    await input.setValue(120)
+    await input.trigger('change')
+
+    expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+      type: 'setColor',
+      colorHue: 120,
+      colorSaturation: 0.9,
+    })
+  })
+
   it('pauses a playing device', async () => {
     const wrapper = await mountSuspended(DeviceControls, {
       props: { device: device({ playback: 'playbackPlaying' }) },
@@ -131,6 +178,35 @@ describe('Device controls', () => {
     expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
       type: 'setPlayback',
       playback: 'playbackPaused',
+    })
+  })
+
+  it.each(['playbackBuffering', 'playbackIdle'])(
+    'pauses a device in the %s state',
+    async playback => {
+      const wrapper = await mountSuspended(DeviceControls, {
+        props: { device: device({ playback }) },
+      })
+
+      await wrapper.get('[aria-label="Pause Lamp"]').trigger('click')
+
+      expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+        type: 'setPlayback',
+        playback: 'playbackPaused',
+      })
+    }
+  )
+
+  it('plays a paused device', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: { device: device({ playback: 'playbackPaused' }) },
+    })
+
+    await wrapper.get('[aria-label="Play Lamp"]').trigger('click')
+
+    expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+      type: 'setPlayback',
+      playback: 'playbackPlaying',
     })
   })
 

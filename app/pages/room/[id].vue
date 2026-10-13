@@ -2,17 +2,17 @@
 import type { Device } from '../../services/dirigera-client'
 
 const route = useRoute()
-const dirigera = useDirigera()
+const cache = useDirigeraCacheStore()
+const { roomById, pending } = storeToRefs(cache)
 const roomId = computed(() => String(route.params.id))
+const room = computed(() => roomById.value[roomId.value]?.data ?? null)
+const error = ref<Error | null>(null)
 
-const {
-  data: room,
-  error,
-  status,
-} = await useAsyncData(
-  () => `room-${roomId.value}`,
-  () => dirigera.getRoom(roomId.value)
-)
+try {
+  await cache.loadRoom(roomId.value)
+} catch (cause) {
+  error.value = cause instanceof Error ? cause : new Error(String(cause))
+}
 
 const format = (value: number) => Math.round(value * 100) / 100
 
@@ -34,8 +34,6 @@ const readings = (device: Device) =>
       : `Motion detected ${device.isDetected ? 'yes' : 'no'}`,
     device.illuminance == null ? null : `Illuminance ${device.illuminance} lx`,
   ].filter((reading): reading is string => reading !== null)
-
-const refreshRoom = () => refreshNuxtData(`room-${roomId.value}`)
 </script>
 
 <template>
@@ -60,12 +58,13 @@ const refreshRoom = () => refreshNuxtData(`room-${roomId.value}`)
           <div class="flex items-center justify-between gap-3">
             <h2 class="font-semibold">{{ device.name }}</h2>
             <UBadge v-if="!device.isReachable" color="warning" variant="subtle">
-              Unreachable
+              Unreachable. Last seen
+              {{ new Date(device.lastSeen).toLocaleString() }}
             </UBadge>
           </div>
         </template>
 
-        <DeviceControls :device="device" class="mb-4" @changed="refreshRoom" />
+        <DeviceControls :device="device" class="mb-4" />
 
         <dl class="space-y-2 text-sm">
           <div v-for="reading in readings(device)" :key="reading">
@@ -74,7 +73,7 @@ const refreshRoom = () => refreshNuxtData(`room-${roomId.value}`)
         </dl>
       </UCard>
 
-      <UCard v-if="status === 'pending'">
+      <UCard v-if="pending[`room:${roomId}`]">
         <USkeleton class="h-32" />
       </UCard>
     </div>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-const dirigera = useDirigera()
+const cache = useDirigeraCacheStore()
+const { rooms, scenes, pending } = storeToRefs(cache)
+const error = ref<Error | null>(null)
 
-const { data, error, status } = await useAsyncData('home', async () => {
-  const [scenes, rooms] = await Promise.all([
-    dirigera.listScenes(),
-    dirigera.listRooms(),
-  ])
-  return { scenes, rooms }
-})
+try {
+  await cache.loadHome()
+} catch (cause) {
+  error.value = cause instanceof Error ? cause : new Error(String(cause))
+}
 
 const formatReading = (value: number) => Math.round(value * 10) / 10
 
@@ -16,7 +16,7 @@ const activeQuickControlId = ref<string | null>(null)
 async function activateScene(id: string) {
   activeSceneId.value = id
   try {
-    await dirigera.activateScene(id)
+    await cache.activateScene(id)
   } finally {
     activeSceneId.value = null
   }
@@ -38,12 +38,11 @@ async function toggleQuickControl(
 ) {
   activeQuickControlId.value = control.id
   try {
-    await dirigera.setQuickControl(
+    await cache.setQuickControl(
       roomId,
       control.type,
       control.isOn == null ? null : !control.isOn
     )
-    await refreshNuxtData('home')
   } finally {
     activeQuickControlId.value = null
   }
@@ -55,7 +54,7 @@ async function toggleQuickControl(
     <h1 class="sr-only">Dirigera home</h1>
     <div class="flex flex-wrap gap-2">
       <UButton
-        v-for="scene in data?.scenes"
+        v-for="scene in scenes?.data"
         :key="scene.id"
         color="neutral"
         variant="outline"
@@ -64,7 +63,7 @@ async function toggleQuickControl(
       >
         {{ scene.name }}
       </UButton>
-      <USkeleton v-if="status === 'pending'" class="h-8 w-24" />
+      <USkeleton v-if="pending.scenes" class="h-8 w-24" />
     </div>
 
     <UAlert
@@ -75,7 +74,7 @@ async function toggleQuickControl(
     />
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <UCard v-for="room in data?.rooms" :key="room.id">
+      <UCard v-for="room in rooms?.data" :key="room.id">
         <template #header>
           <div class="flex items-center justify-between gap-3">
             <h2 class="font-semibold">{{ room.name }}</h2>
@@ -141,7 +140,7 @@ async function toggleQuickControl(
         </div>
       </UCard>
 
-      <UCard v-if="status === 'pending'">
+      <UCard v-if="pending.rooms">
         <USkeleton class="h-24" />
       </UCard>
     </div>
