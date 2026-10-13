@@ -21,6 +21,7 @@ const { client } = vi.hoisted(() => ({
         quickControls: [],
       },
     ]),
+    activateScene: vi.fn().mockResolvedValue(undefined),
   },
 }))
 
@@ -38,5 +39,13 @@ describe('Home page', () => {
     expect(wrapper.text()).toContain('PM2.5 3')
     expect(wrapper.text()).toContain('VOC 98')
     expect(wrapper.text()).toContain('CO2 612')
+  })
+
+  it('activates a scene from its button', async () => {
+    const wrapper = await mountSuspended(HomePage)
+
+    await wrapper.get('button').trigger('click')
+
+    expect(client.activateScene).toHaveBeenCalledWith('all-off')
   })
 })

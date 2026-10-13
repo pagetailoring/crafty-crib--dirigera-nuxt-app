@@ -10,6 +10,16 @@ const { data, error, status } = await useAsyncData('home', async () => {
 })
 
 const formatReading = (value: number) => Math.round(value * 10) / 10
+
+const activeSceneId = ref<string | null>(null)
+async function activateScene(id: string) {
+  activeSceneId.value = id
+  try {
+    await dirigera.activateScene(id)
+  } finally {
+    activeSceneId.value = null
+  }
+}
 </script>
 
 <template>
@@ -20,6 +30,8 @@ const formatReading = (value: number) => Math.round(value * 10) / 10
         :key="scene.id"
         color="neutral"
         variant="outline"
+        :loading="activeSceneId === scene.id"
+        @click="activateScene(scene.id)"
       >
         {{ scene.name }}
       </UButton>
