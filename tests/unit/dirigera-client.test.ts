@@ -227,4 +227,19 @@ describe('Dirigera client', () => {
       { id: 'speaker', type: 'DEVICE', volume: 25 }
     )
   })
+
+  it('loads the current play item image', async () => {
+    const request = vi.fn().mockResolvedValue({
+      devicePlayItemImageURL: 'data:image/png;base64,image',
+    })
+    const client = createDirigeraClient(request)
+
+    await expect(client.getPlayItemImage('speaker')).resolves.toBe(
+      'data:image/png;base64,image'
+    )
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('query DevicePlayItemImage'),
+      { id: 'speaker' }
+    )
+  })
 })

@@ -212,6 +212,12 @@ const setVolumeMutation = `
   }
 `
 
+const playItemImageQuery = `
+  query DevicePlayItemImage($id: String!) {
+    devicePlayItemImageURL(id: $id)
+  }
+`
+
 export function createDirigeraClient(request: GraphqlRequest) {
   return {
     async listRooms() {
@@ -235,6 +241,13 @@ export function createDirigeraClient(request: GraphqlRequest) {
       isOn: boolean | null
     ) {
       await request(quickControlMutation, { roomId, type, isOn })
+    },
+    async getPlayItemImage(id: string) {
+      const data = await request<{ devicePlayItemImageURL: string | null }>(
+        playItemImageQuery,
+        { id }
+      )
+      return data.devicePlayItemImageURL
     },
     async controlDevice(id: string, type: ControlType, command: DeviceCommand) {
       if (command.type === 'setVolume') {
