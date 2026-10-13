@@ -33,6 +33,8 @@
     "test:watch": "vitest --watch",
     "test:unit": "vitest --project unit",
     "test:nuxt": "vitest --project nuxt",
+    "test:pwa": "run-s build verify:pwa",
+    "verify:pwa": "node tools/verify-pwa-build.mjs",
     "start": "node .output/server/index.mjs",
     "up": "nuxt upgrade"
   },
