@@ -43,6 +43,36 @@ const device = (overrides: Partial<Device> = {}): Device => ({
   ...overrides,
 })
 
+const pendingControlCases = [
+  {
+    name: 'color temperature',
+    label: 'Lamp color temperature',
+    value: 3500,
+    device: { colorTemperature: 3000 },
+    disabledLabels: ['Lamp color temperature'],
+  },
+  {
+    name: 'color',
+    label: 'Lamp hue',
+    value: 120,
+    device: { colorHue: 20, colorSaturation: 0.75 },
+    disabledLabels: ['Lamp hue', 'Lamp saturation'],
+  },
+  {
+    name: 'volume',
+    label: 'Lamp volume',
+    value: 30,
+    device: { volume: 20 },
+    disabledLabels: ['Lamp volume'],
+  },
+] satisfies Array<{
+  name: string
+  label: string
+  value: number
+  device: Partial<Device>
+  disabledLabels: string[]
+}>
+
 describe('Device controls', () => {
   beforeEach(() => {
     client.controlDevice.mockReset().mockResolvedValue(undefined)
@@ -110,6 +140,63 @@ describe('Device controls', () => {
       colorTemperature: 3500,
     })
   })
+
+  it.each(pendingControlCases)(
+    'disables the $name control while its command is pending',
+    async ({ label, value, device: deviceOverrides, disabledLabels }) => {
+      const command = Promise.withResolvers<undefined>()
+      client.controlDevice.mockReturnValueOnce(command.promise)
+      const wrapper = await mountSuspended(DeviceControls, {
+        props: { device: device(deviceOverrides) },
+      })
+
+      const input = wrapper.get(`[aria-label="${label}"]`)
+      await input.setValue(value)
+      await input.trigger('change')
+
+      for (const disabledLabel of disabledLabels) {
+        expect(
+          wrapper.get(`[aria-label="${disabledLabel}"]`).attributes('disabled')
+        ).toBeDefined()
+      }
+
+      command.resolve(undefined)
+      await flushPromises()
+
+      for (const disabledLabel of disabledLabels) {
+        expect(
+          wrapper.get(`[aria-label="${disabledLabel}"]`).attributes('disabled')
+        ).toBeUndefined()
+      }
+    }
+  )
+
+  it.each(pendingControlCases)(
+    'restores the $name control after its command fails',
+    async ({ label, value, device: deviceOverrides, disabledLabels }) => {
+      const command = Promise.withResolvers<undefined>()
+      const errorHandler = vi.fn()
+      client.controlDevice.mockReturnValueOnce(command.promise)
+      const wrapper = await mountSuspended(DeviceControls, {
+        props: { device: device(deviceOverrides) },
+        global: { config: { errorHandler } },
+      })
+
+      const input = wrapper.get(`[aria-label="${label}"]`)
+      await input.setValue(value)
+      await input.trigger('change')
+
+      command.reject(new Error('Command failed'))
+      await flushPromises()
+
+      expect(errorHandler).toHaveBeenCalled()
+      for (const disabledLabel of disabledLabels) {
+        expect(
+          wrapper.get(`[aria-label="${disabledLabel}"]`).attributes('disabled')
+        ).toBeUndefined()
+      }
+    }
+  )
 
   it('changes device hue with its current saturation', async () => {
     const wrapper = await mountSuspended(DeviceControls, {
