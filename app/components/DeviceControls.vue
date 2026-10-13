@@ -8,6 +8,14 @@ const pending = ref(false)
 const colorHue = ref(props.device.colorHue ?? 0)
 const colorSaturation = ref(props.device.colorSaturation ?? 1)
 
+const { data: playItemImage } = await useAsyncData(
+  `play-item-image-${props.device.id}`,
+  () => dirigera.getPlayItemImage(props.device.id),
+  {
+    immediate: props.device.playItem != null && props.device.type === 'DEVICE',
+  }
+)
+
 async function setPower() {
   if (props.device.isOn == null) return
 
@@ -219,5 +227,11 @@ async function setVolume(event: Event) {
     <p v-if="device.nextPlayItem" class="text-sm">
       Next: {{ device.nextPlayItem }}
     </p>
+    <img
+      v-if="playItemImage"
+      :src="playItemImage"
+      :alt="`Artwork for ${device.playItem}`"
+      class="w-full rounded-md"
+    />
   </div>
 </template>

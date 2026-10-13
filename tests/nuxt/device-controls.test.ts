@@ -7,6 +7,7 @@ import type { Device } from '../../app/services/dirigera-client'
 const { client } = vi.hoisted(() => ({
   client: {
     controlDevice: vi.fn().mockResolvedValue(undefined),
+    getPlayItemImage: vi.fn().mockResolvedValue('data:image/png;base64,image'),
   },
 }))
 
@@ -164,5 +165,22 @@ describe('Device controls', () => {
       type: 'setVolume',
       volume: 30,
     })
+  })
+
+  it('shows the current play item and its image', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: {
+        device: device({
+          playItem: 'Artist - Song',
+          nextPlayItem: 'Artist - Next song',
+        }),
+      },
+    })
+
+    expect(wrapper.text()).toContain('Now playing: Artist - Song')
+    expect(wrapper.text()).toContain('Next: Artist - Next song')
+    expect(wrapper.get('img').attributes('src')).toBe(
+      'data:image/png;base64,image'
+    )
   })
 })
