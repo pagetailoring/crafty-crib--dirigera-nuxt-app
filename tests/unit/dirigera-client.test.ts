@@ -197,4 +197,34 @@ describe('Dirigera client', () => {
       }
     )
   })
+
+  it('changes device playback', async () => {
+    const request = vi.fn().mockResolvedValue({ setPlayback: true })
+    const client = createDirigeraClient(request)
+
+    await client.controlDevice('speaker', 'DEVICE', {
+      type: 'setPlayback',
+      playback: 'playbackNext',
+    })
+
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('mutation SetPlayback'),
+      { id: 'speaker', type: 'DEVICE', playback: 'playbackNext' }
+    )
+  })
+
+  it('changes device volume', async () => {
+    const request = vi.fn().mockResolvedValue({ setVolume: true })
+    const client = createDirigeraClient(request)
+
+    await client.controlDevice('speaker', 'DEVICE', {
+      type: 'setVolume',
+      volume: 25,
+    })
+
+    expect(request).toHaveBeenCalledWith(
+      expect.stringContaining('mutation SetVolume'),
+      { id: 'speaker', type: 'DEVICE', volume: 25 }
+    )
+  })
 })

@@ -68,6 +68,11 @@ export type DeviceCommand =
   | { type: 'setLightLevel'; lightLevel: number }
   | { type: 'setColorTemperature'; colorTemperature: number }
   | { type: 'setColor'; colorHue: number; colorSaturation: number }
+  | { type: 'setPlayback'; playback: Playback }
+  | { type: 'setVolume'; volume: number }
+
+export type Playback =
+  'playbackPlaying' | 'playbackPaused' | 'playbackNext' | 'playbackPrevious'
 
 const roomsQuery = `
   query Rooms {
@@ -191,6 +196,22 @@ const setColorMutation = `
   }
 `
 
+const setPlaybackMutation = `
+  mutation SetPlayback(
+    $id: String!
+    $type: ControlType!
+    $playback: Playback!
+  ) {
+    setPlayback(id: $id, type: $type, playback: $playback)
+  }
+`
+
+const setVolumeMutation = `
+  mutation SetVolume($id: String!, $type: ControlType!, $volume: Int!) {
+    setVolume(id: $id, type: $type, volume: $volume)
+  }
+`
+
 export function createDirigeraClient(request: GraphqlRequest) {
   return {
     async listRooms() {
@@ -216,6 +237,20 @@ export function createDirigeraClient(request: GraphqlRequest) {
       await request(quickControlMutation, { roomId, type, isOn })
     },
     async controlDevice(id: string, type: ControlType, command: DeviceCommand) {
+      if (command.type === 'setVolume') {
+        await request(setVolumeMutation, { id, type, volume: command.volume })
+        return
+      }
+
+      if (command.type === 'setPlayback') {
+        await request(setPlaybackMutation, {
+          id,
+          type,
+          playback: command.playback,
+        })
+        return
+      }
+
       if (command.type === 'setColor') {
         await request(setColorMutation, {
           id,
