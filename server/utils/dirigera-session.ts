@@ -14,11 +14,11 @@ export function verifyUpdateToken(token: string | null) {
   if (!token) return false
   const [expires, signature, extra] = token.split('.')
   if (
-    !expires
-    || !signature
-    || extra
-    || !/^\d+$/.test(expires)
-    || Number(expires) <= Date.now()
+    !expires ||
+    !signature ||
+    extra ||
+    !/^\d+$/.test(expires) ||
+    Number(expires) <= Date.now()
   )
     return false
   const expected = Buffer.from(sign(expires))

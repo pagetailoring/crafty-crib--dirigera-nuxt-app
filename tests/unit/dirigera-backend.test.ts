@@ -12,7 +12,7 @@ function fixture() {
   const device = (
     id: string,
     attributes: Record<string, unknown>,
-    extra = {},
+    extra = {}
   ) =>
     ({
       id,
@@ -50,7 +50,7 @@ function fixture() {
         {
           type: 'environmentSensor',
           capabilities: { canReceive: [], canSend: [] },
-        },
+        }
       ),
       device(
         'sensor2',
@@ -58,17 +58,17 @@ function fixture() {
         {
           type: 'environmentSensor',
           capabilities: { canReceive: [], canSend: [] },
-        },
+        }
       ),
       device(
         'group-light',
         { isOn: false },
-        { deviceSet: [{ id: 'set', name: 'Set' }] },
+        { deviceSet: [{ id: 'set', name: 'Set' }] }
       ),
       device(
         'speaker',
         { playback: 'playbackPlaying', volume: 20 },
-        { type: 'speaker' },
+        { type: 'speaker' }
       ),
     ],
   } as unknown as Home
@@ -89,7 +89,7 @@ function fixture() {
       const result = await executeDirigeraQuery(backend, { query, variables })
       expect(result.errors).toBeUndefined()
       return result.data as T
-    },
+    }
   )
   return { hub, backend, frontend }
 }
@@ -178,7 +178,7 @@ describe('integrated Dirigera backend', () => {
       query: '{ rooms { id } }',
     })
     expect(failed.errors?.[0]?.message).toBe(
-      'The Dirigera operation failed. Check the hub connection.',
+      'The Dirigera operation failed. Check the hub connection.'
     )
   })
 
@@ -233,8 +233,7 @@ describe('integrated Dirigera backend', () => {
       expect(verifyUpdateToken(null)).toBe(false)
       vi.advanceTimersByTime(60_001)
       expect(verifyUpdateToken(token)).toBe(false)
-    }
-    finally {
+    } finally {
       vi.useRealTimers()
     }
   })

@@ -5,7 +5,7 @@ type ControlType = 'DEVICE' | 'DEVICE_SET'
 
 export function getAttributeIfCanReceive<T extends keyof Device['attributes']>(
   device: Device,
-  attribute: T,
+  attribute: T
 ) {
   return device.capabilities.canReceive.includes(attribute)
     ? device.attributes[attribute]
@@ -15,7 +15,7 @@ export function getAttributeIfCanReceive<T extends keyof Device['attributes']>(
 export function getDevicesNotInSet(devices: Device[]) {
   return devices
     .filter(d => d.deviceSet.length === 0)
-    .map((device) => {
+    .map(device => {
       const playItem = device.attributes.playbackAudio?.playItem
       const nextPlayItem = device.attributes.playbackAudio?.nextPlayItem
 
@@ -68,14 +68,14 @@ export function getDeviceSets(devices: Device[]) {
       .values(),
   ]
 
-  return deviceSets.map((deviceSet) => {
+  return deviceSets.map(deviceSet => {
     const devicesInSet = devices.filter(d =>
-      d.deviceSet.some(ds => ds.id === deviceSet.id),
+      d.deviceSet.some(ds => ds.id === deviceSet.id)
     )
 
     const playItem = devicesInSet[0]?.attributes?.playbackAudio?.playItem
-    const nextPlayItem
-      = devicesInSet[0]?.attributes?.playbackAudio?.nextPlayItem
+    const nextPlayItem =
+      devicesInSet[0]?.attributes?.playbackAudio?.nextPlayItem
 
     return {
       id: deviceSet.id,
@@ -121,13 +121,13 @@ const hasControl = (d: {
   playback: string | null | undefined
   volume: number | null | undefined
 }) =>
-  d.isOn !== null
-  || d.lightLevel !== null
-  || d.colorTemperature !== null
-  || d.colorSaturation !== null
-  || d.colorHue !== null
-  || d.playback !== null
-  || d.volume !== null
+  d.isOn !== null ||
+  d.lightLevel !== null ||
+  d.colorTemperature !== null ||
+  d.colorSaturation !== null ||
+  d.colorHue !== null ||
+  d.playback !== null ||
+  d.volume !== null
 
 function getDevicesInRoomWithRelations({
   roomId,
@@ -173,8 +173,8 @@ function getAverageAttributeValue({
   }
 
   return (
-    attributeValues.reduce((acc, current) => acc + current, 0)
-    / attributeValues.length
+    attributeValues.reduce((acc, current) => acc + current, 0) /
+    attributeValues.length
   )
 }
 
@@ -184,10 +184,10 @@ export function getRoomView(room: Home['rooms'][number], home: Home) {
     devices: home.devices,
   })
   const reachable = home.devices.filter(
-    d => d.room?.id === room.id && d.isReachable,
+    d => d.room?.id === room.id && d.isReachable
   )
   const quickControls = (['light', 'outlet', 'speaker'] as const).flatMap(
-    (type) => {
+    type => {
       const matching = reachable.filter(d => d.type === type)
       if (!matching.length) return []
       return [
@@ -197,11 +197,11 @@ export function getRoomView(room: Home['rooms'][number], home: Home) {
           isOn: matching.some(d =>
             type === 'speaker'
               ? d.attributes.playback === 'playbackPlaying'
-              : d.attributes.isOn,
+              : d.attributes.isOn
           ),
         },
       ]
-    },
+    }
   )
   return {
     id: room.id,

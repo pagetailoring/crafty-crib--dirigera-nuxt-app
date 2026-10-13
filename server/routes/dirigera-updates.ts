@@ -13,12 +13,11 @@ export default defineWebSocketHandler({
   async open(peer) {
     subscriptions.set(
       peer.id,
-      dirigeraConnection.subscribe(() => peer.send('update')),
+      dirigeraConnection.subscribe(() => peer.send('update'))
     )
     try {
       await dirigeraConnection.getClient()
-    }
-    catch {
+    } catch {
       subscriptions.get(peer.id)?.()
       subscriptions.delete(peer.id)
       peer.close(1011, 'The Dirigera connection is unavailable.')

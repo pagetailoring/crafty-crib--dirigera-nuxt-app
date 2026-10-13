@@ -1,7 +1,7 @@
 import type { DirigeraClient } from 'dirigera'
 
 export function createDirigeraConnection(
-  connect: () => Promise<DirigeraClient>,
+  connect: () => Promise<DirigeraClient>
 ) {
   let client: Promise<DirigeraClient> | undefined
   let closed = false
@@ -12,19 +12,19 @@ export function createDirigeraConnection(
       if (closed)
         return Promise.reject(new Error('The Dirigera connection is closed.'))
       client ??= connect()
-        .then((connected) => {
+        .then(connected => {
           if (closed) {
             connected.stopListeningForUpdates()
             throw new Error('The Dirigera connection is closed.')
           }
-          connected.startListeningForUpdates((event) => {
+          connected.startListeningForUpdates(event => {
             if (event.type !== 'pong') {
               for (const notify of subscribers) notify()
             }
           })
           return connected
         })
-        .catch((error) => {
+        .catch(error => {
           client = undefined
           throw error
         })

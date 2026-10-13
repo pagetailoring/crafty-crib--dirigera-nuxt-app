@@ -16,7 +16,7 @@ type ControlArguments = {
 
 export async function executeDirigeraQuery(
   client: DirigeraClient,
-  body: GraphqlBody,
+  body: GraphqlBody
 ) {
   // Each operation observes one home snapshot, including quick-control commands.
   let home: ReturnType<DirigeraClient['home']> | undefined
@@ -75,20 +75,20 @@ export async function executeDirigeraQuery(
         SPEAKERS: 'speaker',
       }[type]
       const devices = (await getHome()).devices.filter(
-        device => device.room?.id === roomId && device.type === deviceType,
+        device => device.room?.id === roomId && device.type === deviceType
       )
       await Promise.all(
-        devices.map((device) => {
+        devices.map(device => {
           if (device.type === 'speaker') {
             return client.speakers.setPlayback({
               id: device.id,
               playback: isOn ? 'playbackPlaying' : 'playbackPaused',
             })
           }
-          const target
-            = device.type === 'light' ? client.lights : client.outlets
+          const target =
+            device.type === 'light' ? client.lights : client.outlets
           return target.setIsOn({ id: device.id, isOn: Boolean(isOn) })
-        }),
+        })
       )
       return null
     },
@@ -107,14 +107,13 @@ export async function executeDirigeraQuery(
       async (args: never) => {
         try {
           return await resolve(args)
-        }
-        catch {
+        } catch {
           throw new GraphQLError(
-            'The Dirigera operation failed. Check the hub connection.',
+            'The Dirigera operation failed. Check the hub connection.'
           )
         }
       },
-    ]),
+    ])
   )
   return graphql({
     schema: dirigeraSchema,

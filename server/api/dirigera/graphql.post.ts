@@ -12,7 +12,7 @@ import {
 } from '../../services/dirigera-api'
 import { dirigeraConnection } from '../../utils/dirigera'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const origin = getHeader(event, 'origin')
   if (origin && origin !== getRequestURL(event).origin) {
     throw createError({
@@ -22,11 +22,11 @@ export default defineEventHandler(async (event) => {
   }
   const body = await readBody<GraphqlBody>(event)
   if (
-    !body
-    || typeof body.query !== 'string'
-    || (body.variables != null
-      && (typeof body.variables !== 'object' || Array.isArray(body.variables)))
-    || (body.operationName != null && typeof body.operationName !== 'string')
+    !body ||
+    typeof body.query !== 'string' ||
+    (body.variables != null &&
+      (typeof body.variables !== 'object' || Array.isArray(body.variables))) ||
+    (body.operationName != null && typeof body.operationName !== 'string')
   ) {
     throw createError({
       statusCode: 400,
