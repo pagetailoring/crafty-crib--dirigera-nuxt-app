@@ -5,6 +5,8 @@ const props = defineProps<{ device: Device }>()
 const emit = defineEmits<{ changed: [] }>()
 const dirigera = useDirigera()
 const pending = ref(false)
+const colorHue = ref(props.device.colorHue ?? 0)
+const colorSaturation = ref(props.device.colorSaturation ?? 1)
 
 async function setPower() {
   if (props.device.isOn == null) return
@@ -26,6 +28,35 @@ async function setLightLevel(event: Event) {
   await dirigera.controlDevice(props.device.id, props.device.type, {
     type: 'setLightLevel',
     lightLevel,
+  })
+  emit('changed')
+}
+
+async function setColorTemperature(event: Event) {
+  const colorTemperature = Number((event.target as HTMLInputElement).value)
+  await dirigera.controlDevice(props.device.id, props.device.type, {
+    type: 'setColorTemperature',
+    colorTemperature,
+  })
+  emit('changed')
+}
+
+async function setHue(event: Event) {
+  colorHue.value = Number((event.target as HTMLInputElement).value)
+  await dirigera.controlDevice(props.device.id, props.device.type, {
+    type: 'setColor',
+    colorHue: colorHue.value,
+    colorSaturation: colorSaturation.value,
+  })
+  emit('changed')
+}
+
+async function setSaturation(event: Event) {
+  colorSaturation.value = Number((event.target as HTMLInputElement).value)
+  await dirigera.controlDevice(props.device.id, props.device.type, {
+    type: 'setColor',
+    colorHue: colorHue.value,
+    colorSaturation: colorSaturation.value,
   })
   emit('changed')
 }
@@ -56,6 +87,55 @@ async function setLightLevel(event: Event) {
         :aria-label="`${device.name} light level`"
         class="w-full accent-primary"
         @change="setLightLevel"
+      />
+    </label>
+
+    <label
+      v-if="device.colorTemperature != null"
+      class="block space-y-1 text-sm"
+    >
+      <span>Color temperature {{ device.colorTemperature }} K</span>
+      <input
+        type="range"
+        min="2202"
+        max="4000"
+        :value="device.colorTemperature"
+        :disabled="!device.isReachable"
+        :aria-label="`${device.name} color temperature`"
+        class="w-full accent-primary"
+        @change="setColorTemperature"
+      />
+    </label>
+
+    <label v-if="device.colorHue != null" class="block space-y-1 text-sm">
+      <span>Hue {{ device.colorHue }}°</span>
+      <input
+        type="range"
+        min="0"
+        max="359"
+        :value="device.colorHue"
+        :disabled="!device.isReachable"
+        :aria-label="`${device.name} hue`"
+        class="w-full accent-primary"
+        @change="setHue"
+      />
+    </label>
+
+    <label
+      v-if="device.colorSaturation != null"
+      class="block space-y-1 text-sm"
+    >
+      <span>Saturation {{ Math.round(device.colorSaturation * 100) }}%</span>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        :value="device.colorSaturation"
+        :disabled="!device.isReachable"
+        :aria-label="`${device.name} saturation`"
+        class="w-full accent-primary"
+        @change="setSaturation"
       />
     </label>
   </div>

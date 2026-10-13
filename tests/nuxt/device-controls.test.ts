@@ -68,4 +68,55 @@ describe('Device controls', () => {
       lightLevel: 45,
     })
   })
+
+  it('changes device color temperature', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: { device: device({ colorTemperature: 3000 }) },
+    })
+
+    const input = wrapper.get('[aria-label="Lamp color temperature"]')
+    await input.setValue(3500)
+    await input.trigger('change')
+
+    expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+      type: 'setColorTemperature',
+      colorTemperature: 3500,
+    })
+  })
+
+  it('changes device hue with its current saturation', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: {
+        device: device({ colorHue: 20, colorSaturation: 0.75 }),
+      },
+    })
+
+    const input = wrapper.get('[aria-label="Lamp hue"]')
+    await input.setValue(120)
+    await input.trigger('change')
+
+    expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+      type: 'setColor',
+      colorHue: 120,
+      colorSaturation: 0.75,
+    })
+  })
+
+  it('changes device saturation with its current hue', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: {
+        device: device({ colorHue: 120, colorSaturation: 0.5 }),
+      },
+    })
+
+    const input = wrapper.get('[aria-label="Lamp saturation"]')
+    await input.setValue(0.8)
+    await input.trigger('change')
+
+    expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+      type: 'setColor',
+      colorHue: 120,
+      colorSaturation: 0.8,
+    })
+  })
 })
