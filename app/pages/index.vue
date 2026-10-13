@@ -52,6 +52,7 @@ async function toggleQuickControl(
 
 <template>
   <div class="space-y-6">
+    <h1 class="sr-only">Dirigera home</h1>
     <div class="flex flex-wrap gap-2">
       <UButton
         v-for="scene in data?.scenes"
