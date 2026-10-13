@@ -41,4 +41,46 @@ export default defineNuxtConfig({
   },
 
   eslint: { config: { stylistic: true } },
+
+  pwa: {
+    registerType: 'autoUpdate',
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+      maximumFileSizeToCacheInBytes: 6_000_000,
+      navigateFallback: undefined,
+      runtimeCaching: [],
+    },
+    manifest: {
+      short_name: 'Dirigera',
+      name: 'Dirigera web',
+      start_url: '/',
+      display: 'standalone',
+      theme_color: '#0059aa',
+      background_color: '#1f1f1f',
+      // icons: [
+      //   {
+      //     src: '/logo192.png',
+      //     sizes: '192x192',
+      //     type: 'image/png',
+      //   },
+      //   {
+      //     src: '/logo512.png',
+      //     sizes: '512x512',
+      //     type: 'image/png',
+      //   },
+      //   {
+      //     src: '/logo192_maskable.png',
+      //     sizes: '192x192',
+      //     type: 'image/png',
+      //     purpose: 'maskable',
+      //   },
+      //   {
+      //     src: '/logo512_maskable.png',
+      //     sizes: '512x512',
+      //     type: 'image/png',
+      //     purpose: 'maskable',
+      //   },
+      // ],
+    },
+  },
 })
