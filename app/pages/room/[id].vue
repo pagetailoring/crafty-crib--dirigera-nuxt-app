@@ -34,6 +34,8 @@ const readings = (device: Device) =>
       : `Motion detected ${device.isDetected ? 'yes' : 'no'}`,
     device.illuminance == null ? null : `Illuminance ${device.illuminance} lx`,
   ].filter((reading): reading is string => reading !== null)
+
+const refreshRoom = () => refreshNuxtData(`room-${roomId.value}`)
 </script>
 
 <template>
@@ -62,6 +64,8 @@ const readings = (device: Device) =>
             </UBadge>
           </div>
         </template>
+
+        <DeviceControls :device="device" class="mb-4" @changed="refreshRoom" />
 
         <dl class="space-y-2 text-sm">
           <div v-for="reading in readings(device)" :key="reading">
