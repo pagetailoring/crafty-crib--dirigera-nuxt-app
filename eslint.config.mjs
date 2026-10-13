@@ -1,6 +1,6 @@
-// @ts-check
+import eslintConfigPrettier from 'eslint-config-prettier'
 import withNuxt from './.nuxt/eslint.config.mjs'
 
-export default withNuxt(
-  // Your custom configs here
-)
+export default withNuxt()
+  // Prettier integration - disable conflicting ESLint rules
+  .append(eslintConfigPrettier)
