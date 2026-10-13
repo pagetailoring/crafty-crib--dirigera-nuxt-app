@@ -6,6 +6,7 @@ export default defineNuxtConfig({
       title: 'Dirigera web',
     },
   },
+  css: ['~/assets/css/main.css'],
   modules: [
     '@nuxt/eslint',
     '@nuxt/hints',
