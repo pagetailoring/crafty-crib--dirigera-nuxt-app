@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { APP_NAME } from '../config/app'
+
 const route = useRoute()
 const cache = useDirigeraCacheStore()
 
@@ -24,7 +26,7 @@ useDirigeraUpdates(() => {
     <main class="min-h-screen bg-default p-4 sm:p-6">
       <header class="mb-6 flex items-center gap-3">
         <NuxtLink to="/" class="text-3xl font-bold text-highlighted">
-          Dirigera web
+          {{ APP_NAME }}
         </NuxtLink>
       </header>
       <NuxtPage />

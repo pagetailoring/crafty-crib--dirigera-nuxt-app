@@ -1,3 +1,5 @@
+import { APP_NAME } from './config/app'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
@@ -16,7 +18,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'en' },
-      title: 'Dirigera web',
+      title: APP_NAME,
     },
   },
   css: ['~/assets/css/main.css'],
@@ -51,8 +53,8 @@ export default defineNuxtConfig({
       runtimeCaching: [],
     },
     manifest: {
-      short_name: 'Dirigera',
-      name: 'Dirigera web',
+      short_name: APP_NAME,
+      name: APP_NAME,
       start_url: '/',
       display: 'standalone',
       theme_color: '#0059aa',

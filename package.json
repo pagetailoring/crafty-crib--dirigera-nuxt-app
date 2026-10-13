@@ -1,9 +1,16 @@
 {
-  "name": "nuxt-template-with-ui-and-storybook",
+  "name": "smarter-home-even-with-dirigera--nuxt-app",
   "version": "0.0.1",
   "author": "pagetailoring",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pagetailoring/smarter-home-even-with-dirigera--nuxt-app"
+  },
+  "engines": {
+    "node": "^26.11.1"
+  },
   "type": "module",
-  "private": true,
+  "private": false,
   "scripts": {
     "analyze": "nuxt analyze",
     "build": "nuxt build",
