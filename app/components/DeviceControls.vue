@@ -45,14 +45,12 @@ const playItemImage = computed(
   () => cache.playItemImageByDeviceId[props.device.id]?.data ?? null
 )
 
-async function setPower() {
-  if (props.device.isOn == null) return
-
+async function setPower(isOn: boolean) {
   powerPending.value = true
   try {
     await cache.controlDevice(props.device, {
       type: 'setIsOn',
-      isOn: !props.device.isOn,
+      isOn,
     })
   } finally {
     powerPending.value = false
@@ -157,28 +155,24 @@ async function setVolume(event: Event) {
 
 <template>
   <div class="space-y-4">
-    <UButton
+    <USwitch
       v-if="device.isOn != null"
-      :color="device.isOn ? 'primary' : 'neutral'"
-      :variant="device.isOn ? 'solid' : 'outline'"
+      :model-value="device.isOn"
+      :label="device.isOn ? 'On' : 'Off'"
       :disabled="!device.isReachable"
       :loading="powerPending"
       :aria-label="`Turn ${device.name} ${device.isOn ? 'off' : 'on'}`"
-      @click="setPower"
-    >
-      {{ device.isOn ? 'On' : 'Off' }}
-    </UButton>
+      @update:model-value="setPower"
+    />
 
     <label v-if="device.lightLevel != null" class="block space-y-1 text-sm">
       <span>Light level {{ device.lightLevel }}%</span>
-      <input
-        type="range"
-        min="1"
-        max="100"
-        :value="device.lightLevel"
+      <USlider
+        :min="1"
+        :max="100"
+        :model-value="device.lightLevel"
         :disabled="!device.isReachable || lightLevelPending"
         :aria-label="`${device.name} light level`"
-        class="w-full accent-primary"
         @change="setLightLevel"
       />
     </label>
@@ -188,28 +182,24 @@ async function setVolume(event: Event) {
       class="block space-y-1 text-sm"
     >
       <span>Color temperature {{ device.colorTemperature }} K</span>
-      <input
-        type="range"
-        min="2202"
-        max="4000"
-        :value="device.colorTemperature"
+      <USlider
+        :min="2202"
+        :max="4000"
+        :model-value="device.colorTemperature"
         :disabled="!device.isReachable || colorTemperaturePending"
         :aria-label="`${device.name} color temperature`"
-        class="w-full accent-primary"
         @change="setColorTemperature"
       />
     </label>
 
     <label v-if="device.colorHue != null" class="block space-y-1 text-sm">
       <span>Hue {{ device.colorHue }}°</span>
-      <input
-        type="range"
-        min="0"
-        max="359"
-        :value="device.colorHue"
+      <USlider
+        :min="0"
+        :max="359"
+        :model-value="device.colorHue"
         :disabled="!device.isReachable || colorPending"
         :aria-label="`${device.name} hue`"
-        class="w-full accent-primary"
         @change="setHue"
       />
     </label>
@@ -219,15 +209,13 @@ async function setVolume(event: Event) {
       class="block space-y-1 text-sm"
     >
       <span>Saturation {{ Math.round(device.colorSaturation * 100) }}%</span>
-      <input
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
-        :value="device.colorSaturation"
+      <USlider
+        :min="0"
+        :max="1"
+        :step="0.01"
+        :model-value="device.colorSaturation"
         :disabled="!device.isReachable || colorPending"
         :aria-label="`${device.name} saturation`"
-        class="w-full accent-primary"
         @change="setSaturation"
       />
     </label>
@@ -278,14 +266,12 @@ async function setVolume(event: Event) {
 
     <label v-if="device.volume != null" class="block space-y-1 text-sm">
       <span>Volume {{ device.volume }}%</span>
-      <input
-        type="range"
-        min="0"
-        max="50"
-        :value="device.volume"
+      <USlider
+        :min="0"
+        :max="50"
+        :model-value="device.volume"
         :disabled="!device.isReachable || volumePending"
         :aria-label="`${device.name} volume`"
-        class="w-full accent-primary"
         @change="setVolume"
       />
     </label>

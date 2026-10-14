@@ -50,6 +50,7 @@ describe('Room page', () => {
     })
 
     expect(client.getRoom).toHaveBeenCalledWith('living-room')
+    expect(wrapper.get('h1').classes()).toContain('sr-only')
     expect(wrapper.text()).toContain('Living Room')
     expect(wrapper.text()).toContain('Environment sensor')
     expect(wrapper.text()).toContain('Unreachable')

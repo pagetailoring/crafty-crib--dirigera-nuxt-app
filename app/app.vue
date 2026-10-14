@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { APP_NAME } from '../config/app'
-
 const route = useRoute()
 const cache = useDirigeraCacheStore()
 const dirigeraStatus = useDirigeraStateStore()
@@ -57,11 +55,7 @@ useDirigeraUpdates(() => {
 
 <template>
   <UApp>
-    <UHeader mode="drawer">
-      <template #title>
-        {{ APP_NAME }}
-      </template>
-    </UHeader>
+    <TheHeader />
 
     <NuxtPwaManifest />
     <NuxtRouteAnnouncer />

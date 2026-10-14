@@ -37,13 +37,8 @@ const readings = (device: Device) =>
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="flex items-center gap-3">
-      <UButton to="/" color="neutral" variant="ghost">Back</UButton>
-      <h1 class="text-2xl font-bold text-highlighted">
-        {{ room?.name || 'Room' }}
-      </h1>
-    </div>
+  <UContainer>
+    <h1 class="sr-only">{{ room?.name || 'Room' }}</h1>
 
     <UAlert
       v-if="error"
@@ -83,5 +78,7 @@ const readings = (device: Device) =>
       color="neutral"
       title="No devices"
     />
-  </div>
+
+    <!-- <small>{{ room?.devices }}</small> -->
+  </UContainer>
 </template>

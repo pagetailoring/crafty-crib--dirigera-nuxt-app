@@ -1,5 +1,5 @@
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
-import { flushPromises } from '@vue/test-utils'
+import { flushPromises, type VueWrapper } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import DeviceControls from '../../app/components/DeviceControls.vue'
@@ -73,6 +73,23 @@ const pendingControlCases = [
   disabledLabels: string[]
 }>
 
+const getSlider = (wrapper: VueWrapper, label: string) => {
+  const slider = wrapper
+    .findAllComponents({ name: 'USlider' })
+    .find(component => component.vm.$attrs['aria-label'] === label)
+  if (!slider) throw new Error(`Unable to find slider: ${label}`)
+  return slider
+}
+
+const changeSlider = async (
+  wrapper: VueWrapper,
+  label: string,
+  value: number
+) => {
+  getSlider(wrapper, label).vm.$emit('change', { target: { value } })
+  await wrapper.vm.$nextTick()
+}
+
 describe('Device controls', () => {
   beforeEach(() => {
     client.controlDevice.mockReset().mockResolvedValue(undefined)
@@ -99,8 +116,7 @@ describe('Device controls', () => {
       props: { device: device({ lightLevel: 70 }) },
     })
 
-    await wrapper.get('[aria-label="Lamp light level"]').setValue(45)
-    await wrapper.get('[aria-label="Lamp light level"]').trigger('change')
+    await changeSlider(wrapper, 'Lamp light level', 45)
 
     expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
       type: 'setLightLevel',
@@ -114,16 +130,15 @@ describe('Device controls', () => {
     const wrapper = await mountSuspended(DeviceControls, {
       props: { device: device({ lightLevel: 70 }) },
     })
-    const input = wrapper.get('[aria-label="Lamp light level"]')
+    const slider = getSlider(wrapper, 'Lamp light level')
 
-    await input.setValue(45)
-    await input.trigger('change')
+    await changeSlider(wrapper, 'Lamp light level', 45)
 
-    expect(input.attributes('disabled')).toBeDefined()
+    expect(slider.props('disabled')).toBe(true)
 
     command.resolve(undefined)
     await flushPromises()
-    expect(input.attributes('disabled')).toBeUndefined()
+    expect(slider.props('disabled')).toBe(false)
   })
 
   it('changes device color temperature', async () => {
@@ -131,9 +146,7 @@ describe('Device controls', () => {
       props: { device: device({ colorTemperature: 3000 }) },
     })
 
-    const input = wrapper.get('[aria-label="Lamp color temperature"]')
-    await input.setValue(3500)
-    await input.trigger('change')
+    await changeSlider(wrapper, 'Lamp color temperature', 3500)
 
     expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
       type: 'setColorTemperature',
@@ -150,23 +163,17 @@ describe('Device controls', () => {
         props: { device: device(deviceOverrides) },
       })
 
-      const input = wrapper.get(`[aria-label="${label}"]`)
-      await input.setValue(value)
-      await input.trigger('change')
+      await changeSlider(wrapper, label, value)
 
       for (const disabledLabel of disabledLabels) {
-        expect(
-          wrapper.get(`[aria-label="${disabledLabel}"]`).attributes('disabled')
-        ).toBeDefined()
+        expect(getSlider(wrapper, disabledLabel).props('disabled')).toBe(true)
       }
 
       command.resolve(undefined)
       await flushPromises()
 
       for (const disabledLabel of disabledLabels) {
-        expect(
-          wrapper.get(`[aria-label="${disabledLabel}"]`).attributes('disabled')
-        ).toBeUndefined()
+        expect(getSlider(wrapper, disabledLabel).props('disabled')).toBe(false)
       }
     }
   )
@@ -182,18 +189,14 @@ describe('Device controls', () => {
         global: { config: { errorHandler } },
       })
 
-      const input = wrapper.get(`[aria-label="${label}"]`)
-      await input.setValue(value)
-      await input.trigger('change')
+      await changeSlider(wrapper, label, value)
 
       command.reject(new Error('Command failed'))
       await flushPromises()
 
       expect(errorHandler).toHaveBeenCalled()
       for (const disabledLabel of disabledLabels) {
-        expect(
-          wrapper.get(`[aria-label="${disabledLabel}"]`).attributes('disabled')
-        ).toBeUndefined()
+        expect(getSlider(wrapper, disabledLabel).props('disabled')).toBe(false)
       }
     }
   )
@@ -205,9 +208,7 @@ describe('Device controls', () => {
       },
     })
 
-    const input = wrapper.get('[aria-label="Lamp hue"]')
-    await input.setValue(120)
-    await input.trigger('change')
+    await changeSlider(wrapper, 'Lamp hue', 120)
 
     expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
       type: 'setColor',
@@ -223,9 +224,7 @@ describe('Device controls', () => {
       },
     })
 
-    const input = wrapper.get('[aria-label="Lamp saturation"]')
-    await input.setValue(0.8)
-    await input.trigger('change')
+    await changeSlider(wrapper, 'Lamp saturation', 0.8)
 
     expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
       type: 'setColor',
@@ -244,9 +243,7 @@ describe('Device controls', () => {
     await wrapper.setProps({
       device: device({ colorHue: 30, colorSaturation: 0.9 }),
     })
-    const input = wrapper.get('[aria-label="Lamp hue"]')
-    await input.setValue(120)
-    await input.trigger('change')
+    await changeSlider(wrapper, 'Lamp hue', 120)
 
     expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
       type: 'setColor',
@@ -320,9 +317,7 @@ describe('Device controls', () => {
       props: { device: device({ volume: 20 }) },
     })
 
-    const input = wrapper.get('[aria-label="Lamp volume"]')
-    await input.setValue(30)
-    await input.trigger('change')
+    await changeSlider(wrapper, 'Lamp volume', 30)
 
     expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
       type: 'setVolume',

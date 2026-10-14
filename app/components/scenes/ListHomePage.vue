@@ -26,5 +26,6 @@ async function activateScene(id: string) {
       {{ scene.name }}
     </UButton>
     <USkeleton v-if="pending.scenes" class="h-8 w-24" />
+    <!-- <small>{{ scenes?.data }}</small> -->
   </div>
 </template>
