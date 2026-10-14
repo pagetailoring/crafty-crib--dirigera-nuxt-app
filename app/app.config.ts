@@ -1,5 +1,12 @@
 export default defineAppConfig({
   ui: {
+    badge: {
+      defaultVariants: {
+        color: 'secondary',
+        variant: 'subtle',
+        size: 'sm',
+      },
+    },
     button: {
       defaultVariants: {
         color: 'neutral',
@@ -12,7 +19,7 @@ export default defineAppConfig({
         highlight: false,
         size: 'md',
         variant: 'card',
-        color: 'info',
+        color: 'secondary',
       },
     },
     container: {

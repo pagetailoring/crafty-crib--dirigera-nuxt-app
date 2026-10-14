@@ -229,8 +229,9 @@ function setVolume(value: number | undefined) {
 
 <template>
   <div class="space-y-4">
-    <USwitch
+    <UiSwitch
       v-if="device.isOn != null"
+      mode="power"
       :model-value="device.isOn"
       :label="device.isOn ? 'On' : 'Off'"
       :disabled="!device.isReachable"

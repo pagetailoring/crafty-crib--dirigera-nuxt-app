@@ -30,6 +30,7 @@ export interface Device {
   type: ControlType
   deviceType: string | null
   productName: string | null
+  roomName?: string | null
   isReachable: boolean
   lastSeen: string
   batteryPercentage: number | null
@@ -118,6 +119,7 @@ const deviceFields = `
         type
         deviceType
         productName
+        roomName
         isReachable
         lastSeen
         batteryPercentage

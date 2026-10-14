@@ -18,7 +18,7 @@ function fixture() {
       id,
       type: 'light',
       deviceType: 'light',
-      room: { id: 'room' },
+      room: { id: 'room', name: 'Living Room' },
       deviceSet: [],
       attributes: {
         customName: id,
@@ -152,8 +152,12 @@ describe('integrated Dirigera backend', () => {
     expect(lights.map(light => light.id)).toEqual(['group-light', 'light'])
     expect(lights.find(light => light.id === 'group-light')).toMatchObject({
       type: 'DEVICE',
+      roomName: null,
       colorTemperatureMin: 4000,
       colorTemperatureMax: 2202,
+    })
+    expect(lights.find(light => light.id === 'light')).toMatchObject({
+      roomName: 'Living Room',
     })
   })
 

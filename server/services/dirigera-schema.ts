@@ -31,6 +31,7 @@ export const dirigeraSchema = buildSchema(`
     type: ControlType!
     deviceType: String
     productName: String
+    roomName: String
     isReachable: Boolean!
     lastSeen: String!
     batteryPercentage: Int

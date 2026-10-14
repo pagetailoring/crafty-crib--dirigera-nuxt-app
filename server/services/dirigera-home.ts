@@ -29,6 +29,7 @@ export function getDeviceViews(devices: Device[]) {
       type: 'DEVICE' as ControlType,
       deviceType: device.deviceType,
       productName: device.attributes.model,
+      roomName: device.room?.name ?? null,
       isReachable: device.isReachable,
       lastSeen: device.lastSeen,
       batteryPercentage: device.attributes.batteryPercentage,
@@ -87,6 +88,7 @@ export function getDeviceSets(devices: Device[]) {
     const productNames = new Set(
       devicesInSet.map(device => device.attributes.model)
     )
+    const roomNames = new Set(devicesInSet.map(device => device.room?.name))
 
     const ranges = devicesInSet.map(device =>
       getColorTemperatureRange(device.attributes)
@@ -110,6 +112,8 @@ export function getDeviceSets(devices: Device[]) {
         productNames.size === 1
           ? (productNames.values().next().value ?? null)
           : null,
+      roomName:
+        roomNames.size === 1 ? (roomNames.values().next().value ?? null) : null,
       isReachable: devicesInSet.every(d => d.isReachable),
       lastSeen: devicesInSet.map(d => d.lastSeen).toSorted()[0],
       batteryPercentage: devicesInSet[0]?.attributes.batteryPercentage,
