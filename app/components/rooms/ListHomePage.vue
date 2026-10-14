@@ -40,7 +40,6 @@ async function toggleQuickControl(
           <h2 class="font-semibold">{{ room.name }}</h2>
           <UButton
             :to="`/room/${room.id}`"
-            color="neutral"
             variant="ghost"
             :aria-label="`Open ${room.name}`"
           >

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { APP_NAME } from '../../config/app'
+import { APP_NAME } from '@@/config/app'
 
 const route = useRoute()
 const cache = useDirigeraCacheStore()
@@ -14,17 +14,24 @@ const activeRoomName = computed(() => {
 <template>
   <UHeader mode="drawer">
     <template #left>
-      <ULink
+      <UButton
         to="/"
-        :aria-label="APP_NAME"
-        class="flex shrink-0 items-end gap-1.5 text-xl font-bold text-highlighted"
-      >
-        {{ APP_NAME }}
-      </ULink>
+        :aria-label="APP_NAME + ' - home page'"
+        class="tracking-widest uppercase font-normal -ml-3"
+        icon="i-lucide-home"
+        :label="APP_NAME"
+        variant="ghost"
+        size="xl"
+      />
 
       <template v-if="activeRoomName">
-        <UButton to="/" color="neutral" variant="ghost">Back</UButton>
-        <span class="text-xl font-bold text-highlighted">
+        <UButton
+          to="/"
+          icon="i-lucide-arrow-left"
+          variant="ghost"
+          aria-label="go back to home page"
+        />
+        <span class="">
           {{ activeRoomName }}
         </span>
       </template>

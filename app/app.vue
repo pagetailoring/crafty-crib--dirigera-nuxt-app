@@ -71,12 +71,7 @@ useDirigeraUpdates(() => {
           :description="unavailableMessage"
           class="min-w-64 flex-1"
         />
-        <UButton
-          color="neutral"
-          variant="outline"
-          :loading="statusPending"
-          @click="refreshDirigeraStatus"
-        >
+        <UButton :loading="statusPending" @click="refreshDirigeraStatus">
           Retry
         </UButton>
       </div>
