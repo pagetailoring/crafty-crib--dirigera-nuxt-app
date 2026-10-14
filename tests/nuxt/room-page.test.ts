@@ -13,6 +13,8 @@ const { client } = vi.hoisted(() => ({
           id: 'sensor',
           name: 'Environment sensor',
           type: 'DEVICE',
+          deviceType: 'environmentSensor',
+          productName: 'VINDSTYRKA',
           isReachable: false,
           lastSeen: '2026-10-13T01:00:00.000Z',
           batteryPercentage: 92,
@@ -53,6 +55,8 @@ describe('Room page', () => {
     expect(wrapper.get('h1').classes()).toContain('sr-only')
     expect(wrapper.text()).toContain('Living Room')
     expect(wrapper.text()).toContain('Environment sensor')
+    expect(wrapper.text()).toContain('environment sensor')
+    expect(wrapper.text()).toContain('VINDSTYRKA')
     expect(wrapper.text()).toContain('Unreachable')
     expect(wrapper.text()).toContain(
       new Date('2026-10-13T01:00:00.000Z').toLocaleString()

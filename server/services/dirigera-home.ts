@@ -1,6 +1,8 @@
 // Device mappings adapted from lpgera/dirigera-web. See THIRD_PARTY_NOTICES.md.
 import type { Device, DeviceSet, Home } from 'dirigera'
 
+import { getColorTemperatureRange } from '../../config/color-temperature'
+
 type ControlType = 'DEVICE' | 'DEVICE_SET'
 
 export function getAttributeIfCanReceive<T extends keyof Device['attributes']>(
@@ -13,46 +15,51 @@ export function getAttributeIfCanReceive<T extends keyof Device['attributes']>(
 }
 
 export function getDevicesNotInSet(devices: Device[]) {
-  return devices
-    .filter(d => d.deviceSet.length === 0)
-    .map(device => {
-      const playItem = device.attributes.playbackAudio?.playItem
-      const nextPlayItem = device.attributes.playbackAudio?.nextPlayItem
+  return getDeviceViews(devices.filter(d => d.deviceSet.length === 0))
+}
 
-      return {
-        id: device.id,
-        name: device.attributes.customName,
-        type: 'DEVICE' as ControlType,
-        isReachable: device.isReachable,
-        lastSeen: device.lastSeen,
-        batteryPercentage: device.attributes.batteryPercentage,
-        isOn: getAttributeIfCanReceive(device, 'isOn'),
-        lightLevel: getAttributeIfCanReceive(device, 'lightLevel'),
-        colorTemperature: getAttributeIfCanReceive(device, 'colorTemperature'),
-        colorSaturation: getAttributeIfCanReceive(device, 'colorSaturation'),
-        colorHue: getAttributeIfCanReceive(device, 'colorHue'),
-        playback: getAttributeIfCanReceive(device, 'playback'),
-        playbackPauseAvailable:
-          device.attributes.playbackAvailableActions?.pause,
-        playbackNextAvailable:
-          device.attributes.playbackAvailableActions?.playbackNext,
-        playbackPreviousAvailable:
-          device.attributes.playbackAvailableActions?.playbackPrev,
-        volume: getAttributeIfCanReceive(device, 'volume'),
-        playItem: playItem ? `${playItem.artist} - ${playItem.title}` : null,
-        nextPlayItem: nextPlayItem
-          ? `${nextPlayItem.artist} - ${nextPlayItem.title}`
-          : null,
-        temperature: device.attributes.currentTemperature,
-        humidity: device.attributes.currentRH,
-        pm25: device.attributes.currentPM25,
-        vocIndex: device.attributes.vocIndex,
-        co2: device.attributes.currentCO2,
-        isOpen: device.attributes.isOpen,
-        isDetected: device.attributes.isDetected,
-        illuminance: device.attributes.illuminance,
-      }
-    })
+export function getDeviceViews(devices: Device[]) {
+  return devices.map(device => {
+    const playItem = device.attributes.playbackAudio?.playItem
+    const nextPlayItem = device.attributes.playbackAudio?.nextPlayItem
+
+    return {
+      id: device.id,
+      name: device.attributes.customName,
+      type: 'DEVICE' as ControlType,
+      deviceType: device.deviceType,
+      productName: device.attributes.model,
+      isReachable: device.isReachable,
+      lastSeen: device.lastSeen,
+      batteryPercentage: device.attributes.batteryPercentage,
+      isOn: getAttributeIfCanReceive(device, 'isOn'),
+      lightLevel: getAttributeIfCanReceive(device, 'lightLevel'),
+      colorTemperature: getAttributeIfCanReceive(device, 'colorTemperature'),
+      colorTemperatureMin: device.attributes.colorTemperatureMin,
+      colorTemperatureMax: device.attributes.colorTemperatureMax,
+      colorSaturation: getAttributeIfCanReceive(device, 'colorSaturation'),
+      colorHue: getAttributeIfCanReceive(device, 'colorHue'),
+      playback: getAttributeIfCanReceive(device, 'playback'),
+      playbackPauseAvailable: device.attributes.playbackAvailableActions?.pause,
+      playbackNextAvailable:
+        device.attributes.playbackAvailableActions?.playbackNext,
+      playbackPreviousAvailable:
+        device.attributes.playbackAvailableActions?.playbackPrev,
+      volume: getAttributeIfCanReceive(device, 'volume'),
+      playItem: playItem ? `${playItem.artist} - ${playItem.title}` : null,
+      nextPlayItem: nextPlayItem
+        ? `${nextPlayItem.artist} - ${nextPlayItem.title}`
+        : null,
+      temperature: device.attributes.currentTemperature,
+      humidity: device.attributes.currentRH,
+      pm25: device.attributes.currentPM25,
+      vocIndex: device.attributes.vocIndex,
+      co2: device.attributes.currentCO2,
+      isOpen: device.attributes.isOpen,
+      isDetected: device.attributes.isDetected,
+      illuminance: device.attributes.illuminance,
+    }
+  })
 }
 
 export function getDeviceSets(devices: Device[]) {
@@ -76,17 +83,43 @@ export function getDeviceSets(devices: Device[]) {
     const playItem = devicesInSet[0]?.attributes?.playbackAudio?.playItem
     const nextPlayItem =
       devicesInSet[0]?.attributes?.playbackAudio?.nextPlayItem
+    const deviceTypes = new Set(devicesInSet.map(device => device.deviceType))
+    const productNames = new Set(
+      devicesInSet.map(device => device.attributes.model)
+    )
+
+    const ranges = devicesInSet.map(device =>
+      getColorTemperatureRange(device.attributes)
+    )
+    const temperatureMin = Math.max(...ranges.map(range => range.min))
+    const temperatureMax = Math.min(...ranges.map(range => range.max))
+    const canSetTemperature =
+      devicesInSet.every(device =>
+        device.capabilities.canReceive.includes('colorTemperature')
+      ) && temperatureMin <= temperatureMax
 
     return {
       id: deviceSet.id,
       name: deviceSet.name,
       type: 'DEVICE_SET' as ControlType,
+      deviceType:
+        deviceTypes.size === 1
+          ? (deviceTypes.values().next().value ?? null)
+          : null,
+      productName:
+        productNames.size === 1
+          ? (productNames.values().next().value ?? null)
+          : null,
       isReachable: devicesInSet.every(d => d.isReachable),
       lastSeen: devicesInSet.map(d => d.lastSeen).toSorted()[0],
       batteryPercentage: devicesInSet[0]?.attributes.batteryPercentage,
       isOn: devicesInSet.some(d => d.attributes.isOn),
       lightLevel: devicesInSet[0]?.attributes.lightLevel,
-      colorTemperature: devicesInSet[0]?.attributes.colorTemperature,
+      colorTemperature: canSetTemperature
+        ? devicesInSet[0]?.attributes.colorTemperature
+        : null,
+      colorTemperatureMin: canSetTemperature ? temperatureMin : null,
+      colorTemperatureMax: canSetTemperature ? temperatureMax : null,
       colorSaturation: devicesInSet[0]?.attributes.colorSaturation,
       colorHue: devicesInSet[0]?.attributes.colorHue,
       playback: devicesInSet[0]?.attributes.playback,

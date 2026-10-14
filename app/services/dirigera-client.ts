@@ -28,12 +28,16 @@ export interface Device {
   id: string
   name: string
   type: ControlType
+  deviceType: string | null
+  productName: string | null
   isReachable: boolean
   lastSeen: string
   batteryPercentage: number | null
   isOn: boolean | null
   lightLevel: number | null
   colorTemperature: number | null
+  colorTemperatureMin?: number | null
+  colorTemperatureMax?: number | null
   colorSaturation: number | null
   colorHue: number | null
   playback: string | null
@@ -108,21 +112,20 @@ const activateSceneMutation = `
   }
 `
 
-const roomQuery = `
-  query Room($id: String!) {
-    room(id: $id) {
-      id
-      name
-      devices {
+const deviceFields = `
         id
         name
         type
+        deviceType
+        productName
         isReachable
         lastSeen
         batteryPercentage
         isOn
         lightLevel
         colorTemperature
+        colorTemperatureMin
+        colorTemperatureMax
         colorSaturation
         colorHue
         playback
@@ -139,6 +142,15 @@ const roomQuery = `
         isOpen
         isDetected
         illuminance
+`
+
+const roomQuery = `
+  query Room($id: String!) {
+    room(id: $id) {
+      id
+      name
+      devices {
+        ${deviceFields}
       }
     }
   }
@@ -220,6 +232,12 @@ const playItemImageQuery = `
 
 export function createDirigeraClient(request: GraphqlRequest) {
   return {
+    async listTemperatureLights() {
+      const data = await request<{ temperatureLights: Device[] }>(
+        `query TemperatureLights { temperatureLights { ${deviceFields} } }`
+      )
+      return data.temperatureLights
+    },
     async listRooms() {
       const data = await request<{ rooms: RoomSummary[] }>(roomsQuery)
       return data.rooms

@@ -15,6 +15,8 @@ try {
 }
 
 const format = (value: number) => Math.round(value * 100) / 100
+const formatDeviceType = (value: string) =>
+  value.replaceAll(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()
 
 const readings = (device: Device) =>
   [
@@ -51,7 +53,21 @@ const readings = (device: Device) =>
       <UCard v-for="device in room?.devices" :key="device.id">
         <template #header>
           <div class="flex items-center justify-between gap-3">
-            <h2 class="font-semibold">{{ device.name }}</h2>
+            <div>
+              <h2 class="font-semibold">{{ device.name }}</h2>
+              <p
+                v-if="device.deviceType || device.productName"
+                class="text-sm text-muted"
+              >
+                <span v-if="device.deviceType">
+                  {{ formatDeviceType(device.deviceType) }}
+                </span>
+                <span v-if="device.deviceType && device.productName">
+                  &middot;
+                </span>
+                <span v-if="device.productName">{{ device.productName }}</span>
+              </p>
+            </div>
             <UBadge v-if="!device.isReachable" color="warning" variant="subtle">
               Unreachable. Last seen
               {{ new Date(device.lastSeen).toLocaleString() }}
