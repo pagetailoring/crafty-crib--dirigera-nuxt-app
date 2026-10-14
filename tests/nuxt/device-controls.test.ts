@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import DeviceControls from '../../app/components/DeviceControls.vue'
 import type { Device } from '../../app/services/dirigera-client'
+import { DEVICE_CONTROL_THROTTLE_MS } from '../../config/device-controls'
 
 const { client } = vi.hoisted(() => ({
   client: {
@@ -18,6 +19,8 @@ const device = (overrides: Partial<Device> = {}): Device => ({
   id: 'lamp',
   name: 'Lamp',
   type: 'DEVICE',
+  deviceType: 'light',
+  productName: 'TRADFRI bulb',
   isReachable: true,
   lastSeen: '2026-10-13T01:00:00.000Z',
   batteryPercentage: null,
@@ -43,36 +46,6 @@ const device = (overrides: Partial<Device> = {}): Device => ({
   ...overrides,
 })
 
-const pendingControlCases = [
-  {
-    name: 'color temperature',
-    label: 'Lamp color temperature',
-    value: 3500,
-    device: { colorTemperature: 3000 },
-    disabledLabels: ['Lamp color temperature'],
-  },
-  {
-    name: 'color',
-    label: 'Lamp hue',
-    value: 120,
-    device: { colorHue: 20, colorSaturation: 0.75 },
-    disabledLabels: ['Lamp hue', 'Lamp saturation'],
-  },
-  {
-    name: 'volume',
-    label: 'Lamp volume',
-    value: 30,
-    device: { volume: 20 },
-    disabledLabels: ['Lamp volume'],
-  },
-] satisfies Array<{
-  name: string
-  label: string
-  value: number
-  device: Partial<Device>
-  disabledLabels: string[]
-}>
-
 const getSlider = (wrapper: VueWrapper, label: string) => {
   const slider = wrapper
     .findAllComponents({ name: 'USlider' })
@@ -86,7 +59,7 @@ const changeSlider = async (
   label: string,
   value: number
 ) => {
-  getSlider(wrapper, label).vm.$emit('change', { target: { value } })
+  getSlider(wrapper, label).vm.$emit('update:modelValue', value)
   await wrapper.vm.$nextTick()
 }
 
@@ -124,21 +97,51 @@ describe('Device controls', () => {
     })
   })
 
-  it('disables the light level while its command is pending', async () => {
-    const command = Promise.withResolvers<undefined>()
-    client.controlDevice.mockReturnValueOnce(command.promise)
+  it('updates the displayed value immediately and throttles device commands', async () => {
     const wrapper = await mountSuspended(DeviceControls, {
       props: { device: device({ lightLevel: 70 }) },
     })
-    const slider = getSlider(wrapper, 'Lamp light level')
+    vi.useFakeTimers()
 
-    await changeSlider(wrapper, 'Lamp light level', 45)
+    try {
+      await changeSlider(wrapper, 'Lamp light level', 45)
+      await flushPromises()
+      await changeSlider(wrapper, 'Lamp light level', 50)
+      await changeSlider(wrapper, 'Lamp light level', 55)
 
-    expect(slider.props('disabled')).toBe(true)
+      expect(wrapper.text()).toContain('Light level 55%')
+      expect(client.controlDevice).toHaveBeenCalledTimes(1)
 
-    command.resolve(undefined)
-    await flushPromises()
-    expect(slider.props('disabled')).toBe(false)
+      await vi.advanceTimersByTimeAsync(DEVICE_CONTROL_THROTTLE_MS)
+
+      expect(client.controlDevice).toHaveBeenCalledTimes(2)
+      expect(client.controlDevice).toHaveBeenLastCalledWith('lamp', 'DEVICE', {
+        type: 'setLightLevel',
+        lightLevel: 55,
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('exposes the full temperature range reported by the hub', async () => {
+    const wrapper = await mountSuspended(DeviceControls, {
+      props: {
+        device: {
+          ...device({ colorTemperature: 3000 }),
+          colorTemperatureMin: 6500,
+          colorTemperatureMax: 2000,
+        },
+      },
+    })
+    const slider = getSlider(wrapper, 'Lamp color temperature')
+    expect(slider.props('min')).toBe(2000)
+    expect(slider.props('max')).toBe(6500)
+    await changeSlider(wrapper, 'Lamp color temperature', 6500)
+    expect(client.controlDevice).toHaveBeenCalledWith('lamp', 'DEVICE', {
+      type: 'setColorTemperature',
+      colorTemperature: 6500,
+    })
   })
 
   it('changes device color temperature', async () => {
@@ -153,53 +156,6 @@ describe('Device controls', () => {
       colorTemperature: 3500,
     })
   })
-
-  it.each(pendingControlCases)(
-    'disables the $name control while its command is pending',
-    async ({ label, value, device: deviceOverrides, disabledLabels }) => {
-      const command = Promise.withResolvers<undefined>()
-      client.controlDevice.mockReturnValueOnce(command.promise)
-      const wrapper = await mountSuspended(DeviceControls, {
-        props: { device: device(deviceOverrides) },
-      })
-
-      await changeSlider(wrapper, label, value)
-
-      for (const disabledLabel of disabledLabels) {
-        expect(getSlider(wrapper, disabledLabel).props('disabled')).toBe(true)
-      }
-
-      command.resolve(undefined)
-      await flushPromises()
-
-      for (const disabledLabel of disabledLabels) {
-        expect(getSlider(wrapper, disabledLabel).props('disabled')).toBe(false)
-      }
-    }
-  )
-
-  it.each(pendingControlCases)(
-    'restores the $name control after its command fails',
-    async ({ label, value, device: deviceOverrides, disabledLabels }) => {
-      const command = Promise.withResolvers<undefined>()
-      const errorHandler = vi.fn()
-      client.controlDevice.mockReturnValueOnce(command.promise)
-      const wrapper = await mountSuspended(DeviceControls, {
-        props: { device: device(deviceOverrides) },
-        global: { config: { errorHandler } },
-      })
-
-      await changeSlider(wrapper, label, value)
-
-      command.reject(new Error('Command failed'))
-      await flushPromises()
-
-      expect(errorHandler).toHaveBeenCalled()
-      for (const disabledLabel of disabledLabels) {
-        expect(getSlider(wrapper, disabledLabel).props('disabled')).toBe(false)
-      }
-    }
-  )
 
   it('changes device hue with its current saturation', async () => {
     const wrapper = await mountSuspended(DeviceControls, {
