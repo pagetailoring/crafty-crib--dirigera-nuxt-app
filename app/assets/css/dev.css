@@ -1,0 +1,20 @@
+.red {
+  outline: 3px dotted rgba(255, 0, 0, 0.4) !important;
+
+  * {
+    outline: 1px dashed rgba(255, 0, 0, 0.3) !important;
+  }
+
+  &.soft {
+    &,
+    & * {
+      outline-color: rgba(255, 0, 0, 0.1) !important;
+      outline: 1px dashed rgba(255, 0, 0, 0.1) !important;
+    }
+  }
+}
+
+/* .full-yellow,
+*,*::before,*::after {
+  outline: 1px dashed rgba(255, 255, 0, 0.3) !important;
+} */
