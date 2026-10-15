@@ -26,12 +26,25 @@ const activeRoomName = computed(() => {
   if (route.name !== 'room-id') return null
   return roomById.value[String(route.params.id)]?.data.name ?? 'Room'
 })
+
+const activePageName = computed(
+  () =>
+    activeRoomName.value ??
+    items.find(item => item.to === route.path)?.label ??
+    null
+)
 </script>
 
 <template>
   <UHeader
     mode="drawer"
     :ui="{ toggle: 'lg:inline-flex', content: 'lg:flex', overlay: 'lg:block' }"
+    :toggle="{
+      color: 'primary',
+      variant: 'subtle',
+      size: 'xl',
+      class: 'rounded-full',
+    }"
   >
     <template #left>
       <UButton
@@ -44,7 +57,7 @@ const activeRoomName = computed(() => {
         size="xl"
       />
 
-      <template v-if="activeRoomName">
+      <template v-if="activePageName">
         <UButton
           to="/"
           icon="i-lucide-arrow-left"
@@ -52,7 +65,7 @@ const activeRoomName = computed(() => {
           aria-label="go back to home page"
         />
         <span class="">
-          {{ activeRoomName }}
+          {{ activePageName }}
         </span>
       </template>
     </template>

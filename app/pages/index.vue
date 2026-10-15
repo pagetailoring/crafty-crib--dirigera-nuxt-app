@@ -20,6 +20,12 @@ try {
         label="White spectrum"
       />
       <UButton
+        to="/devices"
+        label="Devices"
+        trailing-icon="i-lucide-cpu"
+        class="font-light uppercase tracking-wider"
+      />
+      <UButton
         to="/scenes"
         label="Scenes"
         trailing-icon="i-lucide-settings"

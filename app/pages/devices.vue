@@ -10,10 +10,14 @@ const { data: devices, error } = await useFetch('/api/dirigera/devices')
       title="Unable to load devices"
       :description="error.message"
     />
-    <UPageColumns>
-      <template v-for="device in devices" :key="device.id">
-        <DeviceItemCard :device />
+    <DeviceFilters v-if="devices" :devices>
+      <template #default="{ devices: filteredDevices }">
+        <UPageColumns>
+          <template v-for="device in filteredDevices" :key="device.id">
+            <DeviceItemCard :device />
+          </template>
+        </UPageColumns>
       </template>
-    </UPageColumns>
+    </DeviceFilters>
   </UContainer>
 </template>
