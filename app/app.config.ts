@@ -15,6 +15,17 @@ export default defineAppConfig({
         size: 'lg',
       },
     },
+    card: {
+      slots: {
+        // root: 'rounded-lg overflow-hidden',
+        header: 'p-3 pb-2 sm:px-3',
+        // title: 'text-highlighted font-semibold',
+        title: 'text-toned',
+        description: 'mt-1 text-muted text-sm',
+        body: 'p-3 sm:p-3',
+        footer: 'p-3 sm:px-3',
+      },
+    },
     checkboxGroup: {
       defaultVariants: {
         highlight: false,
@@ -32,10 +43,10 @@ export default defineAppConfig({
 
     //
     container: {
-      base: 'grid gap-4 my-2 w-full max-w-(--ui-container) mx-auto px-4 sm:px-6 lg:px-8 ',
+      base: 'grid gap-4 my-2 w-full max-w-(--ui-container) mx-auto px-4 py-1 sm:px-6 lg:px-8 ',
     },
     pageColumns: {
-      base: 'relative columns-1 md:columns-2 lg:columns-3 gap-4 space-y-8 *:break-inside-avoid-column *:will-change-transform',
+      base: 'relative columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4 *:break-inside-avoid-column *:will-change-transform',
     },
   },
 })
