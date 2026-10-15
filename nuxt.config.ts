@@ -7,7 +7,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
-    '@nuxt/hints',
+    // '@nuxt/hints',
     '@nuxt/ui',
     '@nuxt/test-utils/module',
 
