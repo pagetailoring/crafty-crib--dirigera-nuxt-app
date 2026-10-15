@@ -256,13 +256,15 @@ const associationItems = computed(() => {
         </template>
         <template #scenes-body>
           <div class="flex flex-wrap gap-2">
-            <UBadge
+            <UButton
               v-for="scene in associations.scenes"
               :key="scene.id"
+              :to="`/scenes/${encodeURIComponent(scene.id)}`"
               :icon="getIkeaSceneIcon(scene.info.icon)"
               color="neutral"
               variant="subtle"
               :label="scene.info.name"
+              :aria-label="`Open ${scene.info.name}`"
             />
           </div>
         </template>

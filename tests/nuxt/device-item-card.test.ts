@@ -2,6 +2,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Device } from 'dirigera'
+import type { DeviceAssociations } from '../../app/services/device-associations'
 
 import DeviceItemCard from '../../app/components/device/ItemCard.vue'
 
@@ -86,5 +87,25 @@ describe('Device item card power control', () => {
 
     expect(wrapper.findComponent({ name: 'UiSwitch' }).exists()).toBe(false)
     expect(wrapper.text()).toContain('On')
+  })
+
+  it('links an associated scene to its direct page', async () => {
+    const wrapper = await mountSuspended(DeviceItemCard, {
+      props: {
+        device: device('light', true),
+        associations: {
+          devices: [],
+          remotes: [],
+          scenes: [
+            { id: 'evening', info: { name: 'Evening' } },
+          ] as DeviceAssociations['scenes'],
+        },
+        scenesAvailable: true,
+      },
+    })
+
+    await wrapper.find('[data-slot="trigger"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.get('a[href="/scenes/evening"]').text()).toContain('Evening')
   })
 })

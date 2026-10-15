@@ -72,6 +72,7 @@ function replaceScene(updated: Scene) {
         :key="scene.id"
         :scene="scene"
         :products="products"
+        show-details-link
         @updated="replaceScene"
       />
     </div>

@@ -3,6 +3,7 @@ import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import ScenesPage from '../../app/pages/scenes/index.vue'
+import ScenePage from '../../app/pages/scenes/[id].vue'
 import DebugPage from '../../app/pages/scenes/debug.vue'
 
 const { sceneDetails, dirigera, scene } = vi.hoisted(() => {
@@ -90,6 +91,37 @@ describe('Scenes page', () => {
     expect(wrapper.text()).toContain('Mon')
     expect(wrapper.get('a[href="/scenes/debug"]').text()).toContain(
       'Debug view'
+    )
+    expect(wrapper.get('a[href="/scenes/evening"]').text()).toContain('Details')
+  })
+
+  it('opens one scene directly with the same editing and activation actions', async () => {
+    const wrapper = await mountSuspended(ScenePage, {
+      route: '/scenes/evening',
+    })
+
+    expect(wrapper.text()).toContain('Bedside lamp')
+    expect(wrapper.text()).toContain('At 18:00')
+    expect(wrapper.get('a[href="/scenes"]').text()).toContain('All scenes')
+    await wrapper.get('[aria-label="Test Evening"]').trigger('click')
+    expect(dirigera.activateScene).toHaveBeenCalledWith('evening')
+
+    await wrapper.get('[aria-label="Edit Evening"]').trigger('click')
+    await wrapper.get('[aria-label="Save changes to Evening"]').trigger('click')
+    expect(sceneDetails.updateScene).toHaveBeenCalledWith(
+      'evening',
+      expect.any(Object)
+    )
+  })
+
+  it('shows a missing-scene message for an unknown direct link', async () => {
+    const wrapper = await mountSuspended(ScenePage, {
+      route: '/scenes/missing',
+    })
+
+    expect(wrapper.text()).toContain('Scene not found')
+    expect(wrapper.findComponent({ name: 'ScenesSceneCard' }).exists()).toBe(
+      false
     )
   })
 

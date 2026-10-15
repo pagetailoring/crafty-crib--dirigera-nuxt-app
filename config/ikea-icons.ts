@@ -34,7 +34,8 @@ export function getIkeaProductIcon(
   return device.customIcon &&
     Object.hasOwn(IKEA_PRODUCT_ICONS, device.customIcon)
     ? IKEA_PRODUCT_ICONS[device.customIcon as keyof typeof IKEA_PRODUCT_ICONS]
-    : (IKEA_DEVICE_TYPE_ICONS[device.deviceType] ?? 'i-lucide-cpu')
+    : (IKEA_DEVICE_TYPE_ICONS[device.deviceType] ??
+        'i-lucide-gamepad-directional')
 }
 
 export const IKEA_ROOM_ICONS = {
@@ -48,13 +49,13 @@ export const IKEA_ROOM_ICONS = {
   rooms_bunk_bed: 'i-lucide-bed',
   rooms_car: 'i-lucide-car',
   rooms_chair: 'i-lucide-armchair',
-  rooms_clapper: 'i-lucide-clapperboard',
+  rooms_clapper: 'i-lucide-sparkles',
   rooms_coat_hanger: 'i-lucide-shirt',
   rooms_coat_rack: 'i-lucide-shirt',
   rooms_cutlery: 'i-lucide-utensils',
-  rooms_desk: 'i-lucide-monitor',
+  rooms_desk: 'i-lucide-pen-tool',
   rooms_display: 'i-lucide-monitor',
-  rooms_dog: 'i-lucide-dog',
+  rooms_dog: 'i-lucide-rabbit',
   rooms_door: 'i-lucide-door-open',
   rooms_drill: 'i-lucide-drill',
   rooms_fence: 'i-lucide-fence',
@@ -104,8 +105,8 @@ export const IKEA_SCENE_ICONS = {
   scenes_brightness_up: 'i-lucide-sun',
   scenes_broom: 'i-lucide-brush-cleaning',
   scenes_cake: 'i-lucide-cake',
-  scenes_clapper: 'i-lucide-clapperboard',
-  scenes_clean_sparkles: 'i-lucide-sparkles',
+  scenes_clapper: 'i-lucide-sparkles',
+  scenes_clean_sparkles: 'i-lucide-mop-sparkles',
   scenes_cutlery: 'i-lucide-utensils',
   scenes_disco_ball: 'i-lucide-party-popper',
   scenes_game_pad: 'i-lucide-gamepad-2',

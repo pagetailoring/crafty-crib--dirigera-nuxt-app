@@ -12,7 +12,11 @@ import { getIkeaSceneIcon } from '../../../config/ikea-icons'
 
 type Trigger = NonNullable<Scene['triggers']>[number]
 
-const props = defineProps<{ scene: Scene; products: SceneProduct[] }>()
+const props = defineProps<{
+  scene: Scene
+  products: SceneProduct[]
+  showDetailsLink?: boolean
+}>()
 const emit = defineEmits<{ updated: [scene: Scene] }>()
 const details = useSceneDetails()
 const dirigera = useDirigera()
@@ -555,6 +559,15 @@ async function testScene() {
           }}
         </span>
         <div class="flex gap-2">
+          <UButton
+            v-if="showDetailsLink"
+            :to="`/scenes/${encodeURIComponent(scene.id)}`"
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-arrow-up-right"
+            label="Details"
+            :aria-label="`Open ${scene.info.name}`"
+          />
           <UButton
             v-if="canEdit && !editing"
             color="neutral"
