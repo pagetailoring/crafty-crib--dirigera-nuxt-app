@@ -1,4 +1,41 @@
-import type { Room, Scene } from 'dirigera'
+import type { Device, Room, Scene } from 'dirigera'
+
+export const IKEA_PRODUCT_ICONS = {
+  lighting_pendant_light: 'i-lucide-lamp-ceiling',
+  lighting_spot_chandelier: 'i-lucide-lamp-ceiling',
+  lighting_wall_lamp: 'i-lucide-lamp-wall-up',
+  placement_door: 'i-lucide-door-open',
+}
+
+export const IKEA_DEVICE_TYPE_ICONS = {
+  airPurifier: 'i-lucide-wind',
+  blinds: 'i-lucide-blinds',
+  environmentSensor: 'i-lucide-thermometer',
+  shortcutController: 'i-lucide-mouse-pointer-click',
+  lightController: 'i-lucide-toggle-left',
+  soundController: 'i-lucide-volume-2',
+  blindsController: 'i-lucide-blinds',
+  genericSwitch: 'i-lucide-toggle-left',
+  gateway: 'i-lucide-router',
+  light: 'i-lucide-lightbulb',
+  lightSensor: 'i-lucide-sun',
+  motionSensor: 'i-lucide-person-standing',
+  occupancySensor: 'i-lucide-person-standing',
+  openCloseSensor: 'i-lucide-door-open',
+  outlet: 'i-lucide-plug',
+  repeater: 'i-lucide-radio-tower',
+  speaker: 'i-lucide-speaker',
+  waterSensor: 'i-lucide-droplets',
+} satisfies Record<Device['deviceType'], string>
+
+export function getIkeaProductIcon(
+  device: Pick<Device, 'customIcon' | 'deviceType'>
+): string {
+  return device.customIcon &&
+    Object.hasOwn(IKEA_PRODUCT_ICONS, device.customIcon)
+    ? IKEA_PRODUCT_ICONS[device.customIcon as keyof typeof IKEA_PRODUCT_ICONS]
+    : (IKEA_DEVICE_TYPE_ICONS[device.deviceType] ?? 'i-lucide-cpu')
+}
 
 export const IKEA_ROOM_ICONS = {
   rooms_arm_chair: 'i-lucide-armchair',
