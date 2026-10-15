@@ -40,6 +40,26 @@ export default defineAppConfig({
         size: 'xl',
       },
     },
+    //
+    pageCard: {
+      slots: {
+        root: 'relative  flex rounded-lg',
+        spotlight:
+          'absolute inset-0 rounded-[inherit] pointer-events-none bg-default/90',
+        container:
+          'relative flex flex-col flex-1 lg:grid gap-x-8 gap-y-4 p-2 sm:p-3',
+        wrapper: 'flex flex-col flex-1 items-start',
+        // header: 'mb-4',
+        header: 'grid grid-cols-[1.5rem_minmax(0,1fr)_max-content] w-full',
+        body: 'flex flex-wrap gap-3 items-center justify-between w-full',
+        // body: 'flex-1',
+        footer: 'pt-4 mt-auto',
+        leading: 'inline-flex items-center mb-2.5',
+        leadingIcon: 'size-5 shrink-0 text-primary',
+        title: 'text-base text-pretty font-semibold text-highlighted',
+        description: 'text-[15px] text-pretty',
+      },
+    },
 
     //
     container: {

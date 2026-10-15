@@ -57,7 +57,7 @@ const filterItems = computed(() => {
     :items="filterItems"
     value-key="value"
     multiple
-    icon="i-lucide-list-filter"
+    icon="i-lucide-filter"
     aria-label="Filter devices"
     class="w-12 sm:w-64"
     @update:model-value="filters.updateSelectedFilters"

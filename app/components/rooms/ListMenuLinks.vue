@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getIkeaRoomIcon } from '@@/config/ikea-icons'
 
-const { rooms, pending } = storeToRefs(useDirigeraCacheStore())
+const { rooms } = storeToRefs(useDirigeraCacheStore())
 
 const items = computed(() =>
   (rooms.value?.data ?? []).map(room => ({
@@ -13,9 +13,5 @@ const items = computed(() =>
 </script>
 
 <template>
-  <div>
-    <UNavigationMenu :items="items" orientation="vertical" />
-    <!-- <small>{{ rooms }}</small> -->
-    <small v-if="pending.rooms">Loading...</small>
-  </div>
+  <UNavigationMenu :items="items" orientation="vertical" />
 </template>
