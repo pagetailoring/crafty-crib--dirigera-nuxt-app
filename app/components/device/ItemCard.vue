@@ -15,6 +15,7 @@ const cache = useDirigeraCacheStore()
 const toast = useToast()
 const power = ref(device.attributes.isOn)
 const powerPending = ref(false)
+const pendingScenes = ref(new Set<string>())
 const isOpen = ref(false)
 const category = computed(() => getDeviceCategory(device.type))
 const hasLightControls = computed(
@@ -55,6 +56,22 @@ async function setPower(isOn: boolean) {
     })
   } finally {
     powerPending.value = false
+  }
+}
+
+async function activateScene(sceneId: string, sceneName: string) {
+  if (pendingScenes.value.has(sceneId)) return
+
+  pendingScenes.value.add(sceneId)
+  try {
+    await dirigera.activateScene(sceneId)
+  } catch {
+    toast.add({
+      title: `Unable to trigger ${sceneName}`,
+      color: 'error',
+    })
+  } finally {
+    pendingScenes.value.delete(sceneId)
   }
 }
 
@@ -311,21 +328,31 @@ const associationItems = computed(() => {
 
         <template #content>
           <div class="flex flex-wrap gap-2">
+            <UFieldGroup
+              v-for="scene in associations.scenes"
+              :key="scene.id"
+              size="sm"
+            >
+              <UButton
+                :icon="getIkeaSceneIcon(scene.info.icon)"
+                color="primary"
+                :label="scene.info.name"
+                :aria-label="`Trigger ${scene.info.name}`"
+                :loading="pendingScenes.has(scene.id)"
+                @click="activateScene(scene.id, scene.info.name)"
+              />
+              <UButton
+                :to="`/scenes/${encodeURIComponent(scene.id)}`"
+                icon="i-lucide-pencil"
+                color="primary"
+                :aria-label="`Edit ${scene.info.name}`"
+              />
+            </UFieldGroup>
             <UBadge
               v-for="linked in linkedDevices"
               :key="linked.id"
               :icon="getIkeaProductIcon(linked)"
               :label="linked.attributes.customName"
-            />
-            <UButton
-              v-for="scene in associations.scenes"
-              :key="scene.id"
-              :to="`/scenes/${encodeURIComponent(scene.id)}`"
-              :icon="getIkeaSceneIcon(scene.info.icon)"
-              color="primary"
-              size="sm"
-              :label="scene.info.name"
-              :aria-label="`Open ${scene.info.name}`"
             />
           </div>
         </template>

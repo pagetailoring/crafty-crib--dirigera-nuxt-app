@@ -1,6 +1,6 @@
 ---
 createdAt: 2026-10-14
-editedAt: 2026-10-15T14:41:08
+editedAt: 2026-10-16T01:38:00
 lastReviewed: 2026-10-15
 ---
 
@@ -15,6 +15,7 @@ lastReviewed: 2026-10-15
 - `UCheckboxGroup`
 - `UCollapsible`
 - `UContainer`
+- `UFieldGroup`
 - `UForm`
 - `UFormField`
 - `UHeader`

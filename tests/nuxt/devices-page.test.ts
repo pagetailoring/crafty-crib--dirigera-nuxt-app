@@ -54,6 +54,14 @@ const { devices } = vi.hoisted(() => ({
   ],
 }))
 
+const { activateScene } = vi.hoisted(() => ({
+  activateScene: vi.fn().mockResolvedValue(undefined),
+}))
+
+vi.mock('../../app/composables/useDirigera', () => ({
+  useDirigera: () => ({ activateScene }),
+}))
+
 mockNuxtImport('useFetch', () => (url: string) => ({
   data: ref(
     url.endsWith('/devices')
@@ -119,6 +127,7 @@ describe('Devices page', () => {
   })
 
   it('toggles linked devices and scenes in a single collapsible section', async () => {
+    activateScene.mockClear()
     const wrapper = await mountSuspended(DevicesPage, { route: '/devices' })
     const cards = wrapper.findAllComponents({ name: 'DeviceItemCard' })
     const lightCard = cards[0]!
@@ -132,7 +141,20 @@ describe('Devices page', () => {
     await flushPromises()
     expect(trigger.attributes('aria-expanded')).toBe('true')
     expect(lightCard.text()).toContain('Living room remote')
-    expect(lightCard.get('a[href="/scenes/evening"]').text()).toBe('Evening')
+    expect(
+      lightCard.get('a[href="/scenes/evening"]').attributes('aria-label')
+    ).toBe('Edit Evening')
+    const sceneTrigger = lightCard.get('button[aria-label="Trigger Evening"]')
+    expect(sceneTrigger.text()).toContain('Evening')
+    expect(
+      sceneTrigger.element.compareDocumentPosition(
+        lightCard.getComponent({ name: 'UBadge' }).element
+      ) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    await sceneTrigger.trigger('click')
+    await flushPromises()
+    expect(activateScene).toHaveBeenCalledOnce()
+    expect(activateScene).toHaveBeenCalledWith('evening')
 
     await trigger.trigger('click')
     await flushPromises()
@@ -144,7 +166,9 @@ describe('Devices page', () => {
     await remoteCard.get('button[aria-expanded]').trigger('click')
     await flushPromises()
     expect(remoteCard.text()).toContain('Living room lamp')
-    expect(remoteCard.get('a[href="/scenes/evening"]').text()).toBe('Evening')
+    expect(
+      remoteCard.get('a[href="/scenes/evening"]').attributes('aria-label')
+    ).toBe('Edit Evening')
     expect(cards[3]!.find('button[aria-expanded]').exists()).toBe(false)
     wrapper.unmount()
   })
