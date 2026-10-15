@@ -38,7 +38,12 @@ const activePageName = computed(
 <template>
   <UHeader
     mode="drawer"
-    :ui="{ toggle: 'lg:inline-flex', content: 'lg:flex', overlay: 'lg:block' }"
+    :ui="{
+      toggle: 'lg:inline-flex',
+      content: 'lg:flex',
+      overlay: 'lg:block',
+      right: 'gap-3',
+    }"
     :toggle="{
       color: 'primary',
       variant: 'subtle',

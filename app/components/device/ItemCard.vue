@@ -80,6 +80,8 @@ const associationItems = computed(() => {
       : []),
   ]
 })
+
+// dev
 </script>
 
 <!--  :spotlight="true" -->
@@ -91,7 +93,7 @@ const associationItems = computed(() => {
       <span>{{ device.attributes.customName }}</span>
 
       <div class="row-span-2 relative">
-        <span class="ml-auto tracking-widest font-light uppercase">
+        <span class="ml-auto tracking-widest font-light uppercase text-sm">
           {{ device.room?.name }}
         </span>
         <span class="absolute bottom-0 max-h-[50%] w-full left-0">
@@ -118,6 +120,15 @@ const associationItems = computed(() => {
         variant="subtle"
         :label="`${device.attributes.batteryPercentage}%`"
       />
+
+      <DevOnly>
+        <!-- dev -->
+        <LazyToolsDeviceDebug
+          :device
+          class="absolute left-1.5 opacity-15 hover:opacity-100"
+        />
+        <!--  -->
+      </DevOnly>
 
       <UBadge
         v-if="device.attributes.lightLevel != null"
@@ -156,8 +167,6 @@ const associationItems = computed(() => {
       >
         {{ device.attributes.colorTemperature }} K
       </UBadge>
-
-      <!-- <UBadge icon="i-lucide-cpu" :label="device.deviceType" /> -->
 
       <UBadge
         v-if="!device.isReachable"
@@ -236,11 +245,55 @@ const associationItems = computed(() => {
         icon="i-lucide-blinds"
         :label="`Position ${device.attributes.blindsCurrentLevel}%`"
       />
-      <!-- </div> -->
     </template>
 
     <template #footer>
-      <!-- <USeparator label="Hello World" /> -->
+      <UCollapsible v-if="associationItems.length">
+        <UButton
+          icon="i-lucide-link"
+          variant="ghost"
+          size="xs"
+          trailing-icon="i-lucide-chevron-down"
+          class="font-light text-center tracking-widest text-muted"
+          block
+          :ui="{
+            trailingIcon: 'ms-1 -mr-2 opacity-50',
+            leadingIcon: '-ms-2 mr-3 opacity-50',
+          }"
+        >
+          <USeparator :label="`@ADD:TYPE_FROM_RULE connected`" class="" />
+          <!-- <UBadge icon="i-lucide-cpu" :label="device.deviceType" /> -->
+        </UButton>
+
+        <template #content>
+          <div class="flex flex-wrap gap-2">
+            <UBadge
+              v-for="linked in linkedDevices"
+              :key="linked.id"
+              :icon="getIkeaProductIcon(linked)"
+              color="secondary"
+              variant="subtle"
+              size="md"
+              :label="linked.attributes.customName"
+            />
+            <UButton
+              v-for="scene in associations.scenes"
+              :key="scene.id"
+              :to="`/scenes/${encodeURIComponent(scene.id)}`"
+              :icon="getIkeaSceneIcon(scene.info.icon)"
+              color="primary"
+              variant="subtle"
+              size="sm"
+              :label="scene.info.name"
+              :aria-label="`Open ${scene.info.name}`"
+            />
+          </div>
+        </template>
+      </UCollapsible>
+
+      <!-- <USeparator />
+      <USeparator />
+      <USeparator />
       <UAccordion v-if="associationItems.length" :items="associationItems">
         <template #devices-body>
           <div class="flex flex-wrap gap-2">
@@ -268,20 +321,7 @@ const associationItems = computed(() => {
             />
           </div>
         </template>
-      </UAccordion>
-
-      <!-- <DevOnly>
-        <details>
-          <summary>
-            <small class="text-muted cursor-pointer">
-              Details <i>raw data</i>
-            </small>
-          </summary>
-          <small>
-            <pre>{{ JSON.stringify(device, null, 2) }}</pre>
-          </small>
-        </details>
-      </DevOnly> -->
+      </UAccordion> -->
     </template>
   </UPageCard>
 </template>

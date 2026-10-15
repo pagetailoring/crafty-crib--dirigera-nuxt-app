@@ -17,13 +17,19 @@ export default defineAppConfig({
     },
     card: {
       slots: {
-        // root: 'rounded-lg overflow-hidden',
         header: 'p-3 pb-2 sm:px-3',
-        // title: 'text-highlighted font-semibold',
+
         title: 'text-toned',
         description: 'mt-1 text-muted text-sm',
         body: 'p-3 sm:p-3',
         footer: 'p-3 sm:px-3',
+      },
+    },
+    collapsible: {
+      slots: {
+        root: 'w-full',
+        content:
+          'flex gap-2 pt-3 data-[state=open]:animate-[collapsible-down_200ms_var(--ease-out)] data-[state=closed]:animate-[collapsible-up_200ms_var(--ease-out)] data-[state=closed]:overflow-hidden',
       },
     },
     checkboxGroup: {
@@ -43,7 +49,7 @@ export default defineAppConfig({
     //
     pageCard: {
       slots: {
-        root: 'relative  flex rounded-lg',
+        root: 'relative flex rounded-lg',
         spotlight:
           'absolute inset-0 rounded-[inherit] pointer-events-none bg-default/90',
         container:
@@ -51,9 +57,9 @@ export default defineAppConfig({
         wrapper: 'flex flex-col flex-1 items-start',
         // header: 'mb-4',
         header: 'grid grid-cols-[1.5rem_minmax(0,1fr)_max-content] w-full',
-        body: 'flex flex-wrap gap-3 items-center justify-between w-full',
+        body: 'flex flex-wrap gap-3 items-center justify-between w-full pl-6',
         // body: 'flex-1',
-        footer: 'pt-4 mt-auto',
+        footer: 'pt-3 w-full',
         leading: 'inline-flex items-center mb-2.5',
         leadingIcon: 'size-5 shrink-0 text-primary',
         title: 'text-base text-pretty font-semibold text-highlighted',
@@ -99,7 +105,7 @@ export default defineAppConfig({
         // childLinkLabel: 'truncate',
         // childLinkLabelExternalIcon: 'inline-block size-3 align-top text-dimmed',
         // childLinkDescription: 'text-muted',
-        // separator: 'px-2 h-px bg-border',
+        separator: 'px-2 h-px bg-border my-2',
         // viewportWrapper: 'absolute top-full start-0 flex w-full',
         // viewport:
         //   'relative overflow-hidden bg-default shadow-lg rounded-md ring ring-default h-(--reka-navigation-menu-viewport-height) w-full transition-[width,height,left,right] duration-200 ease-out motion-reduce:transition-none origin-[top_center] data-[state=open]:animate-[scale-in_100ms_var(--ease-out)] data-[state=closed]:animate-[scale-out_100ms_var(--ease-out)] z-1',
