@@ -4,6 +4,7 @@ import { APP_NAME } from '@@/config/app'
 const items = [
   { label: 'White Spectrum', icon: 'i-lucide-sun', to: '/white-spectrum' },
   { label: 'Scenes', icon: 'i-lucide-settings', to: '/scenes' },
+  { label: 'Devices', icon: 'i-lucide-cpu', to: '/devices' },
 ]
 
 const colorMode = useColorMode()

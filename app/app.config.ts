@@ -5,7 +5,7 @@ export default defineAppConfig({
       defaultVariants: {
         color: 'secondary',
         variant: 'subtle',
-        size: 'sm',
+        size: 'md',
       },
     },
     button: {
