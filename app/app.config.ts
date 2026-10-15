@@ -1,6 +1,7 @@
 export default defineAppConfig({
   ui: {
     badge: {
+      // tabular-nums
       defaultVariants: {
         color: 'secondary',
         variant: 'subtle',

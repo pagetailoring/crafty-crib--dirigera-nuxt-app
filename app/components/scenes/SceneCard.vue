@@ -6,6 +6,9 @@ import type {
   SceneProduct,
 } from '../../../shared/types/scene-editor'
 import { WEEKDAYS } from '../../../config/scene'
+import { sceneNumericControl } from '../../../config/scene-controls'
+import type { SceneNumericAttribute } from '../../../config/scene-controls'
+import { getIkeaSceneIcon } from '../../../config/ikea-icons'
 
 type Trigger = NonNullable<Scene['triggers']>[number]
 
@@ -40,7 +43,7 @@ function actionName(action: Scene['actions'][number]) {
 const productOptions = computed(() =>
   props.products
     .filter(product => {
-      if (!product.canSetPower) return false
+      if (!product.capabilities.length) return false
       return !draftActions.value.some(action => {
         if (action.kind === 'new') {
           return action.type === product.type && action.deviceId === product.id
@@ -52,7 +55,15 @@ const productOptions = computed(() =>
       })
     })
     .map(product => ({
-      label: `${product.name}${product.roomName ? ` · ${product.roomName}` : ''}`,
+      label: [
+        product.name,
+        product.productName,
+        product.roomName,
+        product.type === 'deviceSet' ? 'Group' : undefined,
+        ...product.groups.map(group => `Group: ${group.name}`),
+      ]
+        .filter(Boolean)
+        .join(' · '),
       value: `${product.type}:${product.id}`,
     }))
 )
@@ -83,22 +94,60 @@ function triggerLabel(trigger: Trigger | undefined) {
   return 'Trigger'
 }
 
+function triggerIcon(trigger: Trigger) {
+  if (trigger.type === 'time') return 'i-lucide-clock-3'
+  if (trigger.type === 'sunriseSunset') {
+    return trigger.trigger.type === 'sunrise'
+      ? 'i-lucide-sunrise'
+      : 'i-lucide-sunset'
+  }
+  if (trigger.type === 'app') return 'i-lucide-smartphone'
+  if (trigger.type === 'controller') return 'i-lucide-toggle-left'
+  if (trigger.type === 'event') return 'i-lucide-zap'
+  return 'i-lucide-calendar-clock'
+}
+
+const attributePresentation = {
+  lightLevel: { label: 'Brightness', icon: 'i-lucide-lightbulb', suffix: '%' },
+  colorTemperature: {
+    label: 'Color temperature',
+    icon: 'i-lucide-thermometer-sun',
+    suffix: ' K',
+  },
+  colorHue: { label: 'Hue', icon: 'i-lucide-palette', suffix: '°' },
+  colorSaturation: {
+    label: 'Saturation',
+    icon: 'i-lucide-droplets',
+    suffix: '',
+  },
+  volume: { label: 'Volume', icon: 'i-lucide-volume-2', suffix: '%' },
+  playback: { label: 'Playback', icon: 'i-lucide-play', suffix: '' },
+} as const
+
 function otherAttributes(action: Scene['actions'][number]) {
   return Object.entries(action.attributes)
     .filter(([key, value]) => key !== 'isOn' && value != null)
-    .map(
-      ([key, value]) =>
-        `${key}: ${typeof value === 'object' ? JSON.stringify(value) : value}`
-    )
+    .map(([key, value]) => {
+      const presentation =
+        attributePresentation[key as keyof typeof attributePresentation]
+      const formattedValue =
+        key === 'colorSaturation' && typeof value === 'number'
+          ? `${Math.round(value * 100)}%`
+          : `${typeof value === 'object' ? JSON.stringify(value) : value}${presentation?.suffix ?? ''}`
+      return {
+        key,
+        label: presentation?.label ?? key,
+        icon: presentation?.icon ?? 'i-lucide-sliders-horizontal',
+        value: formattedValue,
+      }
+    })
 }
 
 function beginEdit() {
-  draftActions.value = props.scene.actions.map((action, index) => ({
+  draftActions.value = props.scene.actions.map((_, index) => ({
     kind: 'existing',
     index,
-    ...(typeof action.attributes.isOn === 'boolean'
-      ? { isOn: action.attributes.isOn }
-      : {}),
+    attributes: {},
   }))
   draftDays.value = (props.scene.triggers ?? []).flatMap((trigger, index) =>
     hasEditableDays(trigger) ? [{ index, days: triggerDays(trigger) }] : []
@@ -113,12 +162,21 @@ function addProduct() {
   const product = props.products.find(
     item => `${item.type}:${item.id}` === selectedProductKey.value
   )
-  if (!product?.canSetPower) return
+  if (!product?.capabilities.length) return
+  const first = product.capabilities[0]!
+  const attributes = product.canSetPower
+    ? { isOn: selectedPower.value }
+    : first === 'playback'
+      ? { playback: 'playbackPlaying' as const }
+      : {
+          [first]: sceneNumericControl(first as SceneNumericAttribute, product)
+            .min,
+        }
   draftActions.value.push({
     kind: 'new',
     type: product.type,
     deviceId: product.id,
-    isOn: selectedPower.value,
+    attributes,
   })
   selectedProductKey.value = undefined
   selectedPower.value = true
@@ -136,22 +194,20 @@ function draftActionName(action: SceneActionEdit) {
   )
 }
 
-function canEditPower(action: SceneActionEdit) {
-  if (action.kind === 'new') return true
-  const original = props.scene.actions[action.index]
-  return original ? (productFor(original)?.canSetPower ?? false) : false
+function draftProduct(action: SceneActionEdit) {
+  return action.kind === 'existing'
+    ? productFor(props.scene.actions[action.index]!)
+    : props.products.find(
+        product =>
+          product.type === action.type && product.id === action.deviceId
+      )
 }
 
-function draftPower(action: SceneActionEdit) {
-  if (action.kind === 'new') return action.isOn
-  if (action.isOn !== undefined) return action.isOn
-  return props.scene.actions[action.index]?.attributes.isOn === true
-}
-
-function setDraftPower(index: number, isOn: boolean) {
-  const action = draftActions.value[index]
-  if (action) action.isOn = isOn
-}
+const selectedProduct = computed(() =>
+  props.products.find(
+    product => `${product.type}:${product.id}` === selectedProductKey.value
+  )
+)
 
 function toggleDay(edit: SceneDaysEdit, day: string) {
   edit.days = edit.days.includes(day)
@@ -199,14 +255,17 @@ async function testScene() {
 </script>
 
 <template>
-  <UCard class="h-fit">
+  <UCard
+    class="h-fit overflow-hidden"
+    :ui="{ header: 'p-4', body: 'p-4', footer: 'p-4' }"
+  >
     <template #header>
-      <div class="flex flex-wrap items-start justify-between gap-4">
-        <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="flex items-center gap-2.5">
           <div
-            class="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary"
+            class="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary ring ring-primary/20"
           >
-            <UIcon name="i-lucide-sparkles" class="size-5" />
+            <UIcon :name="getIkeaSceneIcon(scene.info.icon)" class="size-5" />
           </div>
           <div>
             <h2 class="text-lg font-semibold">{{ scene.info.name }}</h2>
@@ -216,15 +275,25 @@ async function testScene() {
             </p>
           </div>
         </div>
-        <UBadge color="neutral" variant="subtle">{{ scene.type }}</UBadge>
+        <UBadge
+          color="neutral"
+          variant="subtle"
+          icon="i-lucide-clapperboard"
+          :label="scene.type"
+        />
       </div>
     </template>
 
-    <div class="space-y-6">
-      <section>
-        <h3 class="mb-3 flex items-center gap-2 font-medium">
-          <UIcon name="i-lucide-lightbulb" class="size-4 text-muted" />
+    <div class="space-y-4">
+      <section v-if="!editing">
+        <h3 class="mb-2 flex items-center gap-2 font-semibold">
+          <UIcon name="i-lucide-lightbulb" class="size-5 text-secondary" />
           Products
+          <UBadge
+            color="secondary"
+            variant="subtle"
+            :label="scene.actions.length"
+          />
         </h3>
         <p v-if="scene.actions.length === 0" class="text-sm text-muted">
           No products in this scene.
@@ -233,47 +302,74 @@ async function testScene() {
           <div
             v-for="(action, index) in scene.actions"
             :key="action.id ?? index"
-            class="rounded-lg border border-default p-3"
+            class="rounded-lg bg-secondary/5 p-3 ring ring-secondary/30"
           >
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <div>
+              <div class="min-w-0">
                 <p class="font-medium">{{ actionName(action) }}</p>
-                <p
-                  v-if="productFor(action)?.productName"
-                  class="text-xs text-muted"
-                >
-                  {{ productFor(action)?.productName }}
+                <p v-if="productFor(action)" class="text-xs text-muted">
+                  {{
+                    [
+                      productFor(action)?.productName,
+                      ...(productFor(action)?.groups.map(
+                        group => `Group: ${group.name}`
+                      ) ?? []),
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')
+                  }}
                 </p>
               </div>
-              <UBadge
-                v-if="typeof action.attributes.isOn === 'boolean'"
-                :color="action.attributes.isOn ? 'success' : 'neutral'"
-                variant="subtle"
-              >
-                {{ action.attributes.isOn ? 'Turns on' : 'Turns off' }}
-              </UBadge>
+              <div class="flex flex-wrap items-center gap-1.5">
+                <UBadge
+                  v-if="productFor(action)?.roomName"
+                  color="secondary"
+                  variant="outline"
+                  icon="i-lucide-map-pin"
+                  :label="productFor(action)?.roomName ?? undefined"
+                  class="tracking-widest uppercase"
+                />
+                <UBadge
+                  v-if="typeof action.attributes.isOn === 'boolean'"
+                  :color="action.attributes.isOn ? 'success' : 'neutral'"
+                  variant="subtle"
+                  :icon="
+                    action.attributes.isOn
+                      ? 'i-lucide-lightbulb'
+                      : 'i-lucide-lightbulb-off'
+                  "
+                >
+                  {{ action.attributes.isOn ? 'Turns on' : 'Turns off' }}
+                </UBadge>
+              </div>
             </div>
             <div
               v-if="otherAttributes(action).length"
-              class="mt-2 flex flex-wrap gap-1"
+              class="mt-2 flex flex-wrap gap-1.5"
             >
               <UBadge
                 v-for="attribute in otherAttributes(action)"
-                :key="attribute"
-                color="neutral"
-                variant="outline"
+                :key="attribute.key"
+                color="secondary"
+                variant="subtle"
+                :icon="attribute.icon"
               >
-                {{ attribute }}
+                {{ attribute.label }} {{ attribute.value }}
               </UBadge>
             </div>
           </div>
         </div>
       </section>
 
-      <section>
-        <h3 class="mb-3 flex items-center gap-2 font-medium">
-          <UIcon name="i-lucide-calendar-days" class="size-4 text-muted" />
+      <section v-if="!editing">
+        <h3 class="mb-2 flex items-center gap-2 font-semibold">
+          <UIcon name="i-lucide-calendar-days" class="size-5 text-secondary" />
           Schedule and triggers
+          <UBadge
+            color="secondary"
+            variant="subtle"
+            :label="scene.triggers?.length ?? 0"
+          />
         </h3>
         <p v-if="!scene.triggers?.length" class="text-sm text-muted">
           No scheduled triggers.
@@ -282,10 +378,13 @@ async function testScene() {
           <div
             v-for="(trigger, index) in scene.triggers"
             :key="trigger.id ?? index"
-            class="rounded-lg bg-muted/40 p-3 text-sm"
+            class="rounded-lg bg-elevated/50 p-3 text-sm ring ring-default"
           >
             <div class="flex items-center justify-between gap-2">
-              <span class="font-medium">{{ triggerLabel(trigger) }}</span>
+              <span class="flex items-center gap-2 font-medium">
+                <UIcon :name="triggerIcon(trigger)" class="size-4 text-muted" />
+                {{ triggerLabel(trigger) }}
+              </span>
               <UBadge v-if="trigger.disabled" color="warning" variant="subtle">
                 Disabled
               </UBadge>
@@ -298,7 +397,8 @@ async function testScene() {
                 v-for="day in triggerDays(trigger)"
                 :key="day"
                 color="neutral"
-                variant="outline"
+                variant="subtle"
+                icon="i-lucide-calendar-check"
               >
                 {{ day }}
               </UBadge>
@@ -307,78 +407,91 @@ async function testScene() {
         </div>
       </section>
 
-      <p v-if="scene.commands.length" class="text-sm text-muted">
+      <p v-if="!editing && scene.commands.length" class="text-sm text-muted">
         {{ scene.commands.length }} additional commands. This scene is read-only
         here; the debug view shows the commands.
       </p>
-      <p v-else-if="scene.type !== 'userScene'" class="text-sm text-muted">
+      <p
+        v-else-if="!editing && scene.type !== 'userScene'"
+        class="text-sm text-muted"
+      >
         This scene type is read-only here.
       </p>
 
-      <div v-if="editing" class="space-y-5 border-t border-default pt-5">
-        <h3 class="font-semibold">Edit scene</h3>
-        <div class="space-y-2">
-          <h4 class="text-sm font-medium">Products in the scene</h4>
-          <div
+      <div
+        v-if="editing"
+        class="space-y-4 rounded-xl bg-elevated/40 p-3 ring ring-default"
+      >
+        <h3 class="flex items-center gap-2 font-semibold">
+          <UIcon
+            name="i-lucide-sliders-horizontal"
+            class="size-5 text-primary"
+          />
+          Edit scene
+        </h3>
+        <div class="space-y-2.5">
+          <h4 class="flex items-center gap-2 text-sm font-medium text-muted">
+            <UIcon name="i-lucide-package-plus" class="size-4" />
+            Products in the scene
+          </h4>
+          <ScenesActionEditor
             v-for="(action, index) in draftActions"
             :key="
               action.kind === 'existing'
                 ? `existing-${action.index}`
                 : `${action.type}-${action.deviceId}`
             "
-            class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-default p-3"
+            :model-value="action.attributes ?? {}"
+            :name="draftActionName(action)"
+            :product="draftProduct(action)"
+            :original="
+              action.kind === 'existing'
+                ? scene.actions[action.index]?.attributes
+                : undefined
+            "
+            :disabled="saving"
+            @update:model-value="action.attributes = $event"
+            @remove="draftActions.splice(index, 1)"
+          />
+          <div
+            class="flex flex-wrap items-center gap-2 rounded-lg bg-default p-3 ring ring-default"
           >
-            <span class="font-medium">{{ draftActionName(action) }}</span>
-            <div class="flex items-center gap-3">
-              <USwitch
-                v-if="canEditPower(action)"
-                :model-value="draftPower(action)"
-                :label="draftPower(action) ? 'On' : 'Off'"
-                :aria-label="`Turn ${draftActionName(action)} ${draftPower(action) ? 'off' : 'on'} in scene`"
-                @update:model-value="setDraftPower(index, $event)"
-              />
-              <UButton
-                size="sm"
-                color="error"
-                variant="ghost"
-                :aria-label="`Remove ${draftActionName(action)} from scene`"
-                @click="draftActions.splice(index, 1)"
-              >
-                Remove
-              </UButton>
-            </div>
-          </div>
-          <div class="flex flex-wrap items-center gap-2 pt-2">
             <USelect
               v-model="selectedProductKey"
               :items="productOptions"
+              :disabled="saving"
               placeholder="Select a product"
               aria-label="Product to add"
               class="min-w-52 flex-1"
             />
-            <USwitch
+            <UiSwitch
+              v-if="selectedProduct?.canSetPower"
               v-model="selectedPower"
+              :disabled="saving"
               :label="selectedPower ? 'On' : 'Off'"
               aria-label="Power for new product"
             />
             <UButton
               color="neutral"
               variant="outline"
-              :disabled="!selectedProductKey"
+              icon="i-lucide-plus"
+              label="Add product"
+              :disabled="saving || !selectedProductKey"
               aria-label="Add selected product to scene"
               @click="addProduct"
-            >
-              Add product
-            </UButton>
+            />
           </div>
         </div>
 
         <div v-if="draftDays.length" class="space-y-3">
-          <h4 class="text-sm font-medium">Days in existing schedules</h4>
+          <h4 class="flex items-center gap-2 text-sm font-medium text-muted">
+            <UIcon name="i-lucide-calendar-cog" class="size-4" />
+            Days in existing schedules
+          </h4>
           <div
             v-for="edit in draftDays"
             :key="edit.index"
-            class="rounded-lg border border-default p-3"
+            class="rounded-lg bg-default p-3 ring ring-default"
           >
             <p class="mb-2 text-sm font-medium">
               {{ triggerLabel(scene.triggers?.[edit.index]) }}
@@ -392,6 +505,7 @@ async function testScene() {
                 :variant="edit.days.includes(day) ? 'solid' : 'outline'"
                 :aria-label="`${day} for schedule ${edit.index + 1}`"
                 :aria-pressed="edit.days.includes(day)"
+                :disabled="saving"
                 @click="toggleDay(edit, day)"
               >
                 {{ day }}
@@ -400,21 +514,24 @@ async function testScene() {
           </div>
         </div>
 
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
           <UButton
+            color="primary"
+            variant="subtle"
+            icon="i-lucide-save"
+            label="Save changes"
             :loading="saving"
             :aria-label="`Save changes to ${scene.info.name}`"
             @click="save"
-            >Save changes</UButton
-          >
+          />
           <UButton
             color="neutral"
             variant="ghost"
+            icon="i-lucide-x"
+            label="Cancel"
             :disabled="saving"
             @click="editing = false"
-          >
-            Cancel
-          </UButton>
+          />
         </div>
       </div>
 
@@ -427,9 +544,10 @@ async function testScene() {
       <UAlert v-if="success" color="success" :title="success" />
     </div>
 
-    <template #footer>
+    <template v-if="!editing" #footer>
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <span class="text-xs text-muted">
+        <span class="flex items-center gap-1.5 text-xs text-muted">
+          <UIcon name="i-lucide-history" class="size-4" />
           {{
             scene.lastTriggered
               ? `Last run ${new Date(scene.lastTriggered).toLocaleString()}`
@@ -441,18 +559,20 @@ async function testScene() {
             v-if="canEdit && !editing"
             color="neutral"
             variant="outline"
+            icon="i-lucide-pencil"
+            label="Edit"
             :aria-label="`Edit ${scene.info.name}`"
             @click="beginEdit"
-          >
-            Edit
-          </UButton>
+          />
           <UButton
+            color="primary"
+            variant="subtle"
+            icon="i-lucide-play"
+            label="Test scene"
             :loading="testing"
             :aria-label="`Test ${scene.info.name}`"
             @click="testScene"
-          >
-            Test scene
-          </UButton>
+          />
         </div>
       </div>
     </template>

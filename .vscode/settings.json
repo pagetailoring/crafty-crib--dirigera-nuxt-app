@@ -15,5 +15,6 @@
     "dist": true,
     "**/node_modules": true,
     ".eslintcache": true
-  }
+  },
+  "nuxt.isNuxtApp": false
 }

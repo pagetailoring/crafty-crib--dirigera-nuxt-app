@@ -1,7 +1,7 @@
 ---
 createdAt: 2026-10-14
-editedAt: 2026-10-15T02:24:14
-lastReviewed: 2026-10-14
+editedAt: 2026-10-15T03:20:00
+lastReviewed: 2026-10-15
 ---
 
 # Nuxt UI components
@@ -12,6 +12,7 @@ lastReviewed: 2026-10-14
 - `UButton`
 - `UCard`
 - `UCheckboxGroup`
+- `UCollapsible`
 - `UContainer`
 - `UForm`
 - `UFormField`

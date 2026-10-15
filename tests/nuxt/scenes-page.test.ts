@@ -48,6 +48,14 @@ describe('Scenes page', () => {
         productName: 'TRADFRI bulb',
         roomName: 'Bedroom',
         canSetPower: true,
+        capabilities: ['isOn', 'lightLevel', 'colorTemperature'],
+        groups: [],
+        members: [],
+        isReachable: true,
+        colorTemperatureMin: 2500,
+        colorTemperatureMax: 4000,
+        temperatureRangeReported: true,
+        playbackOptions: [],
       },
       {
         id: 'plug',
@@ -56,6 +64,14 @@ describe('Scenes page', () => {
         productName: 'INSPELNING',
         roomName: 'Bedroom',
         canSetPower: true,
+        capabilities: ['isOn'],
+        groups: [],
+        members: [],
+        isReachable: true,
+        colorTemperatureMin: null,
+        colorTemperatureMax: null,
+        temperatureRangeReported: false,
+        playbackOptions: [],
       },
     ])
     sceneDetails.updateScene.mockReset().mockResolvedValue(scene)
@@ -69,7 +85,7 @@ describe('Scenes page', () => {
     expect(wrapper.text()).toContain('Bedside lamp')
     expect(wrapper.text()).toContain('TRADFRI bulb')
     expect(wrapper.text()).toContain('Turns on')
-    expect(wrapper.text()).toContain('lightLevel: 40')
+    expect(wrapper.text()).toContain('Brightness 40%')
     expect(wrapper.text()).toContain('At 18:00')
     expect(wrapper.text()).toContain('Mon')
     expect(wrapper.get('a[href="/scenes/debug"]').text()).toContain(
@@ -80,6 +96,9 @@ describe('Scenes page', () => {
   it('saves a removed product and changed weekdays', async () => {
     const wrapper = await mountSuspended(ScenesPage, { route: '/scenes' })
     await wrapper.get('[aria-label="Edit Evening"]').trigger('click')
+    await wrapper
+      .get('[aria-label="Edit settings for Bedside lamp"]')
+      .trigger('click')
     await wrapper
       .get('[aria-label="Remove Bedside lamp from scene"]')
       .trigger('click')
@@ -98,7 +117,13 @@ describe('Scenes page', () => {
   it('adds a product with its selected power state', async () => {
     const wrapper = await mountSuspended(ScenesPage, { route: '/scenes' })
     await wrapper.get('[aria-label="Edit Evening"]').trigger('click')
-    const select = wrapper.findComponent({ name: 'USelect' })
+    const select = wrapper
+      .findAllComponents({ name: 'USelect' })
+      .find(component =>
+        component
+          .props('items')
+          .some((item: { value: string }) => item.value === 'device:plug')
+      )!
     select.vm.$emit('update:modelValue', 'device:plug')
     await flushPromises()
     await wrapper.get('[aria-label="Power for new product"]').trigger('click')
@@ -111,11 +136,54 @@ describe('Scenes page', () => {
       'evening',
       expect.objectContaining({
         actions: [
-          { kind: 'existing', index: 0, isOn: true },
-          { kind: 'new', type: 'device', deviceId: 'plug', isOn: false },
+          { kind: 'existing', index: 0, attributes: {} },
+          {
+            kind: 'new',
+            type: 'device',
+            deviceId: 'plug',
+            attributes: { isOn: false },
+          },
         ],
       })
     )
+  })
+
+  it('edits white temperature with product limits without activating the scene', async () => {
+    const wrapper = await mountSuspended(ScenesPage, { route: '/scenes' })
+    await wrapper.get('[aria-label="Edit Evening"]').trigger('click')
+    await wrapper
+      .get('[aria-label="Edit settings for Bedside lamp"]')
+      .trigger('click')
+    expect(wrapper.text()).toContain('2500–4000 K')
+    expect(wrapper.text()).toContain('Bedroom')
+    await wrapper
+      .get('[aria-label="Set color temperature for Bedside lamp"]')
+      .trigger('click')
+    const slider = wrapper
+      .findAllComponents({ name: 'USlider' })
+      .find(component => component.props('min') === 2500)!
+    expect(slider.props('min')).toBe(2500)
+    expect(slider.props('max')).toBe(4000)
+    slider.vm.$emit('update:modelValue', 3200)
+    await flushPromises()
+    await wrapper.get('[aria-label="Save changes to Evening"]').trigger('click')
+    expect(sceneDetails.updateScene).toHaveBeenCalledWith(
+      'evening',
+      expect.objectContaining({
+        actions: [
+          {
+            kind: 'existing',
+            index: 0,
+            attributes: {
+              colorTemperature: 3200,
+              colorHue: null,
+              colorSaturation: null,
+            },
+          },
+        ],
+      })
+    )
+    expect(dirigera.activateScene).not.toHaveBeenCalled()
   })
 
   it('keeps the original full-detail page available for debugging', async () => {

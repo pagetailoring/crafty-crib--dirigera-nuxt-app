@@ -16,6 +16,6 @@ const items = computed(() =>
   <div>
     <UNavigationMenu :items="items" orientation="vertical" />
     <!-- <small>{{ rooms }}</small> -->
-    <small v-if="pending">Loading...</small>
+    <small v-if="pending.rooms">Loading...</small>
   </div>
 </template>
