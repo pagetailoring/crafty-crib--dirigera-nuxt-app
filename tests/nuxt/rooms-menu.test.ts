@@ -1,40 +1,46 @@
-import { createPinia, setActivePinia } from 'pinia'
-import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
+import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { nextTick } from 'vue'
-import { expect, it, vi } from 'vitest'
+import { expect, it } from 'vitest'
+import { useNuxtApp } from '#app'
 
 import ListMenuLinks from '../../app/components/rooms/ListMenuLinks.vue'
+import type { RoomSummary } from '../../app/services/dirigera-client'
 import { useDirigeraCacheStore } from '../../app/stores/cache'
 
-const { listRooms } = vi.hoisted(() => ({ listRooms: vi.fn() }))
-mockNuxtImport('useDirigera', () => () => ({ listRooms }))
+const room = (id: string, name: string): RoomSummary => ({
+  id,
+  name,
+  temperature: null,
+  humidity: null,
+  pm25: null,
+  vocIndex: null,
+  co2: null,
+  quickControls: [],
+})
 
-it('shows loading only while the room list request is pending', async () => {
-  const pinia = createPinia()
-  setActivePinia(pinia)
-  const cache = useDirigeraCacheStore()
-  let finish!: (value: []) => void
-  listRooms.mockReturnValue(
-    new Promise<[]>(resolve => {
-      finish = resolve
-    })
-  )
-  const wrapper = await mountSuspended(ListMenuLinks, {
-    global: { plugins: [pinia], stubs: { UNavigationMenu: true } },
-  })
+it('updates room navigation when cached rooms change', async () => {
+  const cache = useDirigeraCacheStore(useNuxtApp().$pinia)
+  cache.rooms = undefined
+  const wrapper = await mountSuspended(ListMenuLinks)
 
-  expect(wrapper.text()).not.toContain('Loading...')
-  const request = cache.loadRooms()
+  expect(wrapper.findAll('a')).toHaveLength(0)
+
+  cache.rooms = {
+    data: [room('kitchen', 'Kitchen')],
+    refreshedAt: Date.now(),
+    stale: false,
+  }
   await nextTick()
-  expect(wrapper.text()).toContain('Loading...')
+  expect(wrapper.get('a[href="/room/kitchen"]').text()).toBe('Kitchen')
 
-  finish([])
-  await request
+  cache.rooms = {
+    data: [room('bedroom', 'Bedroom')],
+    refreshedAt: Date.now(),
+    stale: false,
+  }
   await nextTick()
-  expect(wrapper.text()).not.toContain('Loading...')
+  expect(wrapper.find('a[href="/room/kitchen"]').exists()).toBe(false)
+  expect(wrapper.get('a[href="/room/bedroom"]').text()).toBe('Bedroom')
 
-  cache.pending.scenes = true
-  await nextTick()
-  expect(wrapper.text()).not.toContain('Loading...')
   wrapper.unmount()
 })

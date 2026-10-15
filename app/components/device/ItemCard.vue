@@ -2,6 +2,7 @@
 import type { Device } from 'dirigera'
 import { getIkeaProductIcon, getIkeaSceneIcon } from '@@/config/ikea-icons'
 import type { DeviceAssociations } from '../../services/device-associations'
+import { getDeviceCategory } from '../../utils/device-categories'
 
 const { device, associations, scenesAvailable } = defineProps<{
   device: Device
@@ -14,6 +15,15 @@ const cache = useDirigeraCacheStore()
 const toast = useToast()
 const power = ref(device.attributes.isOn)
 const powerPending = ref(false)
+const isOpen = ref(false)
+const category = computed(() => getDeviceCategory(device.type))
+const hasLightControls = computed(
+  () =>
+    device.type === 'light' &&
+    ['lightLevel', 'colorTemperature', 'colorHue', 'colorSaturation'].some(
+      capability => device.capabilities.canReceive.includes(capability)
+    )
+)
 
 watch(
   () => device.attributes.isOn,
@@ -80,14 +90,12 @@ const associationItems = computed(() => {
       : []),
   ]
 })
-
-// dev
 </script>
 
 <!--  :spotlight="true" -->
 
 <template>
-  <UPageCard>
+  <UPageCard :variant="category?.variant">
     <template #header>
       <UIcon :name="getIkeaProductIcon(device)" class="size-5 m-0.5 ml-0" />
       <span>{{ device.attributes.customName }}</span>
@@ -104,20 +112,27 @@ const associationItems = computed(() => {
         </span>
       </div>
       <span class="text-muted text-xs col-start-2">
-        <!-- <b>{{ device.type }}: </b> -->
         {{ device.attributes.model }}
       </span>
+
+      <UCollapsible
+        v-if="hasLightControls"
+        v-model:open="isOpen"
+        class="col-span-full"
+      >
+        <template #content>
+          <DeviceLightControls :device :disabled="!power" />
+        </template>
+      </UCollapsible>
     </template>
 
     <template #body>
-      <!-- <div class="flex flex-wrap gap-3 items-center justify-between"> -->
       <UBadge
         v-if="
           device.attributes.batteryPercentage != null &&
           device.attributes.batteryPercentage < 15
         "
         icon="i-lucide-battery"
-        variant="subtle"
         :label="`${device.attributes.batteryPercentage}%`"
       />
 
@@ -130,12 +145,23 @@ const associationItems = computed(() => {
         <!--  -->
       </DevOnly>
 
-      <UBadge
-        v-if="device.attributes.lightLevel != null"
-        icon="i-lucide-lightbulb"
+      <UTooltip
+        v-if="device.type === 'light' && device.attributes.lightLevel != null"
+        text="Set brightness"
+        :disabled="!hasLightControls || !power || isOpen"
       >
-        {{ device.attributes.lightLevel }}%
-      </UBadge>
+        <UButton
+          icon="i-lucide-lightbulb"
+          variant="subtle"
+          size="xs"
+          :color="power ? 'primary' : 'secondary'"
+          :label="`${device.attributes.lightLevel}%`"
+          :disabled="!hasLightControls || !power"
+          :aria-expanded="isOpen"
+          :aria-label="`Adjust ${device.attributes.customName} brightness`"
+          @click="isOpen = !isOpen"
+        />
+      </UTooltip>
 
       <UiSwitch
         v-if="
@@ -161,12 +187,25 @@ const associationItems = computed(() => {
         K
       </UBadge>
 
-      <UBadge
-        v-if="device.attributes.colorTemperature != null"
-        icon="i-lucide-thermometer-sun"
+      <UTooltip
+        v-if="
+          device.type === 'light' && device.attributes.colorTemperature != null
+        "
+        text="Set color temperature"
+        :disabled="!hasLightControls || !power || isOpen"
       >
-        {{ device.attributes.colorTemperature }} K
-      </UBadge>
+        <UButton
+          icon="i-lucide-thermometer-sun"
+          variant="subtle"
+          size="xs"
+          :color="power ? 'primary' : 'secondary'"
+          :label="`${device.attributes.colorTemperature} K`"
+          :disabled="!hasLightControls || !power"
+          :aria-expanded="isOpen"
+          :aria-label="`Adjust ${device.attributes.customName} color temperature`"
+          @click="isOpen = !isOpen"
+        />
+      </UTooltip>
 
       <UBadge
         v-if="!device.isReachable"
@@ -253,16 +292,21 @@ const associationItems = computed(() => {
           icon="i-lucide-link"
           variant="ghost"
           size="xs"
-          trailing-icon="i-lucide-chevron-down"
+          :trailing-icon="category?.icon"
           class="font-light text-center tracking-widest text-muted"
           block
           :ui="{
-            trailingIcon: 'ms-1 -mr-2 opacity-50',
+            trailingIcon: 'size-5 ms-1 -mr-2 opacity-50',
             leadingIcon: '-ms-2 mr-3 opacity-50',
           }"
         >
-          <USeparator :label="`@ADD:TYPE_FROM_RULE connected`" class="" />
-          <!-- <UBadge icon="i-lucide-cpu" :label="device.deviceType" /> -->
+          <USeparator
+            :label="`${category?.singularLabel ?? 'device'} connected to`"
+            :ui="{
+              container: 'font-light text-muted',
+              label: 'text-xs tracking-normal',
+            }"
+          />
         </UButton>
 
         <template #content>
@@ -271,9 +315,6 @@ const associationItems = computed(() => {
               v-for="linked in linkedDevices"
               :key="linked.id"
               :icon="getIkeaProductIcon(linked)"
-              color="secondary"
-              variant="subtle"
-              size="md"
               :label="linked.attributes.customName"
             />
             <UButton
@@ -282,7 +323,6 @@ const associationItems = computed(() => {
               :to="`/scenes/${encodeURIComponent(scene.id)}`"
               :icon="getIkeaSceneIcon(scene.info.icon)"
               color="primary"
-              variant="subtle"
               size="sm"
               :label="scene.info.name"
               :aria-label="`Open ${scene.info.name}`"
@@ -290,38 +330,6 @@ const associationItems = computed(() => {
           </div>
         </template>
       </UCollapsible>
-
-      <!-- <USeparator />
-      <USeparator />
-      <USeparator />
-      <UAccordion v-if="associationItems.length" :items="associationItems">
-        <template #devices-body>
-          <div class="flex flex-wrap gap-2">
-            <UBadge
-              v-for="linked in linkedDevices"
-              :key="linked.id"
-              :icon="getIkeaProductIcon(linked)"
-              color="neutral"
-              variant="subtle"
-              :label="linked.attributes.customName"
-            />
-          </div>
-        </template>
-        <template #scenes-body>
-          <div class="flex flex-wrap gap-2">
-            <UButton
-              v-for="scene in associations.scenes"
-              :key="scene.id"
-              :to="`/scenes/${encodeURIComponent(scene.id)}`"
-              :icon="getIkeaSceneIcon(scene.info.icon)"
-              color="neutral"
-              variant="subtle"
-              :label="scene.info.name"
-              :aria-label="`Open ${scene.info.name}`"
-            />
-          </div>
-        </template>
-      </UAccordion> -->
     </template>
   </UPageCard>
 </template>

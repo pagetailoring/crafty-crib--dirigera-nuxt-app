@@ -192,7 +192,6 @@ await load()
             :label="`${state.temperature} K`"
             color="secondary"
             size="lg"
-            variant="subtle"
             class="tabular-nums"
           />
         </template>
@@ -242,7 +241,6 @@ await load()
                     : 'Select at least one light'
                 "
                 :color="selected.length ? 'primary' : 'neutral'"
-                variant="subtle"
                 aria-label="Apply white spectrum"
                 :loading="applying"
                 :disabled="applying || loading || loadError || !selected.length"

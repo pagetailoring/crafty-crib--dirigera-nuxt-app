@@ -118,29 +118,34 @@ describe('Devices page', () => {
     await flushPromises()
   })
 
-  it('hides association details in counted accordion sections', async () => {
+  it('toggles linked devices and scenes in a single collapsible section', async () => {
     const wrapper = await mountSuspended(DevicesPage, { route: '/devices' })
     const cards = wrapper.findAllComponents({ name: 'DeviceItemCard' })
+    const lightCard = cards[0]!
+    const trigger = lightCard.get('button[aria-expanded]')
 
-    const lightAccordion = cards[0]!.findComponent({ name: 'UAccordion' })
-    expect(
-      lightAccordion.props('items').map((item: { label: string }) => item.label)
-    ).toEqual(['Remotes (1)', 'Scenes (1)'])
-    expect(cards[0]!.text()).not.toContain('Living room remote')
-    expect(cards[0]!.text()).not.toContain('Evening')
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(lightCard.text()).not.toContain('Living room remote')
+    expect(lightCard.text()).not.toContain('Evening')
 
-    await cards[0]!.findAll('[data-slot="trigger"]')[0]!.trigger('click')
+    await trigger.trigger('click')
     await flushPromises()
-    expect(cards[0]!.text()).toContain('Living room remote')
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+    expect(lightCard.text()).toContain('Living room remote')
+    expect(lightCard.get('a[href="/scenes/evening"]').text()).toBe('Evening')
 
-    await cards[0]!.findAll('[data-slot="trigger"]')[1]!.trigger('click')
+    await trigger.trigger('click')
     await flushPromises()
-    expect(cards[0]!.text()).toContain('Evening')
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(lightCard.get('[data-slot="content"]').isVisible()).toBe(false)
 
-    expect(cards[1]!.findComponent({ name: 'UAccordion' }).exists()).toBe(false)
-    expect(
-      cards[2]!.findComponent({ name: 'UAccordion' }).props('items')
-    ).toMatchObject([{ label: 'Controls (1)' }, { label: 'Scenes (1)' }])
-    expect(cards[3]!.findComponent({ name: 'UAccordion' }).exists()).toBe(false)
+    expect(cards[1]!.find('button[aria-expanded]').exists()).toBe(false)
+    const remoteCard = cards[2]!
+    await remoteCard.get('button[aria-expanded]').trigger('click')
+    await flushPromises()
+    expect(remoteCard.text()).toContain('Living room lamp')
+    expect(remoteCard.get('a[href="/scenes/evening"]').text()).toBe('Evening')
+    expect(cards[3]!.find('button[aria-expanded]').exists()).toBe(false)
+    wrapper.unmount()
   })
 })

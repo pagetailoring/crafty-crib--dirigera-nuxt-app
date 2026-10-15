@@ -281,7 +281,6 @@ async function testScene() {
         </div>
         <UBadge
           color="neutral"
-          variant="subtle"
           icon="i-lucide-clapperboard"
           :label="scene.type"
         />
@@ -293,11 +292,7 @@ async function testScene() {
         <h3 class="mb-2 flex items-center gap-2 font-semibold">
           <UIcon name="i-lucide-lightbulb" class="size-5 text-secondary" />
           Products
-          <UBadge
-            color="secondary"
-            variant="subtle"
-            :label="scene.actions.length"
-          />
+          <UBadge color="secondary" :label="scene.actions.length" />
         </h3>
         <p v-if="scene.actions.length === 0" class="text-sm text-muted">
           No products in this scene.
@@ -336,7 +331,6 @@ async function testScene() {
                 <UBadge
                   v-if="typeof action.attributes.isOn === 'boolean'"
                   :color="action.attributes.isOn ? 'success' : 'neutral'"
-                  variant="subtle"
                   :icon="
                     action.attributes.isOn
                       ? 'i-lucide-lightbulb'
@@ -389,7 +383,7 @@ async function testScene() {
                 <UIcon :name="triggerIcon(trigger)" class="size-4 text-muted" />
                 {{ triggerLabel(trigger) }}
               </span>
-              <UBadge v-if="trigger.disabled" color="warning" variant="subtle">
+              <UBadge v-if="trigger.disabled" color="warning">
                 Disabled
               </UBadge>
             </div>
@@ -401,7 +395,6 @@ async function testScene() {
                 v-for="day in triggerDays(trigger)"
                 :key="day"
                 color="neutral"
-                variant="subtle"
                 icon="i-lucide-calendar-check"
               >
                 {{ day }}
@@ -579,7 +572,6 @@ async function testScene() {
           />
           <UButton
             color="primary"
-            variant="subtle"
             icon="i-lucide-play"
             label="Test scene"
             :loading="testing"

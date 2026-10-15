@@ -68,7 +68,7 @@ const readings = (device: Device) =>
                 <span v-if="device.productName">{{ device.productName }}</span>
               </p>
             </div>
-            <UBadge v-if="!device.isReachable" color="warning" variant="subtle">
+            <UBadge v-if="!device.isReachable" color="warning">
               Unreachable. Last seen
               {{ new Date(device.lastSeen).toLocaleString() }}
             </UBadge>

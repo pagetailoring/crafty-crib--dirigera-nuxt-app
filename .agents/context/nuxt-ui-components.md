@@ -26,6 +26,7 @@ lastReviewed: 2026-10-15
 - `USeparator`
 - `USkeleton`
 - `USlider`
+- `UTooltip`
 
 ## Project adapters
 

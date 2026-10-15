@@ -46,6 +46,12 @@ export default defineAppConfig({
         size: 'xl',
       },
     },
+    slider: {
+      defaultVariants: {
+        color: 'primary',
+        size: 'sm',
+      },
+    },
     //
     pageCard: {
       slots: {

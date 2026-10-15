@@ -1,4 +1,4 @@
-import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import WhiteSpectrum from '../../app/pages/white-spectrum.vue'
@@ -111,7 +111,6 @@ describe('White spectrum', () => {
       color: 'neutral',
       disabled: true,
       label: 'Select at least one light',
-      variant: 'subtle',
     })
     expect(clearButton?.props('variant')).toBeUndefined()
   })

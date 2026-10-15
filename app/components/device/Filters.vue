@@ -1,13 +1,10 @@
 <script setup lang="ts">
+import { getDeviceCategoryFilterItems } from '../../utils/device-categories'
+
 const filters = useDeviceFiltersStore()
 const { devices, selectedFilters } = storeToRefs(filters)
 
-const productTypeItems = [
-  { label: 'Lights', value: 'type:light', icon: 'i-lucide-lightbulb' },
-  { label: 'Plugs', value: 'type:outlet', icon: 'i-lucide-plug' },
-  { label: 'Remotes', value: 'type:controller', icon: 'i-lucide-toggle-left' },
-  { label: 'Sensors', value: 'type:sensor', icon: 'i-lucide-radar' },
-]
+const productTypeItems = getDeviceCategoryFilterItems()
 
 const filterItems = computed(() => {
   const rooms = new Map(
