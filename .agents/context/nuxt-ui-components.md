@@ -1,6 +1,6 @@
 ---
 createdAt: 2026-10-14
-editedAt: 2026-10-14T22:07:11
+editedAt: 2026-10-15T02:24:14
 lastReviewed: 2026-10-14
 ---
 
@@ -12,13 +12,13 @@ lastReviewed: 2026-10-14
 - `UButton`
 - `UCard`
 - `UCheckboxGroup`
-- `UColorModeButton`
 - `UContainer`
 - `UForm`
 - `UFormField`
 - `UHeader`
 - `UIcon`
 - `UMain`
+- `UNavigationMenu`
 - `USelect`
 - `USeparator`
 - `USkeleton`

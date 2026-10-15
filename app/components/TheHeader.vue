@@ -1,6 +1,22 @@
 <script setup lang="ts">
 import { APP_NAME } from '@@/config/app'
 
+const items = [
+  { label: 'White Spectrum', icon: 'i-lucide-sun', to: '/white-spectrum' },
+  { label: 'Scenes', icon: 'i-lucide-settings', to: '/scenes' },
+]
+
+const colorMode = useColorMode()
+const colorModeItems = [
+  {
+    label: 'Light / dark mode',
+    icon: 'i-lucide-sun-moon',
+    onSelect() {
+      colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+    },
+  },
+]
+
 const route = useRoute()
 const cache = useDirigeraCacheStore()
 const { roomById } = storeToRefs(cache)
@@ -12,7 +28,10 @@ const activeRoomName = computed(() => {
 </script>
 
 <template>
-  <UHeader mode="drawer">
+  <UHeader
+    mode="drawer"
+    :ui="{ toggle: 'lg:inline-flex', content: 'lg:flex', overlay: 'lg:block' }"
+  >
     <template #left>
       <UButton
         to="/"
@@ -35,6 +54,14 @@ const activeRoomName = computed(() => {
           {{ activeRoomName }}
         </span>
       </template>
+    </template>
+
+    <template #body>
+      <UNavigationMenu :items="items" orientation="vertical" />
+      <USeparator icon="i-lucide-house" />
+      <RoomsListMenuLinks />
+      <USeparator icon="i-lucide-settings-2" />
+      <UNavigationMenu :items="colorModeItems" orientation="vertical" />
     </template>
   </UHeader>
 </template>

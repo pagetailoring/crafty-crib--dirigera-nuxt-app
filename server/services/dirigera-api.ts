@@ -54,7 +54,11 @@ export async function executeDirigeraQuery(
     async scenes() {
       return (await getHome()).scenes
         .filter(scene => scene.type === 'userScene')
-        .map(scene => ({ id: scene.id, name: scene.info.name }))
+        .map(scene => ({
+          id: scene.id,
+          name: scene.info.name,
+          icon: scene.info.icon ?? null,
+        }))
     },
     async activateScene({ id }: { id: string }) {
       await client.scenes.trigger({ id })

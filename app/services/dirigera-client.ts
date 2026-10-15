@@ -9,6 +9,7 @@ export interface QuickControl {
 export interface RoomSummary {
   id: string
   name: string
+  icon?: string | null
   temperature: number | null
   humidity: number | null
   pm25: number | null
@@ -20,6 +21,7 @@ export interface RoomSummary {
 export interface Scene {
   id: string
   name: string
+  icon?: string | null
 }
 
 export type ControlType = 'DEVICE' | 'DEVICE_SET'
@@ -60,6 +62,7 @@ export interface Device {
 export interface Room {
   id: string
   name: string
+  icon?: string | null
   devices: Device[]
 }
 
@@ -84,6 +87,7 @@ const roomsQuery = `
     rooms {
       id
       name
+      icon
       temperature
       humidity
       pm25
@@ -103,6 +107,7 @@ const scenesQuery = `
     scenes {
       id
       name
+      icon
     }
   }
 `
@@ -151,6 +156,7 @@ const roomQuery = `
     room(id: $id) {
       id
       name
+      icon
       devices {
         ${deviceFields}
       }

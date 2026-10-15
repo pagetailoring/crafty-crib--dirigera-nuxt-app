@@ -42,9 +42,13 @@ function fixture() {
       ...extra,
     }) as unknown as Device
   const home = {
-    rooms: [{ id: 'room', name: 'Room' }],
+    rooms: [{ id: 'room', name: 'Room', icon: 'rooms_arm_chair' }],
     scenes: [
-      { id: 'scene', type: 'userScene', info: { name: 'Evening' } },
+      {
+        id: 'scene',
+        type: 'userScene',
+        info: { name: 'Evening', icon: 'scenes_moon' },
+      },
       { id: 'hidden', type: 'automation', info: { name: 'Hidden' } },
     ],
     devices: [
@@ -104,6 +108,7 @@ describe('integrated Dirigera backend', () => {
     const { frontend } = fixture()
     const rooms = await frontend.listRooms()
     expect(rooms[0]).toMatchObject({
+      icon: 'rooms_arm_chair',
       temperature: 22,
       humidity: 45,
       pm25: null,
@@ -113,9 +118,10 @@ describe('integrated Dirigera backend', () => {
       { id: 'room-speakers', type: 'SPEAKERS', isOn: true },
     ])
     expect(await frontend.listScenes()).toEqual([
-      { id: 'scene', name: 'Evening' },
+      { id: 'scene', name: 'Evening', icon: 'scenes_moon' },
     ])
     const room = await frontend.getRoom('room')
+    expect(room?.icon).toBe('rooms_arm_chair')
     expect(room?.devices.find(device => device.id === 'light')).toMatchObject({
       deviceType: 'light',
       productName: 'TRADFRI bulb',

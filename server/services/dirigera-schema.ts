@@ -8,6 +8,7 @@ export const dirigeraSchema = buildSchema(`
   type Room {
     id: String!
     name: String!
+    icon: String
   }
 
   extend type Query {
@@ -110,6 +111,7 @@ export const dirigeraSchema = buildSchema(`
   type Scene {
     id: String!
     name: String!
+    icon: String
   }
 
   extend type Query {
