@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 
 import DevicesPage from '../../app/pages/devices.vue'
+import TheHeader from '../../app/components/TheHeader.vue'
 
 const { devices } = vi.hoisted(() => ({
   devices: [
@@ -73,7 +74,12 @@ mockNuxtImport('useFetch', () => (url: string) => ({
 describe('Devices page', () => {
   it('filters devices by multiple IKEA product categories and a room', async () => {
     const wrapper = await mountSuspended(DevicesPage, { route: '/devices' })
-    const filter = wrapper.findComponent({ name: 'USelectMenu' })
+    const header = await mountSuspended(TheHeader, {
+      route: '/devices',
+    })
+    const filter = header.find('[data-slot="right"]').findComponent({
+      name: 'USelectMenu',
+    })
     const options = filter
       .props('items')
       .filter((item: { type?: string }) => !item.type)
@@ -81,7 +87,7 @@ describe('Devices page', () => {
 
     expect(filter.props('multiple')).toBe(true)
     expect(options).toEqual([
-      ['All', 'all'],
+      ['FILTERS', 'all'],
       ['Lights', 'type:light'],
       ['Plugs', 'type:outlet'],
       ['Remotes', 'type:controller'],
@@ -107,6 +113,9 @@ describe('Devices page', () => {
     expect(wrapper.text()).toContain('Living room remote')
     expect(wrapper.text()).not.toContain('Kitchen plug')
     expect(wrapper.text()).not.toContain('Hall sensor')
+
+    filter.vm.$emit('update:modelValue', ['all'])
+    await flushPromises()
   })
 
   it('hides association details in counted accordion sections', async () => {

@@ -70,6 +70,10 @@ const activePageName = computed(
       </template>
     </template>
 
+    <template #right>
+      <DeviceFilters v-if="route.path === '/devices'" />
+    </template>
+
     <template #body>
       <UNavigationMenu :items="items" orientation="vertical" />
       <USeparator icon="i-lucide-house" />

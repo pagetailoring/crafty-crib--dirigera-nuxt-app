@@ -44,15 +44,18 @@ const associationItems = computed(() => {
 </script>
 
 <template>
-  <UCard>
+  <UCard :description="device.attributes.model">
     <template #header>
-      <div class="flex items-center gap-4">
-        <UIcon :name="getIkeaProductIcon(device)" class="size-5 shrink-0" />
+      <div class="flex items-center gap-3">
+        <UIcon :name="getIkeaProductIcon(device)" />
         <span>{{ device.attributes.customName }}</span>
         <span class="ml-auto tracking-widest font-light uppercase">
           {{ device.room?.name }}
         </span>
       </div>
+      <small v-if="device.attributes.model" class="ml-7 text-muted">{{
+        device.attributes.model
+      }}</small>
     </template>
 
     <!-- <template #title>
@@ -97,12 +100,12 @@ const associationItems = computed(() => {
 
       <div class="mt-4 flex flex-wrap gap-2 items-center">
         <UBadge icon="i-lucide-cpu" variant="soft" :label="device.deviceType" />
-        <UBadge
+        <!-- <UBadge
           v-if="device.attributes.model"
           icon="i-lucide-tag"
           variant="soft"
           :label="device.attributes.model"
-        />
+        /> -->
         <UBadge
           :icon="device.isReachable ? 'i-lucide-wifi' : 'i-lucide-wifi-off'"
           variant="soft"
@@ -232,18 +235,19 @@ const associationItems = computed(() => {
       </UAccordion>
     </template>
 
-    <template #footer>
-      <!-- <span>footer</span> -->
-      <details>
-        <summary>
-          <small class="text-muted cursor-pointer"
-            >Details <i>raw data</i></small
-          >
-        </summary>
-        <small>
-          <pre>{{ JSON.stringify(device, null, 2) }}</pre>
-        </small>
-      </details>
-    </template>
+    <!-- <DevOnly>
+      <template #footer>
+        <details>
+          <summary>
+            <small class="text-muted cursor-pointer"
+              >Details <i>raw data</i></small
+            >
+          </summary>
+          <small>
+            <pre>{{ JSON.stringify(device, null, 2) }}</pre>
+          </small>
+        </details>
+      </template>
+    </DevOnly> -->
   </UCard>
 </template>

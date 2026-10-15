@@ -5,6 +5,20 @@ const { data: devices, error } = await useFetch('/api/dirigera/devices')
 const { data: scenes, error: scenesError } = await useFetch(
   '/api/dirigera/scenes'
 )
+const filters = useDeviceFiltersStore()
+const { filteredDevices, hasActiveFilters } = storeToRefs(filters)
+
+watch(
+  devices,
+  value => {
+    filters.devices = value ?? null
+  },
+  { immediate: true }
+)
+
+onUnmounted(() => {
+  filters.devices = null
+})
 </script>
 
 <template>
@@ -21,18 +35,19 @@ const { data: scenes, error: scenesError } = await useFetch(
       title="Unable to load scene links"
       :description="scenesError.message"
     />
-    <DeviceFilters v-if="devices" :devices>
-      <template #default="{ devices: filteredDevices }">
-        <UPageColumns>
-          <template v-for="device in filteredDevices" :key="device.id">
-            <DeviceItemCard
-              :device
-              :associations="deviceAssociations(device, devices, scenes ?? [])"
-              :scenes-available="scenes != null"
-            />
-          </template>
-        </UPageColumns>
+    <UPageColumns v-if="devices">
+      <template v-for="device in filteredDevices" :key="device.id">
+        <DeviceItemCard
+          :device
+          :associations="deviceAssociations(device, devices, scenes ?? [])"
+          :scenes-available="scenes != null"
+        />
       </template>
-    </DeviceFilters>
+    </UPageColumns>
+    <UAlert
+      v-if="devices && hasActiveFilters && filteredDevices.length === 0"
+      color="neutral"
+      title="No devices match the selected filters"
+    />
   </UContainer>
 </template>
