@@ -1,11 +1,12 @@
 ---
 createdAt: 2026-10-14
-editedAt: 2026-10-15T13:49:59
+editedAt: 2026-10-15T14:41:08
 lastReviewed: 2026-10-15
 ---
 
 # Nuxt UI components
 
+- `UAccordion`
 - `UAlert`
 - `UApp`
 - `UBadge`

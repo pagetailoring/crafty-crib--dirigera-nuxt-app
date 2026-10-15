@@ -1,10 +1,46 @@
 <script setup lang="ts">
 import type { Device } from 'dirigera'
-import { getIkeaProductIcon } from '@@/config/ikea-icons'
+import { getIkeaProductIcon, getIkeaSceneIcon } from '@@/config/ikea-icons'
+import type { DeviceAssociations } from '../../services/device-associations'
 
-const { device } = defineProps<{
+const { device, associations, scenesAvailable } = defineProps<{
   device: Device
+  associations: DeviceAssociations
+  scenesAvailable: boolean
 }>()
+
+const linkedDevices = computed(() =>
+  device.type === 'controller' ? associations.devices : associations.remotes
+)
+const associationItems = computed(() => {
+  if (!['controller', 'light', 'outlet'].includes(device.type)) return []
+
+  return [
+    ...(linkedDevices.value.length
+      ? [
+          {
+            label: `${device.type === 'controller' ? 'Controls' : 'Remotes'} (${linkedDevices.value.length})`,
+            icon:
+              device.type === 'controller'
+                ? 'i-lucide-link'
+                : 'i-lucide-toggle-left',
+            value: 'devices',
+            slot: 'devices',
+          },
+        ]
+      : []),
+    ...(scenesAvailable && associations.scenes.length
+      ? [
+          {
+            label: `Scenes (${associations.scenes.length})`,
+            icon: 'i-lucide-clapperboard',
+            value: 'scenes',
+            slot: 'scenes',
+          },
+        ]
+      : []),
+  ]
+})
 </script>
 
 <template>
@@ -163,6 +199,37 @@ const { device } = defineProps<{
           :label="`Position ${device.attributes.blindsCurrentLevel}%`"
         />
       </div>
+
+      <UAccordion
+        v-if="associationItems.length"
+        :items="associationItems"
+        class="mt-4 border-t border-default pt-2"
+      >
+        <template #devices-body>
+          <div class="flex flex-wrap gap-2">
+            <UBadge
+              v-for="linked in linkedDevices"
+              :key="linked.id"
+              :icon="getIkeaProductIcon(linked)"
+              color="neutral"
+              variant="subtle"
+              :label="linked.attributes.customName"
+            />
+          </div>
+        </template>
+        <template #scenes-body>
+          <div class="flex flex-wrap gap-2">
+            <UBadge
+              v-for="scene in associations.scenes"
+              :key="scene.id"
+              :icon="getIkeaSceneIcon(scene.info.icon)"
+              color="neutral"
+              variant="subtle"
+              :label="scene.info.name"
+            />
+          </div>
+        </template>
+      </UAccordion>
     </template>
 
     <template #footer>

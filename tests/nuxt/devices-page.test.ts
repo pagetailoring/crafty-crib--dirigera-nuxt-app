@@ -15,7 +15,7 @@ const { devices } = vi.hoisted(() => ({
       capabilities: { canReceive: [], canSend: [] },
       room: { id: 'living-room', name: 'Living Room' },
       deviceSet: [],
-      remoteLinks: [],
+      remoteLinks: ['remote'],
       isReachable: true,
     },
     {
@@ -53,8 +53,20 @@ const { devices } = vi.hoisted(() => ({
   ],
 }))
 
-mockNuxtImport('useFetch', () => () => ({
-  data: ref(devices),
+mockNuxtImport('useFetch', () => (url: string) => ({
+  data: ref(
+    url.endsWith('/devices')
+      ? devices
+      : [
+          {
+            id: 'evening',
+            info: { name: 'Evening' },
+            triggers: [{ type: 'controller', trigger: { deviceId: 'remote' } }],
+            actions: [{ type: 'device', deviceId: 'light', attributes: {} }],
+            commands: [],
+          },
+        ]
+  ),
   error: ref(null),
 }))
 
@@ -95,5 +107,31 @@ describe('Devices page', () => {
     expect(wrapper.text()).toContain('Living room remote')
     expect(wrapper.text()).not.toContain('Kitchen plug')
     expect(wrapper.text()).not.toContain('Hall sensor')
+  })
+
+  it('hides association details in counted accordion sections', async () => {
+    const wrapper = await mountSuspended(DevicesPage, { route: '/devices' })
+    const cards = wrapper.findAllComponents({ name: 'DeviceItemCard' })
+
+    const lightAccordion = cards[0]!.findComponent({ name: 'UAccordion' })
+    expect(
+      lightAccordion.props('items').map((item: { label: string }) => item.label)
+    ).toEqual(['Remotes (1)', 'Scenes (1)'])
+    expect(cards[0]!.text()).not.toContain('Living room remote')
+    expect(cards[0]!.text()).not.toContain('Evening')
+
+    await cards[0]!.findAll('[data-slot="trigger"]')[0]!.trigger('click')
+    await flushPromises()
+    expect(cards[0]!.text()).toContain('Living room remote')
+
+    await cards[0]!.findAll('[data-slot="trigger"]')[1]!.trigger('click')
+    await flushPromises()
+    expect(cards[0]!.text()).toContain('Evening')
+
+    expect(cards[1]!.findComponent({ name: 'UAccordion' }).exists()).toBe(false)
+    expect(
+      cards[2]!.findComponent({ name: 'UAccordion' }).props('items')
+    ).toMatchObject([{ label: 'Controls (1)' }, { label: 'Scenes (1)' }])
+    expect(cards[3]!.findComponent({ name: 'UAccordion' }).exists()).toBe(false)
   })
 })
