@@ -1,4 +1,5 @@
 import type { Device, Scene } from 'dirigera'
+import type { NormalizedDevice } from './normalize-sensors'
 
 export interface DeviceAssociations {
   devices: Device[]
@@ -6,9 +7,17 @@ export interface DeviceAssociations {
   scenes: Scene[]
 }
 
-function isLinked(first: Device, second: Device) {
-  const firstIds = [first.id, first.relationId].filter(Boolean) as string[]
-  const secondIds = [second.id, second.relationId].filter(Boolean) as string[]
+function isLinked(first: NormalizedDevice, second: NormalizedDevice) {
+  const firstIds = [
+    first.id,
+    first.relationId,
+    ...(first.sourceIds ?? []),
+  ].filter(Boolean) as string[]
+  const secondIds = [
+    second.id,
+    second.relationId,
+    ...(second.sourceIds ?? []),
+  ].filter(Boolean) as string[]
   return (
     first.remoteLinks?.some(id => secondIds.includes(id)) ||
     second.remoteLinks?.some(id => firstIds.includes(id)) ||
@@ -17,11 +26,12 @@ function isLinked(first: Device, second: Device) {
 }
 
 export function deviceAssociations(
-  device: Device,
+  device: NormalizedDevice,
   devices: Device[],
   scenes: Scene[]
 ): DeviceAssociations {
   const isRemote = device.type === 'controller'
+  const sourceIds = device.sourceIds ?? [device.id]
   const linked = devices.filter(
     other =>
       other.id !== device.id &&
@@ -37,13 +47,14 @@ export function deviceAssociations(
         )
       : scene.actions.some(
           action =>
-            action.deviceId === device.id ||
+            (action.deviceId != null && sourceIds.includes(action.deviceId)) ||
             (action.type === 'deviceSet' &&
               device.deviceSet.some(set => set.id === action.deviceId))
         ) ||
         scene.triggers?.some(
           trigger =>
-            trigger.type === 'event' && trigger.trigger.deviceId === device.id
+            trigger.type === 'event' &&
+            sourceIds.includes(trigger.trigger.deviceId)
         )
   )
 

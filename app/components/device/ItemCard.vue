@@ -251,29 +251,38 @@ const associationItems = computed(() => {
             : 'No water detected'
         "
       />
-      <UBadge
-        v-if="device.attributes.currentTemperature != null"
-        icon="i-lucide-thermometer"
-        :label="`${device.attributes.currentTemperature} °C`"
-      />
+
       <UBadge
         v-if="device.attributes.currentRH != null"
         icon="i-lucide-droplet"
-        :label="`Humidity ${device.attributes.currentRH}%`"
+        size="xl"
+        :aria-label="`Humidity ${device.attributes.currentRH}%`"
+        :label="`${device.attributes.currentRH}%`"
       />
+
+      <UBadge
+        v-if="device.attributes.currentTemperature != null"
+        icon="i-lucide-thermometer"
+        size="xl"
+        :label="`${device.attributes.currentTemperature} °C`"
+      />
+
       <UBadge
         v-if="device.attributes.currentPM25 != null"
         icon="i-lucide-wind"
+        size="xl"
         :label="`PM2.5 ${device.attributes.currentPM25} µg/m³`"
       />
       <UBadge
         v-if="device.attributes.currentCO2 != null"
         icon="i-lucide-cloud"
+        size="xl"
         :label="`CO₂ ${device.attributes.currentCO2} ppm`"
       />
       <UBadge
         v-if="device.attributes.vocIndex != null"
         icon="i-lucide-wind"
+        size="xl"
         :label="`VOC index ${device.attributes.vocIndex}`"
       />
       <UBadge

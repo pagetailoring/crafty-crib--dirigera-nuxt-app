@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { deviceAssociations } from '../services/device-associations'
+import { normalizeSensors } from '../services/normalize-sensors'
 
 const { data: devices, error } = await useFetch('/api/dirigera/devices')
 const { data: scenes, error: scenesError } = await useFetch(
@@ -7,9 +8,10 @@ const { data: scenes, error: scenesError } = await useFetch(
 )
 const filters = useDeviceFiltersStore()
 const { filteredDevices, hasActiveFilters } = storeToRefs(filters)
+const normalizedDevices = computed(() => normalizeSensors(devices.value ?? []))
 
 watch(
-  devices,
+  normalizedDevices,
   value => {
     filters.devices = value ?? null
   },
@@ -39,7 +41,9 @@ onUnmounted(() => {
       <template v-for="device in filteredDevices" :key="device.id">
         <DeviceItemCard
           :device
-          :associations="deviceAssociations(device, devices, scenes ?? [])"
+          :associations="
+            deviceAssociations(device, normalizedDevices, scenes ?? [])
+          "
           :scenes-available="scenes != null"
         />
       </template>

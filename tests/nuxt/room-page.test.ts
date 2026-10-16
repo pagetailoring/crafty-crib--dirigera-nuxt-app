@@ -1,74 +1,142 @@
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
-import { describe, expect, it, vi } from 'vitest'
-
+import { flushPromises } from '@vue/test-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ref } from 'vue'
+import { useNuxtApp } from '#app'
+import { useDeviceFiltersStore } from '../../app/stores/device-filters'
+import { useDirigeraCacheStore } from '../../app/stores/cache'
 import RoomPage from '../../app/pages/room/[id].vue'
+import TheHeader from '../../app/components/TheHeader.vue'
 
-const { client } = vi.hoisted(() => ({
+const { client, devices, scenes, state } = vi.hoisted(() => ({
   client: {
-    getRoom: vi.fn().mockResolvedValue({
-      id: 'living-room',
-      name: 'Living Room',
-      devices: [
-        {
-          id: 'sensor',
-          name: 'Environment sensor',
-          type: 'DEVICE',
-          deviceType: 'environmentSensor',
-          productName: 'VINDSTYRKA',
-          isReachable: false,
-          lastSeen: '2026-10-13T01:00:00.000Z',
-          batteryPercentage: 92,
-          isOn: null,
-          lightLevel: null,
-          colorTemperature: null,
-          colorSaturation: null,
-          colorHue: null,
-          playback: null,
-          playbackNextAvailable: null,
-          playbackPreviousAvailable: null,
-          volume: null,
-          playItem: null,
-          nextPlayItem: null,
-          temperature: 22.456,
-          humidity: 44.812,
-          pm25: 3,
-          vocIndex: 98,
-          co2: 612,
-          isOpen: true,
-          isDetected: false,
-          illuminance: 120,
-        },
-      ],
-    }),
+    listRooms: vi.fn().mockResolvedValue([
+      { id: 'kitchen', name: 'Kitchen', quickControls: [] },
+      { id: 'living-room', name: 'Living Room', quickControls: [] },
+      { id: 'empty', name: 'Empty', quickControls: [] },
+    ]),
+    activateScene: vi.fn().mockResolvedValue(undefined),
   },
+  devices: [
+    {
+      id: 'light',
+      type: 'light',
+      deviceType: 'light',
+      attributes: { customName: 'Kitchen lamp', model: 'TRADFRI bulb' },
+      capabilities: { canReceive: [], canSend: [] },
+      room: { id: 'kitchen', name: 'Kitchen' },
+      deviceSet: [],
+      remoteLinks: ['remote'],
+      isReachable: true,
+    },
+    {
+      id: 'remote',
+      type: 'controller',
+      deviceType: 'lightController',
+      attributes: { customName: 'Living room remote', model: 'STYRBAR' },
+      capabilities: { canReceive: [], canSend: [] },
+      room: { id: 'living-room', name: 'Living Room' },
+      deviceSet: [],
+      remoteLinks: [],
+      isReachable: true,
+    },
+  ],
+  scenes: [
+    {
+      id: 'evening',
+      info: { name: 'Evening' },
+      triggers: [],
+      actions: [{ type: 'device', deviceId: 'light', attributes: {} }],
+      commands: [],
+    },
+  ],
+  state: { scenesUnavailable: false, devicesUnavailable: false },
 }))
 
 mockNuxtImport('useDirigera', () => () => client)
+mockNuxtImport('useFetch', () => (url: string) => {
+  const isDevices = url.endsWith('/devices')
+  const unavailable = isDevices
+    ? state.devicesUnavailable
+    : state.scenesUnavailable
+  return {
+    data: ref(unavailable ? null : isDevices ? devices : scenes),
+    error: ref(unavailable ? new Error('Request failed') : null),
+  }
+})
 
 describe('Room page', () => {
-  it('shows devices, availability, battery, and sensor values', async () => {
+  beforeEach(() => {
+    state.scenesUnavailable = false
+    state.devicesUnavailable = false
+    client.activateScene.mockClear()
+    useDirigeraCacheStore(useNuxtApp().$pinia).rooms = undefined
+    useDeviceFiltersStore(useNuxtApp().$pinia).selectedFilters = ['all']
+  })
+
+  it('uses the new cards for the room without the devices page filters', async () => {
+    useDeviceFiltersStore(useNuxtApp().$pinia).selectedFilters = [
+      'room:living-room',
+    ]
+    const wrapper = await mountSuspended(RoomPage, { route: '/room/kitchen' })
+    const header = await mountSuspended(TheHeader, { route: '/room/kitchen' })
+    const cards = wrapper.findAllComponents({ name: 'DeviceItemCard' })
+
+    expect(wrapper.get('h1').text()).toBe('Kitchen')
+    expect(header.text()).toContain('Kitchen')
+    expect(header.findComponent({ name: 'DeviceFilters' }).exists()).toBe(false)
+    expect(cards).toHaveLength(1)
+    expect(cards[0]!.props('device').id).toBe('light')
+    expect(wrapper.text()).toContain('TRADFRI bulb')
+
+    await cards[0]!.get('button[aria-expanded]').trigger('click')
+    await flushPromises()
+    expect(cards[0]!.text()).toContain('Living room remote')
+    expect(
+      cards[0]!.get('a[href="/scenes/evening"]').attributes('aria-label')
+    ).toBe('Edit Evening')
+    await cards[0]!.get('button[aria-label="Trigger Evening"]').trigger('click')
+    await flushPromises()
+    expect(client.activateScene).toHaveBeenCalledWith('evening')
+    wrapper.unmount()
+    header.unmount()
+  })
+
+  it('shows the devices belonging to another room', async () => {
     const wrapper = await mountSuspended(RoomPage, {
       route: '/room/living-room',
     })
+    const cards = wrapper.findAllComponents({ name: 'DeviceItemCard' })
+    expect(cards).toHaveLength(1)
+    expect(cards[0]!.props('device').id).toBe('remote')
+    expect(wrapper.get('h1').text()).toBe('Living Room')
+    wrapper.unmount()
+  })
 
-    expect(client.getRoom).toHaveBeenCalledWith('living-room')
-    expect(wrapper.get('h1').classes()).toContain('sr-only')
-    expect(wrapper.text()).toContain('Living Room')
-    expect(wrapper.text()).toContain('Environment sensor')
-    expect(wrapper.text()).toContain('environment sensor')
-    expect(wrapper.text()).toContain('VINDSTYRKA')
-    expect(wrapper.text()).toContain('Unreachable')
-    expect(wrapper.text()).toContain(
-      new Date('2026-10-13T01:00:00.000Z').toLocaleString()
+  it('shows the empty room state', async () => {
+    const wrapper = await mountSuspended(RoomPage, { route: '/room/empty' })
+    expect(wrapper.findComponent({ name: 'DeviceItemCard' }).exists()).toBe(
+      false
     )
-    expect(wrapper.text()).toContain('Battery 92%')
-    expect(wrapper.text()).toContain('Open')
-    expect(wrapper.text()).toContain('Temperature 22.46°C')
-    expect(wrapper.text()).toContain('Humidity 44.81%')
-    expect(wrapper.text()).toContain('PM2.5 3 μg/m³')
-    expect(wrapper.text()).toContain('VOC index 98')
-    expect(wrapper.text()).toContain('CO2 612 ppm')
-    expect(wrapper.text()).toContain('Motion detected no')
-    expect(wrapper.text()).toContain('Illuminance 120 lx')
+    expect(wrapper.text()).toContain('No devices')
+    wrapper.unmount()
+  })
+
+  it('keeps device cards available when scenes cannot be loaded', async () => {
+    state.scenesUnavailable = true
+    const wrapper = await mountSuspended(RoomPage, { route: '/room/kitchen' })
+    expect(wrapper.text()).toContain('Unable to load scene links')
+    expect(wrapper.findComponent({ name: 'DeviceItemCard' }).exists()).toBe(
+      true
+    )
+    wrapper.unmount()
+  })
+
+  it('reports device loading errors without an empty room message', async () => {
+    state.devicesUnavailable = true
+    const wrapper = await mountSuspended(RoomPage, { route: '/room/kitchen' })
+    expect(wrapper.text()).toContain('Unable to load the room')
+    expect(wrapper.text()).not.toContain('No devices')
+    wrapper.unmount()
   })
 })

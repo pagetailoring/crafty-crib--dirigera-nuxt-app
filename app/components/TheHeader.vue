@@ -20,11 +20,14 @@ const colorModeItems = [
 
 const route = useRoute()
 const cache = useDirigeraCacheStore()
-const { roomById } = storeToRefs(cache)
+const { rooms } = storeToRefs(cache)
 
 const activeRoomName = computed(() => {
   if (route.name !== 'room-id') return null
-  return roomById.value[String(route.params.id)]?.data.name ?? 'Room'
+  return (
+    rooms.value?.data.find(room => room.id === String(route.params.id))?.name ??
+    'Room'
+  )
 })
 
 const activePageName = computed(

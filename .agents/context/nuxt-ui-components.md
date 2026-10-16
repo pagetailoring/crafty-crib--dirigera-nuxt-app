@@ -1,6 +1,6 @@
 ---
 createdAt: 2026-10-14
-editedAt: 2026-10-16T01:38:00
+editedAt: 2026-10-16T01:56:22
 lastReviewed: 2026-10-15
 ---
 
@@ -22,6 +22,7 @@ lastReviewed: 2026-10-15
 - `UIcon`
 - `UMain`
 - `UNavigationMenu`
+- `UPageColumns`
 - `USelect`
 - `USelectMenu`
 - `USeparator`

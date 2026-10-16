@@ -42,7 +42,11 @@ useDirigeraUpdates(() => {
   cache.invalidateAll()
   let refresh: Promise<unknown>
   if (route.name === 'room-id') {
-    refresh = cache.loadRoom(String(route.params.id), { force: true })
+    refresh = Promise.all([
+      cache.loadRooms({ force: true }),
+      refreshNuxtData('/api/dirigera/devices'),
+      refreshNuxtData('/api/dirigera/scenes'),
+    ])
   } else {
     refresh = cache.loadHome({ force: true })
   }
