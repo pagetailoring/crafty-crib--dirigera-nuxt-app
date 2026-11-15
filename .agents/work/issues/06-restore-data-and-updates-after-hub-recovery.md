@@ -1,0 +1,71 @@
+---
+createdAt: 2026-11-15
+editedAt: 2026-11-15T12:48:10
+lastReviewed: 2026-11-15
+status: open
+type: task
+assignee: null
+claimedAt: null
+blockedBy: []
+priority: P2
+reviewAxis: spec
+---
+
+# Restore data and updates after hub recovery
+
+## Description
+
+The PR promises automatic and manual retries and active-view refreshes on
+hub changes. With the hub unavailable at startup, initial queries fail and
+the server closes the update WebSocket with code 1011. Retry refreshes only
+status. Recovery removes the warning but neither reloads page data nor
+recreates the closed socket. The page can remain empty and miss updates
+until reloaded.
+
+## Goal
+
+Recover active-view data and live updates after a startup hub outage without a page reload.
+
+## Scope
+
+- Handle recovery through automatic and manual retry.
+- Reload active-view data and clear recovered page errors.
+- Restore the update subscription with a valid token and clean up obsolete subscriptions.
+
+## Out of scope
+
+- Unrelated refactors and other PR review findings.
+
+## Acceptance criteria
+
+- [ ] Automatic recovery reloads the active home or room view with a controlled backend.
+- [ ] Manual Retry restores the same behavior.
+- [ ] A subsequent hub update refreshes the active view through a working subscription.
+- [ ] Recovery clears obsolete page errors.
+- [ ] Recovery does not accumulate duplicate sockets, listeners, or retry timers.
+
+## Open questions
+
+- None.
+
+## Technical notes
+
+`app/app.vue:24-33`, `app/composables/useDirigeraUpdates.ts:7-25`, and `server/routes/dirigera-updates.ts`. Use a controlled backend; real-device mutations are unnecessary.
+
+Review evidence refers to commit `67bb02e85556ff7be4c7d01fe6f8ea40fd044320`.
+The suite passed 52 tests across 9 files during review; this does not establish
+browser or physical-device behavior.
+
+## Dependencies
+
+- None.
+
+## Design
+
+- [PR #5](https://github.com/pagetailoring/crafty-crib-app--smarter-home-development/pull/5).
+- Review axis: spec. The user selected the GitHub PR description as the
+  requirements source. Open migration tasks are not additional requirements.
+
+## Resolution
+
+To be completed after delivery.
