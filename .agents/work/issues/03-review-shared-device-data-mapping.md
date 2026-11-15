@@ -1,6 +1,6 @@
 ---
 createdAt: 2026-11-15
-editedAt: 2026-11-15T12:48:10
+editedAt: 2026-11-15T13:23:47
 lastReviewed: 2026-11-15
 status: open
 type: task
@@ -45,7 +45,10 @@ Keep shared mappings consistent while preserving intentional device-set semantic
 
 ## Technical notes
 
-`server/services/dirigera-home.ts:28-53` and `:86-110`. Do not force identical mappings where domain semantics differ.
+At target commit `4005c9f`, the duplication remains in
+`server/services/dirigera-home.ts:21-64` and `:79-149`. Device views include
+CO2, while device-set views still omit it. Do not force identical mappings
+where domain semantics differ.
 
 Review evidence refers to commit `67bb02e85556ff7be4c7d01fe6f8ea40fd044320`.
 The suite passed 52 tests across 9 files during review; this does not establish

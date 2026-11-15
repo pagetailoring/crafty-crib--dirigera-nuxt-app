@@ -1,6 +1,6 @@
 ---
 createdAt: 2026-11-15
-editedAt: 2026-11-15T12:48:10
+editedAt: 2026-11-15T13:23:47
 lastReviewed: 2026-11-15
 status: open
 type: task
@@ -45,7 +45,10 @@ Make command coverage explicit while keeping transport and cache responsibilitie
 
 ## Technical notes
 
-`app/services/dirigera-client.ts:252-295` and `app/stores/cache.ts:152-165`. Avoid a broad command framework solely to remove repetition.
+At target commit `4005c9f`, the repeated mapping remains in
+`app/services/dirigera-client.ts:282-339` and `app/stores/cache.ts:139-166`.
+Neither branch is exhaustive at compile time. Avoid a broad command framework
+solely to remove repetition.
 
 Review evidence refers to commit `67bb02e85556ff7be4c7d01fe6f8ea40fd044320`.
 The suite passed 52 tests across 9 files during review; this does not establish

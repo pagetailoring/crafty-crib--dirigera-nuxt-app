@@ -1,7 +1,7 @@
 ---
 createdAt: 2026-10-13
-editedAt: 2026-10-14T00:08:00
-lastReviewed: 2026-10-14
+editedAt: 2026-11-15T13:23:47
+lastReviewed: 2026-11-15
 ---
 
 # Dirigera backend migration coverage
@@ -14,9 +14,9 @@ map each reference structure to its Nuxt counterpart.
 
 ## Sources and scope
 
-This comparison uses the current source files in both local repositories. The
-reference backend is `lpgera/dirigera-web` at commit
-`7f14eace5cd865c6a28f5167665d5fd873898f21`; the current Nuxt target is commit
+The original comparison used source files in both local repositories. The
+reference backend was `lpgera/dirigera-web` at commit
+`7f14eace5cd865c6a28f5167665d5fd873898f21`; the reviewed Nuxt target is commit
 `4a2c32a0e5823ca4dda5a9bc1a6fbc12c3309a33`. The backend was introduced at
 `122e7d6a3e5a32c68701a859040ce04793db248b`; a whitespace-insensitive review of
 `server/` since that commit found no backend behavior change. The comparison covers runtime
@@ -29,12 +29,35 @@ Primary sources:
 - [Reference server entrypoint](https://github.com/lpgera/dirigera-web/blob/7f14eace5cd865c6a28f5167665d5fd873898f21/backend/src/index.ts)
 - [Reference GraphQL definitions](https://github.com/lpgera/dirigera-web/tree/7f14eace5cd865c6a28f5167665d5fd873898f21/backend/src/graphql/definitions)
 - [Reference authentication and request context](https://github.com/lpgera/dirigera-web/tree/7f14eace5cd865c6a28f5167665d5fd873898f21/backend/src/graphql)
-- [Integrated Nuxt server](../../../../server/)
-- [Integrated backend tests](../../../../tests/unit/dirigera-backend.test.ts)
+- [Integrated Nuxt server](../../../server/)
+- [Integrated backend tests](../../../tests/unit/dirigera-backend.test.ts)
+
+## 2026-11-15 checkout review
+
+The active target is now commit `4005c9f`. The authentication and code
+generation conclusions below remain current. The trusted-LAN model still has
+no GraphQL login boundary, and resolver arguments and results are still
+handwritten.
+
+The backend task is no longer a zero-progress task. The current server exposes
+`/api/dirigera/status`, probes `home()` before setting the shared connection to
+`ready`, and permits retry after connection or probe failure. This implements
+the readiness and retry portion of the task.
+
+Error reporting remains incomplete. `executeDirigeraQuery` still replaces every
+root failure with one safe GraphQL message and discards the original cause. It
+does not log structured operation context or return stable safe categories.
+The current branch also adds temperature-light queries and scene editing
+endpoints that were outside the original reference-backend comparison.
+
+The mapping and conclusion below describe the `4a2c32a` snapshot. Use this
+section for the current task status and use the original tables for migration
+history.
 
 ## Conclusion
 
-All domain behavior used by the current Nuxt frontend was transferred: rooms,
+At the reviewed snapshot, all domain behavior used by the Nuxt frontend was
+transferred: rooms,
 room sensor averages, device and device-set presentation, related-device
 attribute merging, quick controls, user scenes, artwork, all six device control
 mutations, the shared hub client, and update broadcasts. The frontend can use

@@ -1,6 +1,6 @@
 ---
 createdAt: 2026-11-15
-editedAt: 2026-11-15T12:48:10
+editedAt: 2026-11-15T13:23:47
 lastReviewed: 2026-11-15
 status: open
 type: task
@@ -50,7 +50,10 @@ Ensure changes observed during an in-flight load are not lost when that load com
 
 ## Technical notes
 
-`app/stores/cache.ts:44-54`, `:93-104`, and invalidation/post-command refresh paths. Do not expand this into cache persistence or normalization work.
+At target commit `4005c9f`, `app/stores/cache.ts:44-54` still returns an existing
+in-flight request before considering a forced reload. The affected write paths
+remain at `:93-104` and `:125-186`. Do not expand this into cache persistence or
+normalization work.
 
 Review evidence refers to commit `67bb02e85556ff7be4c7d01fe6f8ea40fd044320`.
 The suite passed 52 tests across 9 files during review; this does not establish

@@ -1,7 +1,7 @@
 ---
 createdAt: 2026-10-13
-editedAt: 2026-10-13T23:22:11
-lastReviewed: 2026-10-13
+editedAt: 2026-11-15T13:23:47
+lastReviewed: 2026-11-15
 status: open
 type: task
 assignee: null
@@ -55,8 +55,10 @@ web app manifest.
 
 ## Technical notes
 
-The icon declarations in `nuxt.config.ts` remain commented out until the final
-assets are available. Do not restore the removed temporary graphics.
+At target commit `4005c9f`, the icon declarations in `nuxt.config.ts` remain
+commented out and `tools/verify-pwa-build.mjs` does not check icons. Keep the
+issue open until approved assets are available. Do not restore the removed
+temporary graphics.
 
 ## Dependencies
 
@@ -64,7 +66,7 @@ assets are available. Do not restore the removed temporary graphics.
 
 ## Design
 
-- [Frontend migration parity task](../frontend-migration-parity/tasks/01-complete-frontend-migration-parity.md)
+- [Archived frontend migration parity task](../../archive/frontend-migration-parity/tasks/01-complete-frontend-migration-parity.md)
 
 ## Resolution
 

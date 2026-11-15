@@ -1,6 +1,6 @@
 ---
 createdAt: 2026-11-15
-editedAt: 2026-11-15T12:48:10
+editedAt: 2026-11-15T13:23:47
 lastReviewed: 2026-11-15
 status: open
 type: task
@@ -15,12 +15,17 @@ reviewAxis: spec
 
 ## Description
 
-The PR promises automatic and manual retries and active-view refreshes on
-hub changes. With the hub unavailable at startup, initial queries fail and
-the server closes the update WebSocket with code 1011. Retry refreshes only
-status. Recovery removes the warning but neither reloads page data nor
-recreates the closed socket. The page can remain empty and miss updates
-until reloaded.
+The PR promises automatic and manual retries and active-view refreshes on hub
+changes. At target commit `4005c9f`, a retry refreshes only connection status.
+Recovery removes the warning but does not reload failed page data or recreate a
+closed update WebSocket. The page can remain empty and miss updates until it is
+reloaded.
+
+The current application also has device, scene, scene-detail, and
+white-spectrum routes. The refresh callback in `app/app.vue` distinguishes only
+the room route from all other routes, so recovery and update behavior must be
+verified for each data-loading path rather than treating every non-room route
+as the home view.
 
 ## Goal
 
@@ -50,7 +55,11 @@ Recover active-view data and live updates after a startup hub outage without a p
 
 ## Technical notes
 
-`app/app.vue:24-33`, `app/composables/useDirigeraUpdates.ts:7-25`, and `server/routes/dirigera-updates.ts`. Use a controlled backend; real-device mutations are unnecessary.
+`app/app.vue:25-57`, `app/composables/useDirigeraUpdates.ts:7-26`,
+`app/services/update-subscription.ts`, and
+`server/routes/dirigera-updates.ts`. Use a controlled backend; real-device
+mutations are unnecessary. The reconnect implementation on
+`refactor/s1.2--before-errors-handling` is not part of the current checkout.
 
 Review evidence refers to commit `67bb02e85556ff7be4c7d01fe6f8ea40fd044320`.
 The suite passed 52 tests across 9 files during review; this does not establish

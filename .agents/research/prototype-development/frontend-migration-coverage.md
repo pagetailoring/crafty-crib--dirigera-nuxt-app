@@ -1,7 +1,7 @@
 ---
 createdAt: 2026-10-13
-lastReviewed: 2026-10-14
-editedAt: 2026-10-14T00:08:00
+lastReviewed: 2026-11-15
+editedAt: 2026-11-15T13:23:47
 ---
 
 # Frontend migration coverage
@@ -10,7 +10,7 @@ editedAt: 2026-10-14T00:08:00
 
 This report compares the React reference frontend in
 [/Users/pagetailoring/WIP/home/dirigera-web--lpgera/frontend](/Users/pagetailoring/WIP/home/dirigera-web--lpgera/frontend)
-with the current Nuxt application.
+with a Nuxt application snapshot.
 
 The reviewed snapshots are:
 
@@ -22,12 +22,34 @@ outside frontend source. Generated build output and node_modules are excluded.
 Repository source, tests, and generated production artifacts are the primary
 sources for this assessment.
 
-## Verdict
+## 2026-11-15 checkout review
+
+The active target is now commit `4005c9f`. The former
+`app/components/DeviceControls.vue` was removed. Current room and device views
+use raw Dirigera-device data from Nitro endpoints and render
+`device/ItemCard.vue` with `device/LightControls.vue`. The four light sliders
+consume numeric `update:model-value` payloads and throttle commands, but the
+current device card no longer provides playback, volume, artwork, or localized
+last-seen controls. Battery presentation is now implemented.
+
+The Pinia cache still serves the home view, while newer room, device, scene,
+and white-spectrum views use additional direct endpoints. The cache remains
+non-normalized and non-persistent. Automatic WebSocket reconnect, centralized
+GraphQL error classification, schema-derived operation types, browser
+authentication, and PWA manifest icons remain absent from this checkout.
+
+The application now includes device filtering, scene browsing and editing,
+and white-spectrum controls that were outside the original comparison. The
+snapshot report below remains useful as migration history, but its statements
+about the former device controls and missing battery display are not current.
+
+## Snapshot verdict
 
 The migration is still not behaviorally complete, but the previous report
 understated the current target substantially.
 
-The current Nuxt application preserves the core room, scene, device, artwork,
+At the reviewed snapshot, the Nuxt application preserved the core room, scene,
+device, artwork,
 control, loading, error, empty-state, update, and visibility-refresh workflows.
 Since the prior target snapshot, it has also added a shared Pinia cache,
 30-second freshness windows, in-flight request deduplication, mutation
@@ -57,7 +79,7 @@ scenarios, battery icons, and PWA manifest icons.
 | Query refetch hook | [app/app.vue](../../../app/app.vue) | Transferred with changed scope | Refresh invalidates all cache entries, reloads home or the active room, and reports rejected refreshes. This is route-scoped rather than per-mounted-Apollo-query refetching. |
 | Rooms and scenes | [index.vue](../../../app/pages/index.vue) and [cache.ts](../../../app/stores/cache.ts) | Transferred | The target preserves list, loading, error, activation, quick-control, environmental, and navigation behavior. Home loading still awaits rooms and scenes together, so one rejection produces the shared error state. |
 | Room and device presentation | [room/[id].vue](../../../app/pages/room/[id].vue) | Transferred with presentation differences | Device state, sensor readings, reachability, localized last-seen time, empty state, and navigation are present. Reference battery icons remain absent. |
-| Device controls | [DeviceControls.vue](../../../app/components/DeviceControls.vue) | Transferred | All six control families are present. Hue and saturation now resynchronize from props, pending controls disable overlapping input, and non-paused playback states now follow the reference pause behavior. |
+| Device controls | `app/components/DeviceControls.vue` at `4a2c32a` | Transferred at the snapshot | All six control families were present. Hue and saturation resynchronized from props, pending controls disabled overlapping input, and non-paused playback states followed the reference pause behavior. |
 | GraphQL generated types | Handwritten types in [dirigera-client.ts](../../../app/services/dirigera-client.ts) | Changed | Runtime operations are represented, but no schema-derived build-time contract checks query fields, variables, nullability, or enums. |
 | Storybook scenarios | No counterpart | Missing | The reference's frame and device scenarios and GraphQL mocks have not been transferred. |
 | PWA runtime and manifest | [nuxt.config.ts](../../../nuxt.config.ts), [app.vue](../../../app/app.vue), and [verify-pwa-build.mjs](../../../tools/verify-pwa-build.mjs) | Mostly transferred | The target registers an auto-updating service worker, emits a manifest, and precaches built static assets while excluding live GraphQL and WebSocket data. Manifest icons are still commented out and absent. |
@@ -66,7 +88,7 @@ scenarios, battery icons, and PWA manifest icons.
 
 The previous report used target commit
 23c9b5e2925d8e46be9ff32423fd1fd52554e40c. The following findings have changed
-at the current target commit.
+at the reviewed target commit.
 
 ### Resolved
 
@@ -76,14 +98,12 @@ at the current target commit.
   [verify-pwa-build.mjs](../../../tools/verify-pwa-build.mjs)).
 - Last-seen information is rendered for unreachable devices
   ([room/[id].vue](../../../app/pages/room/[id].vue)).
-- Hue and saturation companion values track refreshed device props
-  ([DeviceControls.vue](../../../app/components/DeviceControls.vue)).
-- Playback toggling now matches the reference: paused becomes playing and every
-  other exposed state becomes paused
-  ([DeviceControls.vue](../../../app/components/DeviceControls.vue)).
-- Light level, color temperature, color, playback, and volume expose separate
-  pending states and reject overlapping control input
-  ([DeviceControls.vue](../../../app/components/DeviceControls.vue)).
+- Hue and saturation companion values tracked refreshed device props in
+  `app/components/DeviceControls.vue` at `4a2c32a`.
+- Playback toggling matched the reference at `4a2c32a`: paused became playing
+  and every other exposed state became paused.
+- Light level, color temperature, color, playback, and volume exposed separate
+  pending states and rejected overlapping control input at `4a2c32a`.
 - Update-triggered refreshes now invalidate the cache, reload the active route,
   and retain a visible console failure instead of dropping a rejected promise
   ([app.vue](../../../app/app.vue)).
@@ -113,7 +133,8 @@ at the current target commit.
 - Cache-and-network artwork semantics.
 - Centralized transport and GraphQL error classification.
 - Schema-derived operation and resolver contracts.
-- Storybook scenarios and battery icons.
+- Storybook scenarios and battery icons at the reviewed snapshot. Battery
+  presentation was added later.
 
 ## Accuracy of the existing frontend work task
 
@@ -128,24 +149,24 @@ normalized identity, durable restoration, cache-and-network artwork,
 authentication consumption, centralized error handling, and schema-derived
 operation types are missing.
 
-The task's current implementation summary is stale where it still describes
-the target as useAsyncData-based. Its instruction not to infer mutation-driven
-cache changes also needs a decision: the current store applies successful
-device commands to cached room data before forcing a verification read
+The task now includes a current-status section for the mixed Pinia, GraphQL,
+and direct-endpoint implementation. Its instruction not to infer
+mutation-driven cache changes still needs a decision: the current store applies
+successful device commands to cached room data before forcing a verification read
 ([cache.ts](../../../app/stores/cache.ts)). The task should either accept that
 post-success local update or require its removal.
 
 The task's login and x-token requirements cannot be completed independently of
 the product decision it already names: the current backend intentionally
-removed browser authentication for the trusted-LAN phase. Its implementation
-status should therefore distinguish implemented, partial, blocked, and missing
-capabilities before development starts. This report does not modify the task.
+removed browser authentication for the trusted-LAN phase. The task's
+current-status section now separates delivered and missing capabilities, but
+the authentication product decision remains open.
 
 ## Bottom line
 
-The frontend is materially closer to the reference than the earlier research
-reported. The next parity work is no longer “add caching and PWA” in general;
-it is to finish the exact missing semantics: persistence opt-in and restoration,
-normalization, cache-and-network artwork, reconnect, centralized errors,
-schema-derived types, authentication decision, PWA icons, and remaining support
-scenarios.
+The frontend remains closer to the reference than the first research snapshot,
+but later interface work removed some delivered device behavior. Current work
+must cover cache persistence and normalization, cache-and-network artwork,
+update reconnect, centralized errors, schema-derived types, the authentication
+decision, PWA icons, and the missing playback, volume, artwork, and last-seen
+interface behavior.

@@ -1,12 +1,11 @@
 ---
 createdAt: 2026-10-14
-editedAt: 2026-10-16T01:56:22
-lastReviewed: 2026-10-15
+editedAt: 2026-11-15T13:23:47
+lastReviewed: 2026-11-15
 ---
 
 # Nuxt UI components
 
-- `UAccordion`
 - `UAlert`
 - `UApp`
 - `UBadge`
@@ -21,8 +20,11 @@ lastReviewed: 2026-10-15
 - `UHeader`
 - `UIcon`
 - `UMain`
+- `UModal`
 - `UNavigationMenu`
+- `UPageCard`
 - `UPageColumns`
+- `UProgress`
 - `USelect`
 - `USelectMenu`
 - `USeparator`
