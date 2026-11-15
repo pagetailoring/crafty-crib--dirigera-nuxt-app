@@ -1,4 +1,14 @@
-# Nuxt Dirigera app
+# Your Home Can Be Smarter. Even with IKEA DIRIGERA
+
+## A Nuxt-based app with Nuxt UI, (...) & a few extra tricks up its sleeve.
+
+🏠 Work in progress
+
+## Roadmap
+
+Coming soon: 42 new features. Don't panic! 🚀
+
+## Nuxt Dirigera app
 
 A single Nuxt application for the existing room, device, scene, and media controls.
 The Nitro backend talks directly to the IKEA DIRIGERA hub through the TypeScript
