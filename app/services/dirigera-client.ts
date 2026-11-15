@@ -10,6 +10,7 @@ export interface RoomSummary {
   id: string
   name: string
   icon?: string | null
+  color?: string | null
   temperature: number | null
   humidity: number | null
   pm25: number | null
@@ -63,6 +64,7 @@ export interface Room {
   id: string
   name: string
   icon?: string | null
+  color?: string | null
   devices: Device[]
 }
 
@@ -88,6 +90,7 @@ const roomsQuery = `
       id
       name
       icon
+      color
       temperature
       humidity
       pm25
@@ -157,6 +160,7 @@ const roomQuery = `
       id
       name
       icon
+      color
       devices {
         ${deviceFields}
       }

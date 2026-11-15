@@ -9,6 +9,7 @@ export const dirigeraSchema = buildSchema(`
     id: String!
     name: String!
     icon: String
+    color: String
   }
 
   extend type Query {

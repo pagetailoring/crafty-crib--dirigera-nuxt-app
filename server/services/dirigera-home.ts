@@ -244,6 +244,7 @@ export function getRoomView(room: Home['rooms'][number], home: Home) {
     id: room.id,
     name: room.name,
     icon: room.icon ?? null,
+    color: room.color ?? null,
     devices: [...getDevicesNotInSet(devices), ...getDeviceSets(devices)]
       .sort((a, b) => a.name.localeCompare(b.name))
       .sort((a, b) => Number(hasControl(b)) - Number(hasControl(a))),
