@@ -1,6 +1,6 @@
 ---
 createdAt: 2026-10-14
-editedAt: 2026-11-15T13:23:47
+editedAt: 2026-11-16T14:49:56
 lastReviewed: 2026-11-15
 ---
 
@@ -24,6 +24,7 @@ lastReviewed: 2026-11-15
 - `UNavigationMenu`
 - `UPageCard`
 - `UPageColumns`
+- `UPageGrid`
 - `UProgress`
 - `USelect`
 - `USelectMenu`

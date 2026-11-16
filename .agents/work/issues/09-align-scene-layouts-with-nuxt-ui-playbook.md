@@ -1,11 +1,11 @@
 ---
 createdAt: 2026-11-16
-editedAt: 2026-11-16T14:26:47
+editedAt: 2026-11-16T14:50:18
 lastReviewed: 2026-11-16
-status: open
+status: closed
 type: task
-assignee: null
-claimedAt: null
+assignee: codex
+claimedAt: 2026-11-16T14:49:56
 blockedBy: []
 priority: P2
 reviewAxis: standards
@@ -45,20 +45,19 @@ unrequested visual redesign.
 
 ## Acceptance criteria
 
-- [ ] The relevant Nuxt UI component APIs and existing project adapters are
+- [x] The relevant Nuxt UI component APIs and existing project adapters are
       checked before implementation.
-- [ ] The reviewed header, action group, grid, and card layout use Nuxt UI
+- [x] The reviewed header, action group, grid, and card layout use Nuxt UI
       components where those components can preserve the current behavior.
-- [ ] Every remaining custom markup or styling exception has an explicit,
+- [x] Every remaining custom markup or styling exception has an explicit,
       recorded justification approved by the user.
-- [ ] Focused scene component tests and the repository validation checks pass.
-- [ ] Any manual visual verification performed is reported separately from
+- [x] Focused scene component tests and the repository validation checks pass.
+- [x] Any manual visual verification performed is reported separately from
       automated validation.
 
 ## Open questions
 
-- Which reviewed structures cannot be represented by the current Nuxt UI APIs
-  without changing the intended layout?
+- Resolved by the appearance-preserving exceptions recorded below.
 
 ## Technical notes
 
@@ -79,4 +78,29 @@ The reviewed custom structures begin near `app/pages/scenes/index.vue:41` and
 
 ## Resolution
 
-To be completed after delivery.
+The user explicitly requested preserving the current appearance on 2026-11-16.
+
+Reviewed PageHeader, PageGrid, FieldGroup, and PageCard APIs and the installed
+Nuxt UI themes. The only project adapter is UiSwitch, which remains in use.
+Replaced the scene grid wrapper with UPageGrid. Local classes preserve static
+positioning, gap-5, one column below xl, and two columns from xl.
+
+Approved appearance-preserving exceptions:
+
+- Retain the page header markup and its spacing. PageHeader introduces a border,
+  larger description text, different padding, and different responsive placement.
+- Retain separate, wrapping action buttons in the header and card. FieldGroup
+  joins button edges and changes spacing and wrapping.
+- Retain SceneCard header, product and trigger rows, badge groups, editor panels,
+  schedule buttons, and footer layouts with their existing classes and UCard
+  padding overrides. PageCard and default card layouts do not reproduce these
+  grouped rows, tinted panels, compact spacing, and responsive arrangements.
+- Retain alert margins and existing typography to avoid changing vertical rhythm.
+
+These exceptions are scoped to the two reviewed files and follow the user's
+instruction to preserve their appearance. Scene behavior is unchanged.
+
+Validation: `bun run check` passed, including 122 tests across 18 files,
+scene component tests, ESLint, Prettier, Nuxt typecheck, and vue-tsc.
+`git diff --check` passed. No manual browser verification was performed; visual
+equivalence is based on preserving the existing layout classes, not screenshots.

@@ -66,7 +66,9 @@ function replaceScene(updated: Scene) {
       description="Scenes still appear, but some products may show their IDs."
     />
 
-    <div class="grid gap-5 xl:grid-cols-2">
+    <UPageGrid
+      class="static gap-5 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2"
+    >
       <ScenesSceneCard
         v-for="scene in scenes"
         :key="scene.id"
@@ -75,7 +77,7 @@ function replaceScene(updated: Scene) {
         show-details-link
         @updated="replaceScene"
       />
-    </div>
+    </UPageGrid>
 
     <UAlert
       v-if="!sceneError && scenes.length === 0"
