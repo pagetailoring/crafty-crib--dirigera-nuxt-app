@@ -150,19 +150,34 @@ export const useDirigeraCacheStore = defineStore('cache', () => {
   }
 
   function applyDeviceCommand(device: Device, command: DeviceCommand) {
-    if (command.type === 'setIsOn') device.isOn = command.isOn
+    if (command.type === 'setIsOn') {
+      device.isOn = command.isOn
+      return
+    }
     if (command.type === 'setLightLevel') {
       device.lightLevel = command.lightLevel
+      return
     }
     if (command.type === 'setColorTemperature') {
       device.colorTemperature = command.colorTemperature
+      return
     }
     if (command.type === 'setColor') {
       device.colorHue = command.colorHue
       device.colorSaturation = command.colorSaturation
+      return
     }
-    if (command.type === 'setPlayback') device.playback = command.playback
-    if (command.type === 'setVolume') device.volume = command.volume
+    if (command.type === 'setPlayback') {
+      device.playback = command.playback
+      return
+    }
+    if (command.type === 'setVolume') {
+      device.volume = command.volume
+      return
+    }
+
+    const unhandled: never = command
+    throw new Error(`Unsupported device command: ${unhandled}`)
   }
 
   async function controlDevice(device: Device, command: DeviceCommand) {

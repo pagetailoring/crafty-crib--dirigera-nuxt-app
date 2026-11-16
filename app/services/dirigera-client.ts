@@ -322,7 +322,13 @@ export function createDirigeraClient(request: GraphqlRequest) {
         return
       }
 
-      await request(setIsOnMutation, { id, type, isOn: command.isOn })
+      if (command.type === 'setIsOn') {
+        await request(setIsOnMutation, { id, type, isOn: command.isOn })
+        return
+      }
+
+      const unhandled: never = command
+      throw new Error(`Unsupported device command: ${unhandled}`)
     },
   }
 }

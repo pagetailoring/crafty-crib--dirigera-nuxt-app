@@ -2,7 +2,11 @@ import { createPinia, setActivePinia } from 'pinia'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { Room } from '../../app/services/dirigera-client'
+import type {
+  Device,
+  DeviceCommand,
+  Room,
+} from '../../app/services/dirigera-client'
 import { useDirigeraCacheStore } from '../../app/stores/cache'
 import { DIRIGERA_CACHE_TTL_MS } from '../../config/dirigera-cache'
 
@@ -105,25 +109,79 @@ describe('Dirigera cache', () => {
     expect(client.getRoom).toHaveBeenCalledTimes(2)
   })
 
-  it('updates cached device state before verifying it with the gateway', async () => {
-    const verification = Promise.withResolvers<Room | null>()
-    client.getRoom
-      .mockResolvedValueOnce(room())
-      .mockReturnValueOnce(verification.promise)
+  const commandCases: { command: DeviceCommand; patch: Partial<Device> }[] = [
+    { command: { type: 'setIsOn', isOn: false }, patch: { isOn: false } },
+    {
+      command: { type: 'setLightLevel', lightLevel: 45 },
+      patch: { lightLevel: 45 },
+    },
+    {
+      command: { type: 'setColorTemperature', colorTemperature: 2700 },
+      patch: { colorTemperature: 2700 },
+    },
+    {
+      command: { type: 'setColor', colorHue: 240, colorSaturation: 0.75 },
+      patch: { colorHue: 240, colorSaturation: 0.75 },
+    },
+    {
+      command: { type: 'setPlayback', playback: 'playbackPaused' },
+      patch: { playback: 'playbackPaused' },
+    },
+    { command: { type: 'setVolume', volume: 25 }, patch: { volume: 25 } },
+  ]
+
+  it.each(commandCases)(
+    'applies $command.type after success and replaces it with gateway state',
+    async ({ command, patch }) => {
+      const acknowledgement = Promise.withResolvers<undefined>()
+      const verification = Promise.withResolvers<Room | null>()
+      client.controlDevice.mockReturnValueOnce(acknowledgement.promise)
+      client.getRoom
+        .mockResolvedValueOnce(room())
+        .mockReturnValueOnce(verification.promise)
+      const cache = useDirigeraCacheStore()
+      const loadedRoom = await cache.loadRoom('living-room')
+      const device = loadedRoom!.devices[0]!
+      const original = { ...device }
+
+      const mutation = cache.controlDevice(device, command)
+      expect(client.controlDevice).toHaveBeenCalledExactlyOnceWith(
+        device.id,
+        device.type,
+        command
+      )
+      expect(cache.roomById['living-room']?.data.devices[0]).toEqual(original)
+      expect(client.getRoom).toHaveBeenCalledOnce()
+
+      acknowledgement.resolve(undefined)
+      await vi.waitFor(() => {
+        expect(client.getRoom).toHaveBeenCalledTimes(2)
+      })
+      expect(client.getRoom).toHaveBeenLastCalledWith('living-room')
+      expect(cache.roomById['living-room']?.data.devices[0]).toEqual({
+        ...original,
+        ...patch,
+      })
+
+      verification.resolve(room())
+      await mutation
+      expect(cache.roomById['living-room']?.data.devices[0]).toEqual(original)
+    }
+  )
+
+  it('keeps cached state unchanged when a device command fails', async () => {
     const cache = useDirigeraCacheStore()
     const loadedRoom = await cache.loadRoom('living-room')
+    client.controlDevice.mockRejectedValueOnce(new Error('Command failed'))
 
-    const mutation = cache.controlDevice(loadedRoom!.devices[0]!, {
-      type: 'setIsOn',
-      isOn: false,
-    })
-    await vi.waitFor(() => {
-      expect(cache.roomById['living-room']?.data.devices[0]?.isOn).toBe(false)
-    })
+    await expect(
+      cache.controlDevice(loadedRoom!.devices[0]!, {
+        type: 'setIsOn',
+        isOn: false,
+      })
+    ).rejects.toThrow('Command failed')
 
-    verification.resolve(room(false))
-    await mutation
-    expect(client.getRoom).toHaveBeenCalledTimes(2)
-    expect(cache.roomById['living-room']?.data.devices[0]?.isOn).toBe(false)
+    expect(cache.roomById['living-room']?.data).toEqual(room())
+    expect(client.getRoom).toHaveBeenCalledOnce()
   })
 })

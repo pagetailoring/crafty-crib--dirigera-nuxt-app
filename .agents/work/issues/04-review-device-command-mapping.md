@@ -1,11 +1,11 @@
 ---
 createdAt: 2026-11-15
-editedAt: 2026-11-15T13:23:47
-lastReviewed: 2026-11-15
-status: open
+editedAt: 2026-11-16T14:42:46
+lastReviewed: 2026-11-16
+status: closed
 type: task
-assignee: null
-claimedAt: null
+assignee: codex
+claimedAt: 2026-11-16T14:40:55
 blockedBy: []
 priority: P3
 reviewAxis: standards
@@ -35,13 +35,13 @@ Make command coverage explicit while keeping transport and cache responsibilitie
 
 ## Acceptance criteria
 
-- [ ] Each command has an explicit transport and cache policy.
-- [ ] An unhandled variant cannot silently bypass the cache update policy.
-- [ ] Existing command and cache behavior remains covered by focused checks.
+- [x] Each command has an explicit transport and cache policy.
+- [x] An unhandled variant cannot silently bypass the cache update policy.
+- [x] Existing command and cache behavior remains covered by focused checks.
 
 ## Open questions
 
-- Is exhaustive handling sufficient, or is shared field metadata justified?
+- Resolved below. Exhaustive handling is sufficient for the current commands.
 
 ## Technical notes
 
@@ -66,4 +66,32 @@ browser or physical-device behavior.
 
 ## Resolution
 
-To be completed after delivery.
+Completed on 2026-11-16.
+
+Kept the transport and cache mappings separate and added exhaustive `never`
+checks to both. Shared field metadata is unnecessary for six explicit commands
+with different transport and cache responsibilities. The transport now handles
+`setIsOn` explicitly instead of using it as a fallback. Every cache branch
+returns after applying its fields, so adding a command without a cache policy
+fails type checking.
+
+The existing policies are preserved: power, brightness, color temperature,
+playback, and volume update their corresponding fields; color updates both hue
+and saturation. The client sends the existing GraphQL mutations and payloads.
+After successful commands, the cache updates matching devices and reloads the
+affected rooms. Failed commands leave cached data unchanged.
+
+Expanded the cache tests to cover all six commands, unchanged state while a
+command is pending, gateway state replacing the local patch, and command
+failure. Existing client tests cover all six mutation payloads.
+
+Validation:
+
+- Focused client and cache tests passed: 22 tests in two files.
+- `bun run check` passed: 122 tests in 18 files, ESLint, Prettier, Nuxt typecheck,
+  and vue-tsc.
+- An in-memory TypeScript compiler check added a fictional command and confirmed
+  missing-handler errors in both mappings without modifying source files.
+- No browser or physical-device verification was performed.
+
+The in-flight cache invalidation issue remains separate and unchanged.
