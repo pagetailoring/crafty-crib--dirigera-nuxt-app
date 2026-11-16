@@ -1,0 +1,3 @@
+[mcp_servers.nuxt]
+url = "https://nuxt.com/mcp"
+http_headers = { "X-MCP-Tools" = "list-documentation-pages,get-documentation-page" }
