@@ -1,11 +1,11 @@
 ---
 createdAt: 2026-11-16
-editedAt: 2026-11-16T14:26:47
+editedAt: 2026-11-16T14:39:03
 lastReviewed: 2026-11-16
-status: open
+status: closed
 type: task
-assignee: null
-claimedAt: null
+assignee: codex
+claimedAt: 2026-11-16T14:38:19
 blockedBy: []
 priority: P2
 reviewAxes:
@@ -48,13 +48,13 @@ by PR #6.
 
 ## Acceptance criteria
 
-- [ ] The README no longer says that frontend files and functionality are
+- [x] The README no longer says that frontend files and functionality are
       unchanged or that new frontend features are outside the migration.
-- [ ] The README identifies the GraphQL-backed cache and direct Nitro endpoints
+- [x] The README identifies the GraphQL-backed cache and direct Nitro endpoints
       used by the current views.
-- [ ] The documented setup and deployment steps remain accurate for the
+- [x] The documented setup and deployment steps remain accurate for the
       server-side hub token and WebSocket forwarding.
-- [ ] The README does not claim verification beyond the checks that were run.
+- [x] The README does not claim verification beyond the checks that were run.
 
 ## Open questions
 
@@ -78,4 +78,16 @@ usage appears in `app/pages/devices.vue` and `app/pages/room/[id].vue`.
 
 ## Resolution
 
-To be completed after delivery.
+Completed against checkout `2ca1776` on 2026-11-16.
+
+Updated `README.md` to describe the GraphQL-backed in-memory Pinia cache,
+direct device and scene endpoints, scene editing, and the white-spectrum
+GraphQL path. Removed the unchanged-frontend claim and clarified that media
+state is displayed without playback or volume controls. Aligned the Node
+requirement with `package.json` and retained server-owned credentials and
+WebSocket proxy instructions after checking the configuration and middleware.
+
+Validation: `bunx prettier --check README.md` and `git diff --check` passed.
+The documented paths were checked against current source files. No application
+code changed; application tests, a production build, browser checks, and
+physical-hub checks were not run for this documentation-only change.
