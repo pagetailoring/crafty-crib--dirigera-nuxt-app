@@ -9,6 +9,8 @@ export interface QuickControl {
 export interface RoomSummary {
   id: string
   name: string
+  icon?: string | null
+  color?: string | null
   temperature: number | null
   humidity: number | null
   pm25: number | null
@@ -20,6 +22,7 @@ export interface RoomSummary {
 export interface Scene {
   id: string
   name: string
+  icon?: string | null
 }
 
 export type ControlType = 'DEVICE' | 'DEVICE_SET'
@@ -28,12 +31,17 @@ export interface Device {
   id: string
   name: string
   type: ControlType
+  deviceType: string | null
+  productName: string | null
+  roomName?: string | null
   isReachable: boolean
   lastSeen: string
   batteryPercentage: number | null
   isOn: boolean | null
   lightLevel: number | null
   colorTemperature: number | null
+  colorTemperatureMin?: number | null
+  colorTemperatureMax?: number | null
   colorSaturation: number | null
   colorHue: number | null
   playback: string | null
@@ -55,6 +63,8 @@ export interface Device {
 export interface Room {
   id: string
   name: string
+  icon?: string | null
+  color?: string | null
   devices: Device[]
 }
 
@@ -79,6 +89,8 @@ const roomsQuery = `
     rooms {
       id
       name
+      icon
+      color
       temperature
       humidity
       pm25
@@ -98,6 +110,7 @@ const scenesQuery = `
     scenes {
       id
       name
+      icon
     }
   }
 `
@@ -108,21 +121,21 @@ const activateSceneMutation = `
   }
 `
 
-const roomQuery = `
-  query Room($id: String!) {
-    room(id: $id) {
-      id
-      name
-      devices {
+const deviceFields = `
         id
         name
         type
+        deviceType
+        productName
+        roomName
         isReachable
         lastSeen
         batteryPercentage
         isOn
         lightLevel
         colorTemperature
+        colorTemperatureMin
+        colorTemperatureMax
         colorSaturation
         colorHue
         playback
@@ -139,6 +152,17 @@ const roomQuery = `
         isOpen
         isDetected
         illuminance
+`
+
+const roomQuery = `
+  query Room($id: String!) {
+    room(id: $id) {
+      id
+      name
+      icon
+      color
+      devices {
+        ${deviceFields}
       }
     }
   }
@@ -220,6 +244,12 @@ const playItemImageQuery = `
 
 export function createDirigeraClient(request: GraphqlRequest) {
   return {
+    async listTemperatureLights() {
+      const data = await request<{ temperatureLights: Device[] }>(
+        `query TemperatureLights { temperatureLights { ${deviceFields} } }`
+      )
+      return data.temperatureLights
+    },
     async listRooms() {
       const data = await request<{ rooms: RoomSummary[] }>(roomsQuery)
       return data.rooms

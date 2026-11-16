@@ -8,9 +8,12 @@ export const dirigeraSchema = buildSchema(`
   type Room {
     id: String!
     name: String!
+    icon: String
+    color: String
   }
 
   extend type Query {
+    temperatureLights: [Device!]!
     rooms: [Room!]!
     room(id: String!): Room
   }
@@ -28,12 +31,17 @@ export const dirigeraSchema = buildSchema(`
     id: String!
     name: String!
     type: ControlType!
+    deviceType: String
+    productName: String
+    roomName: String
     isReachable: Boolean!
     lastSeen: String!
     batteryPercentage: Int
     isOn: Boolean
     lightLevel: Int
     colorTemperature: Int
+    colorTemperatureMin: Int
+    colorTemperatureMax: Int
     colorSaturation: Float
     colorHue: Float
     playback: Playback
@@ -104,6 +112,7 @@ export const dirigeraSchema = buildSchema(`
   type Scene {
     id: String!
     name: String!
+    icon: String
   }
 
   extend type Query {

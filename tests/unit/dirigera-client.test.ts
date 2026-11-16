@@ -81,6 +81,8 @@ describe('Dirigera client', () => {
           id: 'lamp',
           name: 'Lamp',
           type: 'DEVICE',
+          deviceType: 'light',
+          productName: 'TRADFRI bulb',
           isReachable: true,
           lastSeen: '2026-10-13T01:00:00.000Z',
           batteryPercentage: null,

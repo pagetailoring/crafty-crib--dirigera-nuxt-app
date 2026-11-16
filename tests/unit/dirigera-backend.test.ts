@@ -17,9 +17,14 @@ function fixture() {
     ({
       id,
       type: 'light',
-      room: { id: 'room' },
+      deviceType: 'light',
+      room: { id: 'room', name: 'Living Room' },
       deviceSet: [],
-      attributes: { customName: id, ...attributes },
+      attributes: {
+        customName: id,
+        model: 'TRADFRI bulb',
+        ...attributes,
+      },
       capabilities: {
         canReceive: [
           'isOn',
@@ -37,9 +42,13 @@ function fixture() {
       ...extra,
     }) as unknown as Device
   const home = {
-    rooms: [{ id: 'room', name: 'Room' }],
+    rooms: [{ id: 'room', name: 'Room', icon: 'rooms_arm_chair' }],
     scenes: [
-      { id: 'scene', type: 'userScene', info: { name: 'Evening' } },
+      {
+        id: 'scene',
+        type: 'userScene',
+        info: { name: 'Evening', icon: 'scenes_moon' },
+      },
       { id: 'hidden', type: 'automation', info: { name: 'Hidden' } },
     ],
     devices: [
@@ -68,7 +77,7 @@ function fixture() {
       device(
         'speaker',
         { playback: 'playbackPlaying', volume: 20 },
-        { type: 'speaker' }
+        { type: 'speaker', deviceType: 'speaker' }
       ),
     ],
   } as unknown as Home
@@ -99,6 +108,7 @@ describe('integrated Dirigera backend', () => {
     const { frontend } = fixture()
     const rooms = await frontend.listRooms()
     expect(rooms[0]).toMatchObject({
+      icon: 'rooms_arm_chair',
       temperature: 22,
       humidity: 45,
       pm25: null,
@@ -108,13 +118,83 @@ describe('integrated Dirigera backend', () => {
       { id: 'room-speakers', type: 'SPEAKERS', isOn: true },
     ])
     expect(await frontend.listScenes()).toEqual([
-      { id: 'scene', name: 'Evening' },
+      { id: 'scene', name: 'Evening', icon: 'scenes_moon' },
     ])
     const room = await frontend.getRoom('room')
+    expect(room?.icon).toBe('rooms_arm_chair')
+    expect(room?.devices.find(device => device.id === 'light')).toMatchObject({
+      deviceType: 'light',
+      productName: 'TRADFRI bulb',
+    })
+    expect(room?.devices.find(device => device.id === 'speaker')).toMatchObject(
+      {
+        deviceType: 'speaker',
+        productName: 'TRADFRI bulb',
+      }
+    )
     expect(room?.devices.map(device => device.id)).toContain('set')
     expect(room?.devices.map(device => device.id)).not.toContain('group-light')
     expect(await frontend.getRoom('missing')).toBeNull()
     expect(await frontend.getPlayItemImage('missing')).toBeNull()
+  })
+
+  it('passes temperature limits through GraphQL and lists individual lights across groups and rooms', async () => {
+    const { frontend, hub } = fixture()
+    const home = await hub.home()
+    home.devices[0]!.attributes.colorTemperature = 3000
+    home.devices[0]!.attributes.colorTemperatureMin = 6500
+    home.devices[0]!.attributes.colorTemperatureMax = 2000
+    const grouped = home.devices.find(device => device.id === 'group-light')!
+    grouped.attributes.colorTemperature = 3000
+    grouped.attributes.colorTemperatureMin = 4000
+    grouped.attributes.colorTemperatureMax = 2202
+    grouped.room = undefined
+    const room = await frontend.getRoom('room')
+    expect(room?.devices.find(device => device.id === 'light')).toMatchObject({
+      colorTemperatureMin: 6500,
+      colorTemperatureMax: 2000,
+    })
+    const lights = await frontend.listTemperatureLights()
+    expect(lights.map(light => light.id)).toEqual(['group-light', 'light'])
+    expect(lights.find(light => light.id === 'group-light')).toMatchObject({
+      type: 'DEVICE',
+      roomName: null,
+      colorTemperatureMin: 4000,
+      colorTemperatureMax: 2202,
+    })
+    expect(lights.find(light => light.id === 'light')).toMatchObject({
+      roomName: 'Living Room',
+    })
+  })
+
+  it('limits a device set to the range supported by every member', async () => {
+    const { frontend, hub } = fixture()
+    const home = await hub.home()
+    const member = home.devices.find(device => device.id === 'group-light')!
+    Object.assign(member.attributes, {
+      colorTemperature: 3000,
+      colorTemperatureMin: 6500,
+      colorTemperatureMax: 2000,
+    })
+    home.devices.push({
+      ...member,
+      id: 'second-member',
+      attributes: {
+        ...member.attributes,
+        colorTemperatureMin: 4000,
+        colorTemperatureMax: 2202,
+      },
+    })
+    let room = await frontend.getRoom('room')
+    expect(room?.devices.find(device => device.id === 'set')).toMatchObject({
+      colorTemperatureMin: 2202,
+      colorTemperatureMax: 4000,
+    })
+    home.devices.at(-1)!.capabilities = { canReceive: [], canSend: [] }
+    room = await frontend.getRoom('room')
+    expect(
+      room?.devices.find(device => device.id === 'set')?.colorTemperature
+    ).toBeNull()
   })
 
   it('routes every existing device command to the library and distinguishes device sets', async () => {

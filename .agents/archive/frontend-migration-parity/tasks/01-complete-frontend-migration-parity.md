@@ -1,7 +1,7 @@
 ---
 createdAt: 2026-10-13
-editedAt: 2026-10-13T23:28:21
-lastReviewed: 2026-10-13
+editedAt: 2026-11-15T13:23:47
+lastReviewed: 2026-11-15
 status: closed
 type: task
 assignee: null
@@ -13,6 +13,12 @@ triage: ready-for-agent
 # Complete selected frontend migration parity
 
 **Status:** closed
+
+## Archive note
+
+This package records work closed at commit `41e2262`. Later changes do not
+change that historical closure. They do mean this file must not be used as a
+statement of the current interface at commit `4005c9f`.
 
 ## Problem Statement
 
@@ -189,8 +195,17 @@ The Nuxt PWA integration is documented by the Vite PWA project at
 
 ## Design
 
-- [Frontend migration coverage](../../../research/frontend-migration-coverage.md)
+- [Frontend migration coverage](../../../research/prototype-development/frontend-migration-coverage.md)
 
 ## Resolution
 
-To be completed after delivery.
+The October delivery added localized last-seen presentation, pending control
+states, hue and saturation synchronization, reference-compatible playback
+behavior, and production PWA generation and verification. The final regular
+and maskable icon artwork was not delivered and remains tracked separately in
+`.agents/work/issues/02-add-pwa-icons.md`.
+
+At the current checkout, the later device-card refactor has removed the former
+last-seen, playback, volume, and artwork controls from the rendered device
+interface. Active research and issues must therefore be used for current
+parity status. This archive records the completed historical delivery only.

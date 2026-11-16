@@ -8,7 +8,7 @@
 
 Coming soon: 42 new features. Don't panic! 🚀
 
-## Nuxt Dirigera app
+# Nuxt Dirigera app
 
 A single Nuxt application for the existing room, device, scene, and media controls.
 The Nitro backend talks directly to the IKEA DIRIGERA hub through the TypeScript

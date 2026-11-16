@@ -15,11 +15,10 @@ async function activateScene(id: string) {
 
 <template>
   <div class="flex flex-wrap gap-2">
+    <slot />
     <UButton
       v-for="scene in scenes?.data"
       :key="scene.id"
-      color="neutral"
-      variant="outline"
       :loading="activeSceneId === scene.id"
       @click="activateScene(scene.id)"
     >

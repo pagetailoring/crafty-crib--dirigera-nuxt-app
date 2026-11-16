@@ -1,7 +1,7 @@
 import type { Device, DirigeraClient } from 'dirigera'
 import { graphql, GraphQLError } from 'graphql'
 import { dirigeraSchema } from './dirigera-schema'
-import { getRoomView } from './dirigera-home'
+import { getDeviceViews, getRoomView } from './dirigera-home'
 
 export interface GraphqlBody {
   query: string
@@ -31,6 +31,15 @@ export async function executeDirigeraQuery(
     return true
   }
   const root = {
+    async temperatureLights() {
+      return getDeviceViews(
+        (await getHome()).devices.filter(
+          device =>
+            device.type === 'light' &&
+            device.capabilities.canReceive.includes('colorTemperature')
+        )
+      ).sort((a, b) => a.name.localeCompare(b.name))
+    },
     async rooms() {
       const state = await getHome()
       return state.rooms
@@ -45,7 +54,11 @@ export async function executeDirigeraQuery(
     async scenes() {
       return (await getHome()).scenes
         .filter(scene => scene.type === 'userScene')
-        .map(scene => ({ id: scene.id, name: scene.info.name }))
+        .map(scene => ({
+          id: scene.id,
+          name: scene.info.name,
+          icon: scene.info.icon ?? null,
+        }))
     },
     async activateScene({ id }: { id: string }) {
       await client.scenes.trigger({ id })

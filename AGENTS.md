@@ -9,3 +9,10 @@ Before working in this repository, read and follow `.agents/AGENTS.md`.
 ## Always-On Rules
 
 Correct obvious typos in prompts. If the intent is unclear, STOP and ask for clarification.
+
+## Nuxt UI
+
+This project uses Nuxt UI. Before creating, modifying, or reviewing UI, read
+and follow [the Nuxt UI instructions](.agents/playbooks/nuxt-ui.md).
+
+When the user identifies a prompt as dictated, restate the interpreted component names, layout, and actions before editing. Treat unknown words and context-sensitive UI terms as ambiguous and ask one short clarification.

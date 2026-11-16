@@ -1,0 +1,1 @@
+export const DEVICE_CONTROL_THROTTLE_MS = 300

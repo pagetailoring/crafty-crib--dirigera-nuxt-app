@@ -12,7 +12,26 @@ try {
 <template>
   <UContainer>
     <h1 class="sr-only">Home page</h1>
-    <ScenesListHomePage />
+    <ScenesListHomePage>
+      <UButton
+        class="font-light uppercase tracking-wider"
+        to="/white-spectrum"
+        trailing-icon="i-lucide-palette"
+        label="White spectrum"
+      />
+      <UButton
+        to="/devices"
+        label="Devices"
+        trailing-icon="i-lucide-component"
+        class="font-light uppercase tracking-wider"
+      />
+      <UButton
+        to="/scenes"
+        label="Scenes"
+        trailing-icon="i-lucide-sparkles"
+        class="font-light uppercase tracking-wider"
+      />
+    </ScenesListHomePage>
 
     <UAlert
       v-if="error"
