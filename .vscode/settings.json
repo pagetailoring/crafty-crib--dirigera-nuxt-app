@@ -15,5 +15,24 @@
     "**/node_modules": true,
     ".eslintcache": true
   },
-  "nuxt.isNuxtApp": false
+  "material-icon-theme.activeIconPack": "vue",
+  "material-icon-theme.folders.associations": {
+    "crud": "update",
+    "codex": "robot",
+    "table": "database",
+    "firebase": "firebase",
+    "pomodoro": "temp",
+    "chart": "scons",
+    "new-logs": "input",
+    "edit": "ci",
+    "composables": "src",
+    "stores": "store",
+    "table/cell": "log",
+    "copy-value": "functions",
+    "form-manual": "input",
+    "calendar": "coverage",
+    "summary": "graphql",
+    "work": "changesets",
+    "header": "ui"
+  }
 }
