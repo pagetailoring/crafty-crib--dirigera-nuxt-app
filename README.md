@@ -1,6 +1,8 @@
 # Your Home Can Be Smarter. Even with IKEA DIRIGERA
 
-## A Nuxt-based app with Nuxt UI, (...) & a few extra tricks up its sleeve.
+This app was born out of frustration with the UX of the IKEA app. When the idea came to me, I discovered the [lpgera/dirigera](https://github.com/lpgera/dirigera) library and the [dirigera-web](https://github.com/lpgera/dirigera-web) repository created by @lpgera. The first stage of development involved rewriting the application in [Nuxt](https://github.com/nuxt/nuxt) with the help of Codex, drawing inspiration from [@lpgera](https://github.com/lpgera).
+
+## A Nuxt app with Nuxt UI
 
 🏠 Work in progress
 
