@@ -1,3 +1,4 @@
+/** Resolve a valid color-temperature range, falling back when the hub reports no usable limits. */
 export function getColorTemperatureRange(device: ColorTemperatureAttributes) {
   const bounds = [device.colorTemperatureMin, device.colorTemperatureMax]
   if (
@@ -15,6 +16,7 @@ export function getColorTemperatureRange(device: ColorTemperatureAttributes) {
   return { min: 2202, max: 4000, reported: false }
 }
 
+/** Clamp and round a color temperature to the range supported by a device. */
 export function clampColorTemperature(
   value: number,
   device: ColorTemperatureAttributes

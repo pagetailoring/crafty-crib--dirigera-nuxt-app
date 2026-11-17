@@ -7,13 +7,16 @@ import { dirigeraSchema } from '@@/server/utils/dirigera-schema'
 import type { DirigeraClient } from 'dirigera'
 import { graphql, GraphQLError } from 'graphql'
 
+/** Execute one GraphQL request against a consistent snapshot of the Dirigera home. */
 export async function executeDirigeraQuery(
   client: DirigeraClient,
   body: GraphqlBody
 ) {
   // Each operation observes one home snapshot, including quick-control commands.
   let home: ReturnType<DirigeraClient['home']> | undefined
+  /** Load and reuse the home snapshot for the current GraphQL operation. */
   const getHome = () => (home ??= client.home())
+  /** Apply GraphQL control attributes to a device or device set. */
   const setAttributes = async ({
     id,
     type,
@@ -24,6 +27,7 @@ export async function executeDirigeraQuery(
     return true
   }
   const root = {
+    /** List lights that support color-temperature control. */
     async temperatureLights() {
       return getDeviceViews(
         (await getHome()).devices.filter(
@@ -33,17 +37,20 @@ export async function executeDirigeraQuery(
         )
       ).sort((a, b) => a.name.localeCompare(b.name))
     },
+    /** List room summaries derived from the current home snapshot. */
     async rooms() {
       const state = await getHome()
       return state.rooms
         .map(room => getRoomView(room, state))
         .sort((a, b) => a.name.localeCompare(b.name))
     },
+    /** Resolve one room view by its Dirigera identifier. */
     async room({ id }: { id: string }) {
       const state = await getHome()
       const room = state.rooms.find(room => room.id === id)
       return room ? getRoomView(room, state) : null
     },
+    /** List user-created scenes available for activation. */
     async scenes() {
       return (await getHome()).scenes
         .filter(scene => scene.type === 'userScene')
@@ -53,10 +60,12 @@ export async function executeDirigeraQuery(
           icon: scene.info.icon ?? null,
         }))
     },
+    /** Trigger a Dirigera scene by its identifier. */
     async activateScene({ id }: { id: string }) {
       await client.scenes.trigger({ id })
       return null
     },
+    /** Fetch and encode the current media artwork for a device. */
     async devicePlayItemImageURL({ id }: { id: string }) {
       const device = (await getHome()).devices.find(device => device.id === id)
       const url = device?.attributes.playbackAudio?.playItem?.imageURL
@@ -66,6 +75,7 @@ export async function executeDirigeraQuery(
       const buffer = Buffer.from(await response.arrayBuffer())
       return `data:${response.headers.get('content-type') ?? 'image/jpeg'};base64,${buffer.toString('base64')}`
     },
+    /** Apply a room-wide power or playback state to one device category. */
     async quickControl({
       roomId,
       type,

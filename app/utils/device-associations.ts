@@ -2,6 +2,7 @@ import type { Device, Scene } from 'dirigera'
 import type { DeviceAssociations } from '~/types/device-associations'
 import type { NormalizedDevice } from '~/types/normalize-sensors'
 
+/** Check whether two normalized devices reference one another through their source or remote-link identifiers. */
 function isLinked(first: NormalizedDevice, second: NormalizedDevice) {
   const firstIds = [
     first.id,
@@ -21,6 +22,7 @@ function isLinked(first: NormalizedDevice, second: NormalizedDevice) {
   )
 }
 
+/** Collect the devices, remotes, and scenes associated with a normalized device. */
 export function deviceAssociations(
   device: NormalizedDevice,
   devices: Device[],

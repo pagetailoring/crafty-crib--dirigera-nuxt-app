@@ -5,6 +5,7 @@ import {
 import { createDirigeraClient } from 'dirigera'
 import { useRuntimeConfig } from 'nitropack/runtime'
 
+/** Shared lazy connection configured for the app's Dirigera hub. */
 export const dirigeraConnection = createDirigeraConnection(async () => {
   const config = useRuntimeConfig()
   const accessToken = config.dirigeraAccessToken || process.env.ACCESS_TOKEN

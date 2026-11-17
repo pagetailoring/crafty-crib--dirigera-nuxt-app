@@ -1,6 +1,7 @@
 import type { Device } from 'dirigera'
 import type { PageCardProps } from '@nuxt/ui'
 
+/** Display metadata for one category of Dirigera devices. */
 export interface DeviceCategory {
   type: Device['type']
   label: string

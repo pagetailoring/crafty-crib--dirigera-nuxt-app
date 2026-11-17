@@ -1,6 +1,7 @@
 import type { Device } from 'dirigera'
 import type { NormalizedDevice } from '~/types/normalize-sensors'
 
+/** Identify device records that represent supported sensor endpoints. */
 const isSensor = (device: Device) =>
   device.type === 'sensor' ||
   (device.type === 'unknown' && device.deviceType === 'lightSensor')

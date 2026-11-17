@@ -4,6 +4,7 @@ import type { Device, DeviceSet, Home } from 'dirigera'
 
 import { getColorTemperatureRange } from '#shared/utils/color-temperature'
 
+/** Read an attribute only when the device declares that it can receive it. */
 export function getAttributeIfCanReceive<T extends keyof Device['attributes']>(
   device: Device,
   attribute: T
@@ -13,10 +14,12 @@ export function getAttributeIfCanReceive<T extends keyof Device['attributes']>(
     : null
 }
 
+/** Convert standalone devices into app-facing device views. */
 export function getDevicesNotInSet(devices: Device[]) {
   return getDeviceViews(devices.filter(d => d.deviceSet.length === 0))
 }
 
+/** Map Dirigera devices to the flattened shape consumed by the app. */
 export function getDeviceViews(devices: Device[]) {
   return devices.map(device => {
     const playItem = device.attributes.playbackAudio?.playItem
@@ -62,6 +65,7 @@ export function getDeviceViews(devices: Device[]) {
   })
 }
 
+/** Aggregate unique Dirigera device sets into controllable app-facing views. */
 export function getDeviceSets(devices: Device[]) {
   const deviceSets = [
     ...devices
@@ -148,6 +152,7 @@ export function getDeviceSets(devices: Device[]) {
   })
 }
 
+/** Check whether a device view exposes at least one controllable attribute. */
 const hasControl = (d: {
   isOn: boolean | null | undefined
   lightLevel: number | null | undefined
@@ -165,6 +170,7 @@ const hasControl = (d: {
   d.playback !== null ||
   d.volume !== null
 
+/** Merge related endpoint attributes into devices assigned to one room. */
 function getDevicesInRoomWithRelations({
   roomId,
   devices,
@@ -188,6 +194,7 @@ function getDevicesInRoomWithRelations({
   }))
 }
 
+/** Calculate the average available sensor value for one device attribute. */
 function getAverageAttributeValue({
   devices,
   attribute,
@@ -214,6 +221,7 @@ function getAverageAttributeValue({
   )
 }
 
+/** Build the app-facing room view with devices, quick controls, and sensor averages. */
 export function getRoomView(room: Home['rooms'][number], home: Home) {
   const devices = getDevicesInRoomWithRelations({
     roomId: room.id,

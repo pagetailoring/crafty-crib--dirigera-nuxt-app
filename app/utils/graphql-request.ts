@@ -1,6 +1,8 @@
 import type { Fetch } from '~/types/graphql-request'
 
+/** Create a GraphQL request function that targets the app's Dirigera API endpoint. */
 export function createGraphqlRequest(fetch: Fetch) {
+  /** Execute a Dirigera GraphQL operation and return its validated data payload. */
   return async function request<T>(
     query: string,
     variables?: Record<string, unknown>

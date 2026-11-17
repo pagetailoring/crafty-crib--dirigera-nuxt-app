@@ -1,6 +1,7 @@
 // GraphQL contract adapted from lpgera/dirigera-web. See THIRD_PARTY_NOTICES.md.
 import { buildSchema } from 'graphql'
 
+/** GraphQL schema exposed by the app's Dirigera API. */
 export const dirigeraSchema = buildSchema(`
   type Query { _: String }
   type Mutation { _: String }

@@ -1,8 +1,10 @@
 import type { DirigeraClient } from 'dirigera'
 
+/** Report a classified failure to establish a Dirigera hub connection. */
 export class DirigeraConnectionError extends Error {
   readonly statusCode = 503
 
+  /** Create a connection error with a public reason and an optional underlying cause. */
   constructor(
     readonly reason: DirigeraUnavailableReason,
     message: string,
@@ -13,6 +15,7 @@ export class DirigeraConnectionError extends Error {
   }
 }
 
+/** Manage a lazy shared Dirigera connection, its status, and update subscribers. */
 export function createDirigeraConnection(
   connect: () => Promise<DirigeraClient>
 ) {
@@ -22,6 +25,7 @@ export function createDirigeraConnection(
   const subscribers = new Set<() => void>()
 
   return {
+    /** Return the active client or establish and verify a new hub connection. */
     getClient() {
       if (closed)
         return Promise.reject(new Error('The Dirigera connection is closed.'))
@@ -60,15 +64,19 @@ export function createDirigeraConnection(
       }
       return client
     },
+    /** Return the latest connection status without opening a connection. */
     getStatus() {
       return status
     },
+    /** Register an update callback and return a function that unregisters it. */
     subscribe(notify: () => void) {
       subscribers.add(notify)
+      /** Remove this callback from the connection's update subscribers. */
       return () => {
         subscribers.delete(notify)
       }
     },
+    /** Close the shared connection and discard all update subscribers. */
     async close() {
       closed = true
       subscribers.clear()

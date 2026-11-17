@@ -1,5 +1,6 @@
 import { createUpdateSubscription } from '~/utils/update-subscription'
 
+/** Refresh app data in response to authenticated Dirigera update events. */
 export function useDirigeraUpdates(refresh: () => void) {
   const config = useRuntimeConfig()
   let stop: (() => void) | null = null

@@ -167,29 +167,36 @@ const playItemImageQuery = `
   }
 `
 
+/** Create a typed Dirigera client backed by the provided GraphQL request function. */
 export function createDirigeraClient(request: GraphqlRequest) {
   return {
+    /** Fetch all lights that expose color-temperature controls. */
     async listTemperatureLights() {
       const data = await request<{ temperatureLights: Device[] }>(
         `query TemperatureLights { temperatureLights { ${deviceFields} } }`
       )
       return data.temperatureLights
     },
+    /** Fetch summaries of all rooms from the Dirigera backend. */
     async listRooms() {
       const data = await request<{ rooms: RoomSummary[] }>(roomsQuery)
       return data.rooms
     },
+    /** Fetch all scenes available through the Dirigera backend. */
     async listScenes() {
       const data = await request<{ scenes: Scene[] }>(scenesQuery)
       return data.scenes
     },
+    /** Activate a scene by its Dirigera identifier. */
     async activateScene(id: string) {
       await request(activateSceneMutation, { id })
     },
+    /** Fetch a room and its devices by the room's Dirigera identifier. */
     async getRoom(id: string) {
       const data = await request<{ room: Room | null }>(roomQuery, { id })
       return data.room
     },
+    /** Apply a quick-control state to the devices in a room. */
     async setQuickControl(
       roomId: string,
       type: QuickControlType,
@@ -197,6 +204,7 @@ export function createDirigeraClient(request: GraphqlRequest) {
     ) {
       await request(quickControlMutation, { roomId, type, isOn })
     },
+    /** Fetch the current play item's image URL for a media device. */
     async getPlayItemImage(id: string) {
       const data = await request<{ devicePlayItemImageURL: string | null }>(
         playItemImageQuery,
@@ -204,6 +212,7 @@ export function createDirigeraClient(request: GraphqlRequest) {
       )
       return data.devicePlayItemImageURL
     },
+    /** Dispatch a typed control command to a device or device set. */
     async controlDevice(id: string, type: ControlType, command: DeviceCommand) {
       if (command.type === 'setVolume') {
         await request(setVolumeMutation, { id, type, volume: command.volume })

@@ -1,11 +1,14 @@
+/** Room-wide device categories supported by quick controls. */
 export type QuickControlType = 'LIGHTS' | 'OUTLETS' | 'SPEAKERS'
 
+/** Current state of a room-wide quick control. */
 export interface QuickControl {
   id: string
   type: QuickControlType
   isOn: boolean | null
 }
 
+/** Room data used by room lists and overview cards. */
 export interface RoomSummary {
   id: string
   name: string
@@ -19,14 +22,17 @@ export interface RoomSummary {
   quickControls: QuickControl[]
 }
 
+/** Scene data required by scene lists and activation controls. */
 export interface Scene {
   id: string
   name: string
   icon?: string | null
 }
 
+/** Target kind accepted by device-control mutations. */
 export type ControlType = 'DEVICE' | 'DEVICE_SET'
 
+/** Flattened device or device-set data returned to the app. */
 export interface Device {
   id: string
   name: string
@@ -60,6 +66,7 @@ export interface Device {
   illuminance: number | null
 }
 
+/** Room details together with its controllable devices. */
 export interface Room {
   id: string
   name: string
@@ -68,11 +75,13 @@ export interface Room {
   devices: Device[]
 }
 
+/** Execute a GraphQL operation and return its typed data payload. */
 export type GraphqlRequest = <T>(
   query: string,
   variables?: Record<string, unknown>
 ) => Promise<T>
 
+/** Control command supported by the app's Dirigera client. */
 export type DeviceCommand =
   | { type: 'setIsOn'; isOn: boolean }
   | { type: 'setLightLevel'; lightLevel: number }
@@ -81,5 +90,6 @@ export type DeviceCommand =
   | { type: 'setPlayback'; playback: Playback }
   | { type: 'setVolume'; volume: number }
 
+/** Playback action accepted by speaker controls. */
 export type Playback =
   'playbackPlaying' | 'playbackPaused' | 'playbackNext' | 'playbackPrevious'

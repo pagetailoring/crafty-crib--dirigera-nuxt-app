@@ -8,7 +8,9 @@ import {
 } from '@@/config/scene-controls'
 import type { Device, DirigeraClient, Scene } from 'dirigera'
 
+/** Report a scene-editing failure with its intended HTTP status code. */
 export class SceneEditError extends Error {
+  /** Create a scene-editing error for a specific client response status. */
   constructor(
     message: string,
     readonly statusCode: number
@@ -17,14 +19,17 @@ export class SceneEditError extends Error {
   }
 }
 
+/** List full scene details from the Dirigera client. */
 export function listSceneDetails(client: DirigeraClient) {
   return client.scenes.list()
 }
 
+/** List devices and device sets together with their scene-editing capabilities. */
 export async function listSceneProducts(
   client: DirigeraClient
 ): Promise<SceneProduct[]> {
   const home = await client.home()
+  /** Summarize capabilities shared by every member of a scene product. */
   function describe(members: Device[]) {
     const capabilities = SCENE_ATTRIBUTES.filter(
       key =>
@@ -112,10 +117,12 @@ export async function listSceneProducts(
   return [...devices, ...sets].sort((a, b) => a.name.localeCompare(b.name))
 }
 
+/** Check whether an unknown value is a non-array object. */
 function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
+/** Validate the runtime structure of a scene update request. */
 export function isSceneUpdateInput(value: unknown): value is SceneUpdateInput {
   if (!isObject(value)) return false
   if (!Array.isArray(value.expectedActions)) return false
@@ -169,6 +176,7 @@ export function isSceneUpdateInput(value: unknown): value is SceneUpdateInput {
   )
 }
 
+/** Apply validated attribute edits while preserving compatible scene state. */
 function applyAttributes(
   original: Scene['actions'][number]['attributes'],
   patch: SceneAttributeEdits,
@@ -233,12 +241,14 @@ function applyAttributes(
   return attributes
 }
 
+/** Serialize stable trigger data while ignoring hub-generated timestamps. */
 function triggerSnapshot(triggers: Scene['triggers']) {
   return JSON.stringify(triggers, (key, value) =>
     key === 'triggeredAt' || key === 'nextTriggerAt' ? undefined : value
   )
 }
 
+/** Validate and persist scene action and schedule changes with conflict detection. */
 export async function updateScene(
   client: DirigeraClient,
   id: string,
