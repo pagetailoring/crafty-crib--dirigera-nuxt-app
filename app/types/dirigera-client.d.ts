@@ -29,9 +29,6 @@ export interface Scene {
   icon?: string | null
 }
 
-/** Target kind accepted by device-control mutations. */
-export type ControlType = 'DEVICE' | 'DEVICE_SET'
-
 /** Flattened device or device-set data returned to the app. */
 export interface Device {
   id: string

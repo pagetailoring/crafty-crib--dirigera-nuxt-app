@@ -10,5 +10,5 @@ export interface GraphqlBody {
 /** GraphQL device-control arguments forwarded to the Dirigera client. */
 export type ControlArguments = {
   id: string
-  type: 'DEVICE' | 'DEVICE_SET'
+  type: ControlType
 } & Partial<Device['attributes']>

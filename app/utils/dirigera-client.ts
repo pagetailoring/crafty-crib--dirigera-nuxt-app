@@ -1,5 +1,4 @@
 import type {
-  ControlType,
   Device,
   DeviceCommand,
   GraphqlRequest,

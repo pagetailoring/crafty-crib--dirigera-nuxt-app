@@ -1,4 +1,3 @@
-import type { DirigeraControlType as ControlType } from '@@/server/types/dirigera-home'
 // Device mappings adapted from lpgera/dirigera-web. See THIRD_PARTY_NOTICES.md.
 import type { Device, DeviceSet, Home } from 'dirigera'
 
