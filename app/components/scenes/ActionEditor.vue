@@ -1,10 +1,5 @@
 <script setup lang="ts">
 import type { Scene } from 'dirigera'
-import type {
-  SceneAttribute,
-  SceneAttributeEdits,
-  SceneProduct,
-} from '#shared/types/scene-editor'
 import {
   SCENE_NUMERIC_CONTROLS,
   SCENE_PLAYBACK_LABELS,

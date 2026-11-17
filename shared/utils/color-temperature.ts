@@ -1,5 +1,3 @@
-import type { ColorTemperatureAttributes } from '#shared/types/color-temperature'
-
 export function getColorTemperatureRange(device: ColorTemperatureAttributes) {
   const bounds = [device.colorTemperatureMin, device.colorTemperatureMax]
   if (

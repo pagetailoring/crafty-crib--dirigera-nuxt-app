@@ -1,10 +1,5 @@
 <script setup lang="ts">
 import type { Scene } from 'dirigera'
-import type {
-  SceneActionEdit,
-  SceneDaysEdit,
-  SceneProduct,
-} from '#shared/types/scene-editor'
 import { WEEKDAYS } from '@@/config/scene'
 import { sceneNumericControl } from '@@/config/scene-controls'
 import type { SceneNumericAttribute } from '@@/config/scene-controls'

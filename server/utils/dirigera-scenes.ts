@@ -1,9 +1,4 @@
 import type { Device, DirigeraClient, Scene } from 'dirigera'
-import type {
-  SceneAttributeEdits,
-  SceneProduct,
-  SceneUpdateInput,
-} from '#shared/types/scene-editor'
 import { WEEKDAYS } from '@@/config/scene'
 import { getColorTemperatureRange } from '#shared/utils/color-temperature'
 import {

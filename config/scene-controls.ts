@@ -1,5 +1,4 @@
 import { getColorTemperatureRange } from '#shared/utils/color-temperature'
-import type { SceneAttribute, SceneProduct } from '#shared/types/scene-editor'
 
 export const SCENE_ATTRIBUTES = [
   'isOn',

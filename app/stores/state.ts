@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia'
 
-import type { DirigeraStatus } from '#shared/types/dirigera-status'
-
 export const useDirigeraStateStore = defineStore('state', () => {
   const status = ref<DirigeraStatus>({ state: 'idle' })
   const pending = ref(false)

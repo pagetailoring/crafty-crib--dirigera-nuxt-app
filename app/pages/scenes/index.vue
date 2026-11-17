@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Scene } from 'dirigera'
-import type { SceneProduct } from '#shared/types/scene-editor'
 
 const sceneDetails = useSceneDetails()
 const scenes = ref<Scene[]>([])
