@@ -1,10 +1,10 @@
-import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import ScenesPage from '~/pages/scenes/index.vue'
 import ScenePage from '~/pages/scenes/[id].vue'
 import DebugPage from '~/pages/scenes/debug.vue'
+import ScenesPage from '~/pages/scenes/index.vue'
 
 const { sceneDetails, dirigera, scene } = vi.hoisted(() => {
   const scene = {

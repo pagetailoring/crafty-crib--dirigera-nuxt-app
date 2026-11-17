@@ -1,4 +1,4 @@
-import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { describe, expect, it, vi } from 'vitest'
 
 import HomePage from '~/pages/index.vue'

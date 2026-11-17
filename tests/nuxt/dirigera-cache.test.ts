@@ -1,10 +1,10 @@
-import { createPinia, setActivePinia } from 'pinia'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
+import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { Device, DeviceCommand, Room } from '~/types/dirigera-client'
-import { useDirigeraCacheStore } from '~/stores/cache'
 import { DIRIGERA_CACHE_TTL_MS } from '@@/config/dirigera-cache'
+import { useDirigeraCacheStore } from '~/stores/cache'
+import type { Device, DeviceCommand, Room } from '~/types/dirigera-client'
 
 const { client } = vi.hoisted(() => ({
   client: {

@@ -1,11 +1,11 @@
-import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { nextTick } from 'vue'
-import { expect, it } from 'vitest'
 import { useNuxtApp } from '#app'
+import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { expect, it } from 'vitest'
+import { nextTick } from 'vue'
 
 import ListMenuLinks from '~/components/rooms/ListMenuLinks.vue'
-import type { RoomSummary } from '~/types/dirigera-client'
 import { useDirigeraCacheStore } from '~/stores/cache'
+import type { RoomSummary } from '~/types/dirigera-client'
 
 const room = (id: string, name: string): RoomSummary => ({
   id,

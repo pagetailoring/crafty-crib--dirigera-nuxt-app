@@ -1,10 +1,10 @@
-import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 
-import DevicesPage from '~/pages/devices.vue'
 import TheHeader from '~/components/TheHeader.vue'
+import DevicesPage from '~/pages/devices.vue'
 
 const { devices } = vi.hoisted(() => ({
   devices: [

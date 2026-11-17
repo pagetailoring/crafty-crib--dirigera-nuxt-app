@@ -1,12 +1,12 @@
-import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
+import { useNuxtApp } from '#app'
+import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
-import { useNuxtApp } from '#app'
-import { useDeviceFiltersStore } from '~/stores/device-filters'
-import { useDirigeraCacheStore } from '~/stores/cache'
-import RoomPage from '~/pages/room/[id].vue'
 import TheHeader from '~/components/TheHeader.vue'
+import RoomPage from '~/pages/room/[id].vue'
+import { useDirigeraCacheStore } from '~/stores/cache'
+import { useDeviceFiltersStore } from '~/stores/device-filters'
 
 const { client, devices, scenes, state } = vi.hoisted(() => ({
   client: {

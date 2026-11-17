@@ -1,5 +1,5 @@
-import { createPinia, setActivePinia } from 'pinia'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
+import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useDirigeraStateStore } from '~/stores/state'
