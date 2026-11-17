@@ -1,5 +1,5 @@
-import type { DeviceAssociations } from '~/types/device-associations'
 import type { Device, Scene } from 'dirigera'
+import type { DeviceAssociations } from '~/types/device-associations'
 import type { NormalizedDevice } from '~/types/normalize-sensors'
 
 function isLinked(first: NormalizedDevice, second: NormalizedDevice) {
@@ -13,6 +13,7 @@ function isLinked(first: NormalizedDevice, second: NormalizedDevice) {
     second.relationId,
     ...(second.sourceIds ?? []),
   ].filter(Boolean) as string[]
+
   return (
     first.remoteLinks?.some(id => secondIds.includes(id)) ||
     second.remoteLinks?.some(id => firstIds.includes(id)) ||

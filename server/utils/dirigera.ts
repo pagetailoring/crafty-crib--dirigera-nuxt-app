@@ -1,9 +1,9 @@
-import { useRuntimeConfig } from 'nitropack/runtime'
-import { createDirigeraClient } from 'dirigera'
 import {
   createDirigeraConnection,
   DirigeraConnectionError,
 } from '@@/server/utils/dirigera-connection'
+import { createDirigeraClient } from 'dirigera'
+import { useRuntimeConfig } from 'nitropack/runtime'
 
 export const dirigeraConnection = createDirigeraConnection(async () => {
   const config = useRuntimeConfig()

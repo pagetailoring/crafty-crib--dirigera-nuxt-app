@@ -1,6 +1,6 @@
-import { defineWebSocketHandler } from 'h3'
 import { dirigeraConnection } from '@@/server/utils/dirigera'
 import { verifyUpdateToken } from '@@/server/utils/dirigera-session'
+import { defineWebSocketHandler } from 'h3'
 
 const subscriptions = new Map<string, () => void>()
 

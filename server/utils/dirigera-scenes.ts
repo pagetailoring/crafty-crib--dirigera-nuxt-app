@@ -1,12 +1,12 @@
-import type { Device, DirigeraClient, Scene } from 'dirigera'
-import { WEEKDAYS } from '@@/config/scene'
 import { getColorTemperatureRange } from '#shared/utils/color-temperature'
+import { WEEKDAYS } from '@@/config/scene'
+import type { SceneNumericAttribute } from '@@/config/scene-controls'
 import {
   SCENE_ATTRIBUTES,
   SCENE_NUMERIC_CONTROLS,
   sceneNumericControl,
 } from '@@/config/scene-controls'
-import type { SceneNumericAttribute } from '@@/config/scene-controls'
+import type { Device, DirigeraClient, Scene } from 'dirigera'
 
 export class SceneEditError extends Error {
   constructor(

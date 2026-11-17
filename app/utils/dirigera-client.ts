@@ -1,12 +1,12 @@
 import type {
-  QuickControlType,
-  RoomSummary,
-  Scene,
   ControlType,
   Device,
-  Room,
-  GraphqlRequest,
   DeviceCommand,
+  GraphqlRequest,
+  QuickControlType,
+  Room,
+  RoomSummary,
+  Scene,
 } from '~/types/dirigera-client'
 
 const roomsQuery = `

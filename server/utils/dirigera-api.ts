@@ -1,11 +1,11 @@
 import type {
-  GraphqlBody,
   ControlArguments,
+  GraphqlBody,
 } from '@@/server/types/dirigera-api'
+import { getDeviceViews, getRoomView } from '@@/server/utils/dirigera-home'
+import { dirigeraSchema } from '@@/server/utils/dirigera-schema'
 import type { DirigeraClient } from 'dirigera'
 import { graphql, GraphQLError } from 'graphql'
-import { dirigeraSchema } from '@@/server/utils/dirigera-schema'
-import { getDeviceViews, getRoomView } from '@@/server/utils/dirigera-home'
 
 export async function executeDirigeraQuery(
   client: DirigeraClient,
@@ -121,6 +121,7 @@ export async function executeDirigeraQuery(
       },
     ])
   )
+
   return graphql({
     schema: dirigeraSchema,
     source: body.query,

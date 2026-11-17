@@ -1,6 +1,6 @@
 import type {
-  EventLike,
   DocumentLike,
+  EventLike,
   WebSocketLike,
 } from '~/types/update-subscription'
 
