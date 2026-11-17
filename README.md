@@ -68,7 +68,7 @@ Nuxt for secure WebSocket URLs.
 
 - The home view loads room and scene summaries through `app/stores/cache.ts`.
   This Pinia store uses `useDirigera()` and the GraphQL client at
-  `app/services/dirigera-client.ts`, with requests sent to
+  `app/utils/dirigera-client.ts`, with requests sent to
   `/api/dirigera/graphql`. It also provides room-detail and artwork loaders,
   request deduplication, freshness checks, and invalidation. Its query data is
   held in memory, without normalized entities or persistence across reloads.
@@ -91,7 +91,7 @@ credentials. The frontend does not connect directly to the hub.
   executes GraphQL locally. It does not proxy another application.
 - Other handlers under `server/api/dirigera/` serve the direct device and scene
   endpoints, hub status, and short-lived update tokens.
-- `server/services/` contains the GraphQL schema, home/device mappings, commands,
+- `server/utils/` contains the GraphQL schema, home/device mappings, commands,
   and the shared hub connection lifecycle.
 - `server/routes/dirigera-updates.ts` sends refresh notifications over Nitro's
   WebSocket support, enabled with `nitro.experimental.websocket` in the Nuxt
