@@ -4,13 +4,13 @@ import type {
   SceneAttribute,
   SceneAttributeEdits,
   SceneProduct,
-} from '../../../shared/types/scene-editor'
+} from '#shared/types/scene-editor'
 import {
   SCENE_NUMERIC_CONTROLS,
   SCENE_PLAYBACK_LABELS,
   sceneNumericControl,
-} from '../../../config/scene-controls'
-import type { SceneNumericAttribute } from '../../../config/scene-controls'
+} from '@@/config/scene-controls'
+import type { SceneNumericAttribute } from '@@/config/scene-controls'
 
 const props = defineProps<{
   name: string

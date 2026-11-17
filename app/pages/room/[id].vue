@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { deviceAssociations } from '../../services/device-associations'
-import { normalizeSensors } from '../../services/normalize-sensors'
+import { deviceAssociations } from '~/utils/device-associations'
+import { normalizeSensors } from '~/utils/normalize-sensors'
 
 const route = useRoute()
 const cache = useDirigeraCacheStore()

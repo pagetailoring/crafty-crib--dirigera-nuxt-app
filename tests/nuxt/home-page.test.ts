@@ -1,7 +1,7 @@
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { describe, expect, it, vi } from 'vitest'
 
-import HomePage from '../../app/pages/index.vue'
+import HomePage from '~/pages/index.vue'
 
 const { client } = vi.hoisted(() => ({
   client: {

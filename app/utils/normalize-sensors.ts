@@ -1,6 +1,5 @@
+import type { NormalizedDevice } from '~/types/normalize-sensors'
 import type { Device } from 'dirigera'
-
-export type NormalizedDevice = Device & { sourceIds?: string[] }
 
 const isSensor = (device: Device) =>
   device.type === 'sensor' ||

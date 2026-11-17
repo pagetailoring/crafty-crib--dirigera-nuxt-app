@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { deviceAssociations } from '../services/device-associations'
-import { normalizeSensors } from '../services/normalize-sensors'
+import { deviceAssociations } from '~/utils/device-associations'
+import { normalizeSensors } from '~/utils/normalize-sensors'
 
 const { data: devices, error } = await useFetch('/api/dirigera/devices')
 const { data: scenes, error: scenesError } = await useFetch(

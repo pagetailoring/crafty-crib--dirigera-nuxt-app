@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getDeviceCategoryFilterItems } from '../../utils/device-categories'
+import { getDeviceCategoryFilterItems } from '~/utils/device-categories'
 
 const filters = useDeviceFiltersStore()
 const { devices, selectedFilters } = storeToRefs(filters)

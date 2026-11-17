@@ -3,8 +3,8 @@ import { flushPromises } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 
-import DevicesPage from '../../app/pages/devices.vue'
-import TheHeader from '../../app/components/TheHeader.vue'
+import DevicesPage from '~/pages/devices.vue'
+import TheHeader from '~/components/TheHeader.vue'
 
 const { devices } = vi.hoisted(() => ({
   devices: [

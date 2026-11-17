@@ -1,11 +1,6 @@
+import type { DeviceAssociations } from '~/types/device-associations'
 import type { Device, Scene } from 'dirigera'
-import type { NormalizedDevice } from './normalize-sensors'
-
-export interface DeviceAssociations {
-  devices: Device[]
-  remotes: Device[]
-  scenes: Scene[]
-}
+import type { NormalizedDevice } from '~/types/normalize-sensors'
 
 function isLinked(first: NormalizedDevice, second: NormalizedDevice) {
   const firstIds = [

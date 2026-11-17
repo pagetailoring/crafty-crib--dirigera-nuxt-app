@@ -1,4 +1,4 @@
-import { createUpdateSubscription } from '../services/update-subscription'
+import { createUpdateSubscription } from '~/utils/update-subscription'
 
 export function useDirigeraUpdates(refresh: () => void) {
   const config = useRuntimeConfig()

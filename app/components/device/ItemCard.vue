@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Device } from 'dirigera'
 import { getIkeaProductIcon, getIkeaSceneIcon } from '@@/config/ikea-icons'
-import type { DeviceAssociations } from '../../services/device-associations'
-import { getDeviceCategory } from '../../utils/device-categories'
+import type { DeviceAssociations } from '~/types/device-associations'
+import { getDeviceCategory } from '~/utils/device-categories'
 
 const { device, associations, scenesAvailable } = defineProps<{
   device: Device

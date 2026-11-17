@@ -3,10 +3,10 @@ import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { useNuxtApp } from '#app'
-import { useDeviceFiltersStore } from '../../app/stores/device-filters'
-import { useDirigeraCacheStore } from '../../app/stores/cache'
-import RoomPage from '../../app/pages/room/[id].vue'
-import TheHeader from '../../app/components/TheHeader.vue'
+import { useDeviceFiltersStore } from '~/stores/device-filters'
+import { useDirigeraCacheStore } from '~/stores/cache'
+import RoomPage from '~/pages/room/[id].vue'
+import TheHeader from '~/components/TheHeader.vue'
 
 const { client, devices, scenes, state } = vi.hoisted(() => ({
   client: {

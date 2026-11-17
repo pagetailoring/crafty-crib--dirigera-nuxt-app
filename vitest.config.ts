@@ -6,6 +6,13 @@ export default defineConfig({
   test: {
     projects: [
       {
+        resolve: {
+          alias: {
+            '~': fileURLToPath(new URL('./app', import.meta.url)),
+            '@@': fileURLToPath(new URL('.', import.meta.url)),
+            '#shared': fileURLToPath(new URL('./shared', import.meta.url)),
+          },
+        },
         test: {
           name: 'unit',
           include: ['tests/unit/*.{test,spec}.ts'],

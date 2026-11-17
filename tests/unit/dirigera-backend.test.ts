@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Device, DirigeraClient, Home } from 'dirigera'
-import { executeDirigeraQuery } from '../../server/services/dirigera-api'
-import { createDirigeraClient } from '../../app/services/dirigera-client'
-import { createDirigeraConnection } from '../../server/services/dirigera-connection'
+import { executeDirigeraQuery } from '@@/server/utils/dirigera-api'
+import { createDirigeraClient } from '~/utils/dirigera-client'
+import { createDirigeraConnection } from '@@/server/utils/dirigera-connection'
 import {
   createUpdateToken,
   verifyUpdateToken,
-} from '../../server/utils/dirigera-session'
+} from '@@/server/utils/dirigera-session'
 
 function fixture() {
   const device = (

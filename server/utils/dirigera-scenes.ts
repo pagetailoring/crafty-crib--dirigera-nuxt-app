@@ -3,15 +3,15 @@ import type {
   SceneAttributeEdits,
   SceneProduct,
   SceneUpdateInput,
-} from '../../shared/types/scene-editor'
-import { WEEKDAYS } from '../../config/scene'
-import { getColorTemperatureRange } from '../../config/color-temperature'
+} from '#shared/types/scene-editor'
+import { WEEKDAYS } from '@@/config/scene'
+import { getColorTemperatureRange } from '#shared/utils/color-temperature'
 import {
   SCENE_ATTRIBUTES,
   SCENE_NUMERIC_CONTROLS,
   sceneNumericControl,
-} from '../../config/scene-controls'
-import type { SceneNumericAttribute } from '../../config/scene-controls'
+} from '@@/config/scene-controls'
+import type { SceneNumericAttribute } from '@@/config/scene-controls'
 
 export class SceneEditError extends Error {
   constructor(

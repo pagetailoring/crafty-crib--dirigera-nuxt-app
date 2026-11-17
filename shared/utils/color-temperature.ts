@@ -1,7 +1,4 @@
-export interface ColorTemperatureAttributes {
-  colorTemperatureMin?: number | null
-  colorTemperatureMax?: number | null
-}
+import type { ColorTemperatureAttributes } from '#shared/types/color-temperature'
 
 export function getColorTemperatureRange(device: ColorTemperatureAttributes) {
   const bounds = [device.colorTemperatureMin, device.colorTemperatureMax]

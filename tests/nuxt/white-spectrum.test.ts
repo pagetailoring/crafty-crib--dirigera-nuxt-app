@@ -1,7 +1,7 @@
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import WhiteSpectrum from '../../app/pages/white-spectrum.vue'
+import WhiteSpectrum from '~/pages/white-spectrum.vue'
 
 const { client, toast } = vi.hoisted(() => ({
   client: { listTemperatureLights: vi.fn(), controlDevice: vi.fn() },

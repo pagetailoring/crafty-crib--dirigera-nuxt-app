@@ -4,13 +4,13 @@ import type {
   SceneActionEdit,
   SceneDaysEdit,
   SceneProduct,
-} from '../../../shared/types/scene-editor'
-import { WEEKDAYS } from '../../../config/scene'
-import { sceneNumericControl } from '../../../config/scene-controls'
-import type { SceneNumericAttribute } from '../../../config/scene-controls'
-import { getIkeaSceneIcon } from '../../../config/ikea-icons'
+} from '#shared/types/scene-editor'
+import { WEEKDAYS } from '@@/config/scene'
+import { sceneNumericControl } from '@@/config/scene-controls'
+import type { SceneNumericAttribute } from '@@/config/scene-controls'
+import { getIkeaSceneIcon } from '@@/config/ikea-icons'
 
-type Trigger = NonNullable<Scene['triggers']>[number]
+import type { Trigger } from '~/types/scene-card'
 
 const props = defineProps<{
   scene: Scene

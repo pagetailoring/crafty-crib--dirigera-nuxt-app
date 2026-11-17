@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Device } from 'dirigera'
-import { getColorTemperatureRange } from '@@/config/color-temperature'
+import { getColorTemperatureRange } from '#shared/utils/color-temperature'
 import { DEVICE_CONTROL_THROTTLE_MS } from '@@/config/device-controls'
 
 const props = defineProps<{ device: Device; disabled?: boolean }>()

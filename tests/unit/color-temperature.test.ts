@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   clampColorTemperature,
   getColorTemperatureRange,
-} from '../../config/color-temperature'
+} from '#shared/utils/color-temperature'
 
 describe('Color temperature ranges', () => {
   it.each([

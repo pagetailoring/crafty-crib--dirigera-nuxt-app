@@ -1,18 +1,9 @@
 <script setup lang="ts" generic="T = boolean">
-import type { SwitchEmits, SwitchProps, SwitchSlots } from '@nuxt/ui'
+import type { SwitchEmits, SwitchSlots } from '@nuxt/ui'
+import type { DeviceSwitchProps } from '~/types/device-switch'
 import { useForwardPropsEmits } from 'reka-ui'
 
-interface Props extends SwitchProps<T> {
-  /**
-   * Custom icon variants for switching devices on and off:
-   * - `light`: lights.
-   * - `power`: other electrical devices.
-   * Omitting the mode preserves the default Nuxt UI switch behavior.
-   */
-  mode?: 'power' | 'light'
-}
-
-const props = defineProps<Props>()
+const props = defineProps<DeviceSwitchProps<T>>()
 const emit = defineEmits<SwitchEmits<T>>()
 const slots = defineSlots<SwitchSlots>()
 defineOptions({ inheritAttrs: false })
@@ -28,7 +19,7 @@ const icons = {
   },
 }
 
-const forwarded = useForwardPropsEmits((): Props => props, emit)
+const forwarded = useForwardPropsEmits((): DeviceSwitchProps<T> => props, emit)
 const switchProps = computed(() => {
   const { mode, ...rest } = forwarded.value
   return { ...(mode ? icons[mode] : {}), ...rest }

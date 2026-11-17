@@ -1,9 +1,8 @@
+import type { DirigeraControlType as ControlType } from '@@/server/types/dirigera-home'
 // Device mappings adapted from lpgera/dirigera-web. See THIRD_PARTY_NOTICES.md.
 import type { Device, DeviceSet, Home } from 'dirigera'
 
-import { getColorTemperatureRange } from '../../config/color-temperature'
-
-type ControlType = 'DEVICE' | 'DEVICE_SET'
+import { getColorTemperatureRange } from '#shared/utils/color-temperature'
 
 export function getAttributeIfCanReceive<T extends keyof Device['attributes']>(
   device: Device,

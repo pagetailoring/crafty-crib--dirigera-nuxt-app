@@ -11,8 +11,8 @@ import {
   isSceneUpdateInput,
   SceneEditError,
   updateScene,
-} from '../../../services/dirigera-scenes'
-import { dirigeraConnection } from '../../../utils/dirigera'
+} from '@@/server/utils/dirigera-scenes'
+import { dirigeraConnection } from '@@/server/utils/dirigera'
 
 export default defineEventHandler(async event => {
   const origin = getHeader(event, 'origin')

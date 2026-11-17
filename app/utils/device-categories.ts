@@ -1,4 +1,4 @@
-import { DEVICE_CATEGORIES } from '../../config/device-categories'
+import { DEVICE_CATEGORIES } from '@@/config/device-categories'
 
 export function getDeviceCategory(type: string) {
   return DEVICE_CATEGORIES.find(category => category.type === type)

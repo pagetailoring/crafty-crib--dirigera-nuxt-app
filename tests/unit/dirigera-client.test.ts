@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { createDirigeraClient } from '../../app/services/dirigera-client'
+import { createDirigeraClient } from '~/utils/dirigera-client'
 
 describe('Dirigera client', () => {
   it('lists rooms with their environment readings and quick controls', async () => {

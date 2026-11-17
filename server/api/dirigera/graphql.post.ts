@@ -1,3 +1,4 @@
+import type { GraphqlBody } from '@@/server/types/dirigera-api'
 import {
   defineEventHandler,
   getHeader,
@@ -6,11 +7,8 @@ import {
   readBody,
   setResponseHeader,
 } from 'h3'
-import {
-  executeDirigeraQuery,
-  type GraphqlBody,
-} from '../../services/dirigera-api'
-import { dirigeraConnection } from '../../utils/dirigera'
+import { executeDirigeraQuery } from '@@/server/utils/dirigera-api'
+import { dirigeraConnection } from '@@/server/utils/dirigera'
 
 export default defineEventHandler(async event => {
   const origin = getHeader(event, 'origin')

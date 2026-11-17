@@ -3,7 +3,7 @@ import { createDirigeraClient } from 'dirigera'
 import {
   createDirigeraConnection,
   DirigeraConnectionError,
-} from '../services/dirigera-connection'
+} from '@@/server/utils/dirigera-connection'
 
 export const dirigeraConnection = createDirigeraConnection(async () => {
   const config = useRuntimeConfig()

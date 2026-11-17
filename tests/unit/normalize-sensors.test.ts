@@ -1,7 +1,7 @@
 import type { Device, Scene } from 'dirigera'
 import { describe, expect, it } from 'vitest'
-import { normalizeSensors } from '../../app/services/normalize-sensors'
-import { deviceAssociations } from '../../app/services/device-associations'
+import { normalizeSensors } from '~/utils/normalize-sensors'
+import { deviceAssociations } from '~/utils/device-associations'
 
 const endpoint = (id: string, overrides: Partial<Device> = {}) =>
   ({

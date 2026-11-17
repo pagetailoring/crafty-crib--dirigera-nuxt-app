@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { createGraphqlRequest } from '../../app/services/graphql-request'
+import { createGraphqlRequest } from '~/utils/graphql-request'
 
 describe('GraphQL request adapter', () => {
   it('returns GraphQL data from the Nuxt server endpoint', async () => {

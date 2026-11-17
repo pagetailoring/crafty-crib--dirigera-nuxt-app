@@ -5,7 +5,7 @@ import {
   listSceneDetails,
   listSceneProducts,
   updateScene,
-} from '../../server/services/dirigera-scenes'
+} from '@@/server/utils/dirigera-scenes'
 
 describe('Dirigera scene details', () => {
   it('returns every scene with its complete hub representation', async () => {

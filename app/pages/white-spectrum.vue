@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Device } from '../services/dirigera-client'
+import type { Device } from '~/types/dirigera-client'
 import {
   clampColorTemperature,
   getColorTemperatureRange,
-} from '../../config/color-temperature'
+} from '#shared/utils/color-temperature'
 
 const dirigera = useDirigera()
 const cache = useDirigeraCacheStore()

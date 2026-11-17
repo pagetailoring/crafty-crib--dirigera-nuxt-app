@@ -2,7 +2,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useDirigeraStateStore } from '../../app/stores/state'
+import { useDirigeraStateStore } from '~/stores/state'
 
 const { fetch } = vi.hoisted(() => ({ fetch: vi.fn() }))
 

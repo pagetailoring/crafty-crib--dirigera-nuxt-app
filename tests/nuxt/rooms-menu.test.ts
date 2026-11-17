@@ -3,9 +3,9 @@ import { nextTick } from 'vue'
 import { expect, it } from 'vitest'
 import { useNuxtApp } from '#app'
 
-import ListMenuLinks from '../../app/components/rooms/ListMenuLinks.vue'
-import type { RoomSummary } from '../../app/services/dirigera-client'
-import { useDirigeraCacheStore } from '../../app/stores/cache'
+import ListMenuLinks from '~/components/rooms/ListMenuLinks.vue'
+import type { RoomSummary } from '~/types/dirigera-client'
+import { useDirigeraCacheStore } from '~/stores/cache'
 
 const room = (id: string, name: string): RoomSummary => ({
   id,

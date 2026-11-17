@@ -1,5 +1,5 @@
 import { defineEventHandler, setResponseHeader } from 'h3'
-import { createUpdateToken } from '../../utils/dirigera-session'
+import { createUpdateToken } from '@@/server/utils/dirigera-session'
 
 export default defineEventHandler(event => {
   setResponseHeader(event, 'Cache-Control', 'no-store')

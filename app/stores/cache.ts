@@ -1,6 +1,7 @@
+import type { CacheEntry, LoadOptions } from '~/types/cache'
 import { defineStore } from 'pinia'
 
-import { DIRIGERA_CACHE_TTL_MS } from '../../config/dirigera-cache'
+import { DIRIGERA_CACHE_TTL_MS } from '@@/config/dirigera-cache'
 import type {
   Device,
   DeviceCommand,
@@ -8,17 +9,7 @@ import type {
   Room,
   RoomSummary,
   Scene,
-} from '../services/dirigera-client'
-
-interface CacheEntry<T> {
-  data: T
-  refreshedAt: number
-  stale: boolean
-}
-
-interface LoadOptions {
-  force?: boolean
-}
+} from '~/types/dirigera-client'
 
 const isFresh = <T>(entry: CacheEntry<T> | undefined, now: number) =>
   entry != null &&

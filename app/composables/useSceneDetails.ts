@@ -1,8 +1,5 @@
 import type { Scene } from 'dirigera'
-import type {
-  SceneProduct,
-  SceneUpdateInput,
-} from '../../shared/types/scene-editor'
+import type { SceneProduct, SceneUpdateInput } from '#shared/types/scene-editor'
 
 export function useSceneDetails() {
   return {

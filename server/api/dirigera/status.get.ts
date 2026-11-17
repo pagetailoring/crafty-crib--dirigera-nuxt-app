@@ -1,5 +1,5 @@
 import { defineEventHandler, setResponseHeader } from 'h3'
-import { dirigeraConnection } from '../../utils/dirigera'
+import { dirigeraConnection } from '@@/server/utils/dirigera'
 
 export default defineEventHandler(async event => {
   setResponseHeader(event, 'Cache-Control', 'no-store')

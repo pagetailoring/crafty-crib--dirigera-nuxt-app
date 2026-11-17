@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getDeviceCategory,
   getDeviceCategoryFilterItems,
-} from '../../app/utils/device-categories'
+} from '~/utils/device-categories'
 
 describe('Device categories', () => {
   it.each([

@@ -1,18 +1,11 @@
-import type { Device, DirigeraClient } from 'dirigera'
+import type {
+  GraphqlBody,
+  ControlArguments,
+} from '@@/server/types/dirigera-api'
+import type { DirigeraClient } from 'dirigera'
 import { graphql, GraphQLError } from 'graphql'
-import { dirigeraSchema } from './dirigera-schema'
-import { getDeviceViews, getRoomView } from './dirigera-home'
-
-export interface GraphqlBody {
-  query: string
-  variables?: Record<string, unknown>
-  operationName?: string
-}
-
-type ControlArguments = {
-  id: string
-  type: 'DEVICE' | 'DEVICE_SET'
-} & Partial<Device['attributes']>
+import { dirigeraSchema } from '@@/server/utils/dirigera-schema'
+import { getDeviceViews, getRoomView } from '@@/server/utils/dirigera-home'
 
 export async function executeDirigeraQuery(
   client: DirigeraClient,

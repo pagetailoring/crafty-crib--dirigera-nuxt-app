@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { createUpdateSubscription } from '../../app/services/update-subscription'
+import { createUpdateSubscription } from '~/utils/update-subscription'
 
 describe('Dirigera update subscription', () => {
   it('refreshes after a socket update and when the page becomes visible', () => {

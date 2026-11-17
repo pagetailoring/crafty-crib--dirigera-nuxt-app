@@ -1,20 +1,8 @@
-interface EventTargetLike {
-  addEventListener(name: string, listener: (event: EventLike) => void): void
-}
-
-interface EventLike {
-  type?: string
-  data?: unknown
-}
-
-interface DocumentLike extends EventTargetLike {
-  hidden: boolean
-  removeEventListener(name: string, listener: () => void): void
-}
-
-interface WebSocketLike extends EventTargetLike {
-  close(): void
-}
+import type {
+  EventLike,
+  DocumentLike,
+  WebSocketLike,
+} from '~/types/update-subscription'
 
 export function createUpdateSubscription({
   url,

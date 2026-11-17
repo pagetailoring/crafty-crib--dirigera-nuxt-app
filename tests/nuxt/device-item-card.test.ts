@@ -3,7 +3,7 @@ import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Device } from 'dirigera'
 import { defineComponent } from 'vue'
-import DeviceItemCard from '../../app/components/device/ItemCard.vue'
+import DeviceItemCard from '~/components/device/ItemCard.vue'
 
 const { controlDevice } = vi.hoisted(() => ({
   controlDevice: vi.fn().mockResolvedValue(undefined),

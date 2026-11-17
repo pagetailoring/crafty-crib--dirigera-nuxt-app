@@ -1,6 +1,6 @@
 import type { Device, Scene } from 'dirigera'
 import { describe, expect, it } from 'vitest'
-import { deviceAssociations } from '../../app/services/device-associations'
+import { deviceAssociations } from '~/utils/device-associations'
 
 const device = (
   id: string,

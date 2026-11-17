@@ -2,7 +2,7 @@ import type { DirigeraClient } from 'dirigera'
 import type {
   DirigeraStatus,
   DirigeraUnavailableReason,
-} from '../../shared/types/dirigera-status'
+} from '#shared/types/dirigera-status'
 
 export class DirigeraConnectionError extends Error {
   readonly statusCode = 503

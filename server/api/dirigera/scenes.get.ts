@@ -1,6 +1,6 @@
 import { createError, defineEventHandler, setResponseHeader } from 'h3'
-import { listSceneDetails } from '../../services/dirigera-scenes'
-import { dirigeraConnection } from '../../utils/dirigera'
+import { listSceneDetails } from '@@/server/utils/dirigera-scenes'
+import { dirigeraConnection } from '@@/server/utils/dirigera'
 
 export default defineEventHandler(async event => {
   setResponseHeader(event, 'Cache-Control', 'no-store')
