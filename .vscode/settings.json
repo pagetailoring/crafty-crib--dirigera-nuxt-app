@@ -6,10 +6,12 @@
   "editor.wordWrap": "on",
   "files.insertFinalNewline": true,
 
-  // Quiet mode
+  // Quiet mode - adhd dx - for adhd dx
   "files.exclude": {
     // Main directories to exclude/include
     ".nuxt": true,
+    ".output": true,
+    ".output": true,
     "dist": true,
     "**/node_modules": true,
     ".eslintcache": true
