@@ -1,10 +1,10 @@
 {
-  "name": "smarter-home-even-with-dirigera--nuxt-app",
+  "name": "crafty-crib--smarter-home-app",
   "version": "0.0.1",
   "author": "pagetailoring",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pagetailoring/smarter-home-even-with-dirigera--nuxt-app"
+    "url": "https://github.com/pagetailoring/crafty-crib--dirigera-nuxt-app"
   },
   "engines": {
     "node": "^26.11.1"
