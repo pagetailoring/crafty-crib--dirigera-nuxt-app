@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getIkeaRoomColor } from '@@/config/ikea-room-colors'
+
 const cache = useDirigeraCacheStore()
 const { rooms, pending } = storeToRefs(cache)
 const activeQuickControlId = ref<string | null>(null)
@@ -37,10 +39,17 @@ async function toggleQuickControl(
     <UCard v-for="room in rooms?.data" :key="room.id">
       <template #header>
         <div class="flex items-center justify-between gap-3">
-          <h2 class="font-semibold">{{ room.name }}</h2>
+          <h2 class="font-semibold">
+            <span>{{ room.name }}</span>
+            <span
+              v-if="getIkeaRoomColor(room.color)"
+              aria-hidden="true"
+              class="inline-block size-2.5 rounded-full align-middle ms-2"
+              :style="{ backgroundColor: getIkeaRoomColor(room.color) }"
+            />
+          </h2>
           <UButton
             :to="`/room/${room.id}`"
-            color="neutral"
             variant="ghost"
             :aria-label="`Open ${room.name}`"
           >

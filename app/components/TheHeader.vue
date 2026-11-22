@@ -1,33 +1,93 @@
 <script setup lang="ts">
-import { APP_NAME } from '../../config/app'
+import { APP_NAME } from '@@/config/app'
+
+const items = [
+  { label: 'White Spectrum', icon: 'i-lucide-palette', to: '/white-spectrum' },
+  { label: 'Scenes', icon: 'i-lucide-sparkles', to: '/scenes' },
+  { label: 'Devices', icon: 'i-lucide-component', to: '/devices' },
+]
+
+const colorMode = useColorMode()
+const colorModeItems = [
+  {
+    label: 'Light / dark mode',
+    icon: 'i-lucide-sun-moon',
+    onSelect() {
+      colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+    },
+  },
+]
 
 const route = useRoute()
 const cache = useDirigeraCacheStore()
-const { roomById } = storeToRefs(cache)
+const { rooms } = storeToRefs(cache)
 
 const activeRoomName = computed(() => {
   if (route.name !== 'room-id') return null
-  return roomById.value[String(route.params.id)]?.data.name ?? 'Room'
+  return (
+    rooms.value?.data.find(room => room.id === String(route.params.id))?.name ??
+    'Room'
+  )
 })
+
+const activePageName = computed(
+  () =>
+    activeRoomName.value ??
+    items.find(item => item.to === route.path)?.label ??
+    null
+)
 </script>
 
 <template>
-  <UHeader mode="drawer">
+  <UHeader
+    mode="drawer"
+    :ui="{
+      toggle: 'lg:inline-flex',
+      content: 'lg:flex',
+      overlay: 'lg:block',
+      right: 'gap-3',
+    }"
+    :toggle="{
+      color: 'primary',
+      variant: 'subtle',
+      size: 'xl',
+      class: 'rounded-full',
+    }"
+  >
     <template #left>
-      <ULink
+      <UButton
         to="/"
-        :aria-label="APP_NAME"
-        class="flex shrink-0 items-end gap-1.5 text-xl font-bold text-highlighted"
-      >
-        {{ APP_NAME }}
-      </ULink>
+        :aria-label="APP_NAME + ' - home page'"
+        class="tracking-widest uppercase font-normal -ml-3"
+        icon="i-lucide-home"
+        :label="APP_NAME"
+        variant="ghost"
+        size="xl"
+      />
 
-      <template v-if="activeRoomName">
-        <UButton to="/" color="neutral" variant="ghost">Back</UButton>
-        <span class="text-xl font-bold text-highlighted">
-          {{ activeRoomName }}
+      <template v-if="activePageName">
+        <UButton
+          to="/"
+          icon="i-lucide-arrow-left"
+          variant="ghost"
+          aria-label="go back to home page"
+        />
+        <span class="">
+          {{ activePageName }}
         </span>
       </template>
+    </template>
+
+    <template #right>
+      <DeviceFilters v-if="route.path === '/devices'" />
+    </template>
+
+    <template #body>
+      <UNavigationMenu :items="items" orientation="vertical" />
+      <USeparator icon="i-lucide-house" />
+      <RoomsListMenuLinks />
+      <USeparator icon="i-lucide-settings-2" />
+      <UNavigationMenu :items="colorModeItems" orientation="vertical" />
     </template>
   </UHeader>
 </template>

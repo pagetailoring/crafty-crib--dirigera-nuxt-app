@@ -42,7 +42,11 @@ useDirigeraUpdates(() => {
   cache.invalidateAll()
   let refresh: Promise<unknown>
   if (route.name === 'room-id') {
-    refresh = cache.loadRoom(String(route.params.id), { force: true })
+    refresh = Promise.all([
+      cache.loadRooms({ force: true }),
+      refreshNuxtData('/api/dirigera/devices'),
+      refreshNuxtData('/api/dirigera/scenes'),
+    ])
   } else {
     refresh = cache.loadHome({ force: true })
   }
@@ -71,12 +75,7 @@ useDirigeraUpdates(() => {
           :description="unavailableMessage"
           class="min-w-64 flex-1"
         />
-        <UButton
-          color="neutral"
-          variant="outline"
-          :loading="statusPending"
-          @click="refreshDirigeraStatus"
-        >
+        <UButton :loading="statusPending" @click="refreshDirigeraStatus">
           Retry
         </UButton>
       </div>

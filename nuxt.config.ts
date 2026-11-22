@@ -1,10 +1,13 @@
 import { APP_NAME } from './config/app'
 
+/**  Build flags */
+const isDevelopment = process.env.NODE_ENV === 'development'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
-    '@nuxt/hints',
+    // '@nuxt/hints',
     '@nuxt/ui',
     '@nuxt/test-utils/module',
 
@@ -21,7 +24,9 @@ export default defineNuxtConfig({
       title: APP_NAME,
     },
   },
-  css: ['~/assets/css/main.css'],
+  css: isDevelopment
+    ? ['~/assets/css/main.css', '~/assets/css/dev.css']
+    : ['~/assets/css/main.css'],
 
   runtimeConfig: {
     dirigeraGatewayIp: '',

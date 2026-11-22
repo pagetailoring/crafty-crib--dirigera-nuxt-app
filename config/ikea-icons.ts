@@ -1,0 +1,149 @@
+import type { Device, Room, Scene } from 'dirigera'
+
+export const IKEA_PRODUCT_ICONS = {
+  lighting_pendant_light: 'i-lucide-lamp-ceiling',
+  lighting_spot_chandelier: 'i-lucide-lamp-ceiling',
+  lighting_wall_lamp: 'i-lucide-lamp-wall-up',
+  placement_door: 'i-lucide-door-open',
+}
+
+export const IKEA_DEVICE_TYPE_ICONS = {
+  airPurifier: 'i-lucide-wind',
+  blinds: 'i-lucide-blinds',
+  environmentSensor: 'i-lucide-thermometer',
+  shortcutController: 'i-lucide-mouse-pointer-click',
+  lightController: 'i-lucide-toggle-left',
+  soundController: 'i-lucide-volume-2',
+  blindsController: 'i-lucide-blinds',
+  genericSwitch: 'i-lucide-toggle-left',
+  gateway: 'i-lucide-router',
+  light: 'i-lucide-lightbulb',
+  lightSensor: 'i-lucide-sun',
+  motionSensor: 'i-lucide-person-standing',
+  occupancySensor: 'i-lucide-person-standing',
+  openCloseSensor: 'i-lucide-door-open',
+  outlet: 'i-lucide-plug',
+  repeater: 'i-lucide-radio-tower',
+  speaker: 'i-lucide-speaker',
+  waterSensor: 'i-lucide-droplets',
+} satisfies Record<Device['deviceType'], string>
+
+export function getIkeaProductIcon(
+  device: Pick<Device, 'customIcon' | 'deviceType'>
+): string {
+  return device.customIcon &&
+    Object.hasOwn(IKEA_PRODUCT_ICONS, device.customIcon)
+    ? IKEA_PRODUCT_ICONS[device.customIcon as keyof typeof IKEA_PRODUCT_ICONS]
+    : (IKEA_DEVICE_TYPE_ICONS[device.deviceType] ??
+        'i-lucide-gamepad-directional')
+}
+
+export const IKEA_ROOM_ICONS = {
+  rooms_arm_chair: 'i-lucide-armchair',
+  rooms_bathtub: 'i-lucide-bath',
+  rooms_bed: 'i-lucide-bed-double',
+  rooms_bedside_table: 'i-lucide-lamp',
+  rooms_bike: 'i-lucide-bike',
+  rooms_book_case: 'i-lucide-library',
+  rooms_box: 'i-lucide-box',
+  rooms_bunk_bed: 'i-lucide-bed',
+  rooms_car: 'i-lucide-car',
+  rooms_chair: 'i-lucide-armchair',
+  rooms_clapper: 'i-lucide-sparkles',
+  rooms_coat_hanger: 'i-lucide-shirt',
+  rooms_coat_rack: 'i-lucide-shirt',
+  rooms_cutlery: 'i-lucide-utensils',
+  rooms_desk: 'i-lucide-pen-tool',
+  rooms_display: 'i-lucide-monitor',
+  rooms_dog: 'i-lucide-rabbit',
+  rooms_door: 'i-lucide-door-open',
+  rooms_drill: 'i-lucide-drill',
+  rooms_fence: 'i-lucide-fence',
+  rooms_fireplace: 'i-lucide-flame',
+  rooms_fish: 'i-lucide-fish',
+  rooms_flower: 'i-lucide-flower',
+  rooms_game_pad: 'i-lucide-gamepad-2',
+  rooms_heart: 'i-lucide-heart',
+  rooms_home: 'i-lucide-house',
+  rooms_hot_drink: 'i-lucide-coffee',
+  rooms_iron: 'i-lucide-shirt',
+  rooms_kitchen: 'i-lucide-cooking-pot',
+  rooms_ladle: 'i-lucide-utensils',
+  rooms_mobile: 'i-lucide-smartphone',
+  rooms_motor_bike: 'i-lucide-bike',
+  rooms_mower: 'i-lucide-sprout',
+  rooms_office_chair: 'i-lucide-armchair',
+  rooms_paper_towels: 'i-lucide-scroll',
+  rooms_parasol: 'i-lucide-umbrella',
+  rooms_play_area: 'i-lucide-blocks',
+  rooms_pool_ladder: 'i-lucide-waves',
+  rooms_pot_plant: 'i-lucide-flower-2',
+  rooms_pot_with_lid: 'i-lucide-cooking-pot',
+  rooms_pram: 'i-lucide-baby',
+  rooms_printer: 'i-lucide-printer',
+  rooms_restroom_baby_care: 'i-lucide-baby',
+  rooms_sewing_machine: 'i-lucide-spool',
+  rooms_shower: 'i-lucide-shower-head',
+  rooms_sideboard: 'i-lucide-archive',
+  rooms_sink: 'i-lucide-droplets',
+  rooms_sofa: 'i-lucide-sofa',
+  rooms_stairway: 'i-lucide-footprints',
+  rooms_strainer: 'i-lucide-cooking-pot',
+  rooms_t_shirt: 'i-lucide-shirt',
+  rooms_teddy: 'i-lucide-toy-brick',
+  rooms_toothbrush: 'i-lucide-brush',
+  rooms_wardrobe: 'i-lucide-door-closed',
+  rooms_washing_machine: 'i-lucide-washing-machine',
+  rooms_weights: 'i-lucide-dumbbell',
+  rooms_wrench: 'i-lucide-wrench',
+} satisfies Record<Room['icon'], string>
+
+export const IKEA_SCENE_ICONS = {
+  scenes_arrive_home: 'i-lucide-log-in',
+  scenes_book: 'i-lucide-book-open',
+  scenes_briefcase: 'i-lucide-briefcase',
+  scenes_brightness_up: 'i-lucide-sun',
+  scenes_broom: 'i-lucide-brush-cleaning',
+  scenes_cake: 'i-lucide-cake',
+  scenes_clapper: 'i-lucide-sparkles',
+  scenes_clean_sparkles: 'i-lucide-mop-sparkles',
+  scenes_cutlery: 'i-lucide-utensils',
+  scenes_disco_ball: 'i-lucide-party-popper',
+  scenes_game_pad: 'i-lucide-gamepad-2',
+  scenes_gift_bag: 'i-lucide-shopping-bag',
+  scenes_gift_box: 'i-lucide-gift',
+  scenes_headphones: 'i-lucide-headphones',
+  scenes_heart: 'i-lucide-heart',
+  scenes_home_filled: 'i-lucide-house',
+  scenes_hot_drink: 'i-lucide-coffee',
+  scenes_ladle: 'i-lucide-utensils',
+  scenes_leaf: 'i-lucide-leaf',
+  scenes_leave_home: 'i-lucide-log-out',
+  scenes_moon: 'i-lucide-moon',
+  scenes_music_note: 'i-lucide-music',
+  scenes_painting: 'i-lucide-image',
+  scenes_popcorn: 'i-lucide-popcorn',
+  scenes_pot_with_lid: 'i-lucide-cooking-pot',
+  scenes_speaker_generic: 'i-lucide-speaker',
+  scenes_spray_bottle: 'i-lucide-spray-can',
+  scenes_suitcase: 'i-lucide-luggage',
+  scenes_suitcase_2: 'i-lucide-luggage',
+  scenes_sun_horizon: 'i-lucide-sunset',
+  scenes_tree: 'i-lucide-tree-pine',
+  scenes_trophy: 'i-lucide-trophy',
+  scenes_wake_up: 'i-lucide-alarm-clock',
+  scenes_weights: 'i-lucide-dumbbell',
+  scenes_yoga: 'i-lucide-person-standing',
+} satisfies Record<Scene['info']['icon'], string>
+
+export function getIkeaRoomIcon(name?: string | null): string {
+  return name && Object.hasOwn(IKEA_ROOM_ICONS, name)
+    ? IKEA_ROOM_ICONS[name as keyof typeof IKEA_ROOM_ICONS]
+    : 'i-lucide-house'
+}
+
+export function getIkeaSceneIcon(name?: string | null): string {
+  return name && Object.hasOwn(IKEA_SCENE_ICONS, name)
+    ? IKEA_SCENE_ICONS[name as keyof typeof IKEA_SCENE_ICONS]
+    : 'i-lucide-sparkles'
+}

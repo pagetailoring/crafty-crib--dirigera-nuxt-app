@@ -1,39 +1,30 @@
 <script setup lang="ts">
-import type { Device } from '../../services/dirigera-client'
+import { deviceAssociations } from '../../services/device-associations'
+import { normalizeSensors } from '../../services/normalize-sensors'
 
 const route = useRoute()
 const cache = useDirigeraCacheStore()
-const { roomById, pending } = storeToRefs(cache)
+const { rooms } = storeToRefs(cache)
 const roomId = computed(() => String(route.params.id))
-const room = computed(() => roomById.value[roomId.value]?.data ?? null)
-const error = ref<Error | null>(null)
+const room = computed(() =>
+  rooms.value?.data.find(room => room.id === roomId.value)
+)
+const { data: devices, error } = await useFetch('/api/dirigera/devices')
+const { data: scenes, error: scenesError } = await useFetch(
+  '/api/dirigera/scenes'
+)
+const roomsError = ref<Error | null>(null)
 
 try {
-  await cache.loadRoom(roomId.value)
+  await cache.loadRooms()
 } catch (cause) {
-  error.value = cause instanceof Error ? cause : new Error(String(cause))
+  roomsError.value = cause instanceof Error ? cause : new Error(String(cause))
 }
 
-const format = (value: number) => Math.round(value * 100) / 100
-
-const readings = (device: Device) =>
-  [
-    device.batteryPercentage == null
-      ? null
-      : `Battery ${device.batteryPercentage}%`,
-    device.isOpen == null ? null : device.isOpen ? 'Open' : 'Closed',
-    device.temperature == null
-      ? null
-      : `Temperature ${format(device.temperature)}°C`,
-    device.humidity == null ? null : `Humidity ${format(device.humidity)}%`,
-    device.pm25 == null ? null : `PM2.5 ${device.pm25} μg/m³`,
-    device.vocIndex == null ? null : `VOC index ${device.vocIndex}`,
-    device.co2 == null ? null : `CO2 ${device.co2} ppm`,
-    device.isDetected == null
-      ? null
-      : `Motion detected ${device.isDetected ? 'yes' : 'no'}`,
-    device.illuminance == null ? null : `Illuminance ${device.illuminance} lx`,
-  ].filter((reading): reading is string => reading !== null)
+const normalizedDevices = computed(() => normalizeSensors(devices.value ?? []))
+const roomDevices = computed(() =>
+  normalizedDevices.value.filter(device => device.room?.id === roomId.value)
+)
 </script>
 
 <template>
@@ -41,40 +32,30 @@ const readings = (device: Device) =>
     <h1 class="sr-only">{{ room?.name || 'Room' }}</h1>
 
     <UAlert
-      v-if="error"
+      v-if="error || roomsError"
       color="error"
       title="Unable to load the room"
-      :description="error.message"
+      :description="(error || roomsError)?.message"
     />
-
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <UCard v-for="device in room?.devices" :key="device.id">
-        <template #header>
-          <div class="flex items-center justify-between gap-3">
-            <h2 class="font-semibold">{{ device.name }}</h2>
-            <UBadge v-if="!device.isReachable" color="warning" variant="subtle">
-              Unreachable. Last seen
-              {{ new Date(device.lastSeen).toLocaleString() }}
-            </UBadge>
-          </div>
-        </template>
-
-        <DeviceControls :device="device" class="mb-4" />
-
-        <dl class="space-y-2 text-sm">
-          <div v-for="reading in readings(device)" :key="reading">
-            {{ reading }}
-          </div>
-        </dl>
-      </UCard>
-
-      <UCard v-if="pending[`room:${roomId}`]">
-        <USkeleton class="h-32" />
-      </UCard>
-    </div>
-
     <UAlert
-      v-if="room && room.devices.length === 0"
+      v-if="devices && scenesError"
+      color="warning"
+      title="Unable to load scene links"
+      :description="scenesError.message"
+    />
+    <UPageColumns v-if="devices">
+      <DeviceItemCard
+        v-for="device in roomDevices"
+        :key="device.id"
+        :device
+        :associations="
+          deviceAssociations(device, normalizedDevices, scenes ?? [])
+        "
+        :scenes-available="scenes != null"
+      />
+    </UPageColumns>
+    <UAlert
+      v-if="devices && roomDevices.length === 0"
       color="neutral"
       title="No devices"
     />

@@ -42,6 +42,8 @@ describe('Home page', () => {
     expect(wrapper.text()).toContain('PM2.5 3')
     expect(wrapper.text()).toContain('VOC 98')
     expect(wrapper.text()).toContain('CO2 612')
+    expect(wrapper.get('a[href="/devices"]').text()).toContain('Devices')
+    expect(wrapper.get('a[href="/scenes"]').text()).toContain('Scenes')
   })
 
   it('activates a scene from its button', async () => {

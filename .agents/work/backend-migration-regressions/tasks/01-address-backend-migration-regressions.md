@@ -1,7 +1,7 @@
 ---
 createdAt: 2026-10-13
-editedAt: 2026-10-13T18:43:48
-lastReviewed: 2026-10-13
+editedAt: 2026-11-15T13:23:47
+lastReviewed: 2026-11-15
 status: open
 type: task
 assignee: null
@@ -13,6 +13,19 @@ triage: ready-for-agent
 # Address integrated backend migration regressions
 
 **Status:** ready-for-agent
+
+## Current status
+
+This task is partially implemented at target commit `4005c9f`. The application
+now exposes `/api/dirigera/status`, probes the hub before reporting `ready`, and
+keeps failed connection initialization retryable. Those changes cover the
+readiness and recovery part of the task.
+
+The remaining work is still open. Root resolver failures are converted to one
+safe message, but the original cause is discarded and no structured operation
+category is reported. Resolver types are still handwritten, no reproducible
+schema-derived generation command exists, and the trusted-LAN access model is
+unchanged.
 
 ## Problem Statement
 
@@ -184,7 +197,7 @@ The migration assessment classified the gaps as follows:
 | No explicit compression or 30-day static cache rule            | Unproven performance gap                                                                                    | Runtime behavior must be measured before treating this as a regression.                          |
 
 The source comparison is recorded in
-[Dirigera backend migration coverage](../../../research/backend-migration-coverage.md).
+[Dirigera backend migration coverage](../../../research/prototype-development/backend-migration-coverage.md).
 
 ## Dependencies
 
@@ -192,7 +205,7 @@ The source comparison is recorded in
 
 ## Design
 
-- [Dirigera backend migration coverage](../../../research/backend-migration-coverage.md)
+- [Dirigera backend migration coverage](../../../research/prototype-development/backend-migration-coverage.md)
 
 ## Resolution
 

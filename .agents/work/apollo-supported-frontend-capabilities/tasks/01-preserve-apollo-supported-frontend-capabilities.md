@@ -1,7 +1,7 @@
 ---
 createdAt: 2026-10-13
-editedAt: 2026-10-13T19:45:08
-lastReviewed: 2026-10-13
+editedAt: 2026-11-15T13:23:47
+lastReviewed: 2026-11-15
 status: open
 type: task
 assignee: null
@@ -14,15 +14,30 @@ triage: ready-for-agent
 
 **Status:** ready-for-agent
 
+## Current status
+
+This task remains open at target commit `4005c9f`. The home view still uses the
+shared Pinia cache, but newer room, device, scene, and white-spectrum views also
+load raw Nitro endpoints with `useFetch`. The cache remains query-shaped,
+non-normalized, and non-persistent. Authentication consumption, centralized
+GraphQL error classification, cache-and-network artwork behavior, and
+schema-derived operation types are still missing.
+
+The former `DeviceControls.vue` component was removed. The current
+`device/LightControls.vue` covers power and four light sliders, while the
+current device card only displays playback and volume values. It does not
+provide the former playback, volume, or artwork controls. Treat the capability
+inventory below as the parity target, not as a description of current delivery.
+
 ## Problem Statement
 
 The reference frontend used Apollo Client as more than a GraphQL request
 function. Apollo provided shared query state, normalized and persistent caching,
 query and mutation lifecycle state, transport configuration, centralized error
 handling, authentication-header injection, and explicit refetch controls. The
-Nuxt frontend preserves the domain operations through a small `$fetch` client
-and `useAsyncData`, but it does not preserve every behavior that surrounded
-those operations.
+Nuxt frontend preserves the domain operations through a mixture of a small
+GraphQL client, a Pinia cache, and direct Nitro endpoints, but it does not
+preserve every behavior that surrounded those operations.
 
 Without an explicit capability inventory, maintainers can incorrectly treat
 "the GraphQL calls still work" as complete Apollo parity. They also risk
@@ -268,7 +283,7 @@ invalid-authentication reaction cross the Apollo client boundary.
 
 ## Design
 
-- [Frontend migration coverage](../../../research/frontend-migration-coverage.md)
+- [Frontend migration coverage](../../../research/prototype-development/frontend-migration-coverage.md)
 
 ## Resolution
 
